@@ -1,0 +1,28 @@
+{
+    "name" : "quiqqer/search",
+    "type" : "quiqqer-library",
+    "description" : "Extra Search - provided extra Search functionality. Not the standard search. Search Package provieded an extra API and support MATCH searches.",
+
+    "version" : "dev-master",
+
+    "authors" : [{
+        "name": "Henning Leutz",
+        "email": "leutz@pcsg.de",
+        "homepage": "http://www.pcsg.de",
+        "role": "Developer"
+    }],
+
+    "support" : {
+        "email" : "support@pcsg.de"
+    },
+
+    "require": {
+        "quiqqer/quiqqer" : "*"
+    },
+
+    "autoload": {
+        "psr-0" : {
+            "QUI" : "lib/"
+        }
+    }
+}
