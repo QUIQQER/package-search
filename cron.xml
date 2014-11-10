@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<crons>
+
+    <cron exec="\QUI\Tags\Cron::createCache">
+
+        <title>Tag Cache aufbauen</title>
+        <description>Beschreibung des Cron</description>
+
+        <!-- available params -->
+        <params>
+            <param name="project">
+                <locale group="" value="" />
+            </param>
+            <param name="lang">
+                <locale group="" value="" />
+            </param>
+        </params>
+    </cron>
+
+</crons>
