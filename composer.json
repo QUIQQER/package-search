@@ -3,7 +3,7 @@
     "type" : "quiqqer-library",
     "description" : "Extra Search - provided extra Search functionality. Not the standard search. Search Package provieded an extra API and support MATCH searches.",
 
-    "version" : "dev-master",
+    "version" : "dev-dev",
 
     "authors" : [{
         "name": "Henning Leutz",
@@ -17,7 +17,7 @@
     },
 
     "require": {
-        "quiqqer/quiqqer" : "*"
+        "quiqqer/quiqqer" : "*@dev"
     },
 
     "autoload": {
