@@ -7,6 +7,12 @@
 namespace QUI;
 
 use QUI\Projects\Project;
+use QUI\Projects\Site;
+use QUI\Projects\Site\Edit as SiteEdit;
+use QUI\System\Log;
+
+use QUI\Search\Fulltext;
+use QUI\Search\Quicksearch;
 
 /**
  * Hauptsuche
@@ -27,16 +33,40 @@ class Search
     const tableSearchFull = 'searchFull';
 
     /**
+     * Create the fulltext search table for the Project
+     * Exceutes events and insert the standard
      *
      * @param \QUI\Projects\Project $Project
      */
     public function createFulltextSearch(Project $Project)
     {
-        $list = $Project->getSitesIds();
+        $list     = $Project->getSitesIds();
+        $Fulltext = new Fulltext();
 
-        foreach ( $list as $id ) {
+        $Fulltext->clearSearchTable( $Project );
 
+        foreach ( $list as $siteParams )
+        {
+            try
+            {
+                $siteId = (int)$siteParams['id'];
+                $Site   = new SiteEdit( $Project, (int)$siteId );
+
+                $Fulltext->addEntry($Project, $siteId, array(
+                    'name'  => $Site->getAttribute('name'),
+                    'title' => $Site->getAttribute('title'),
+                    'short' => $Site->getAttribute('short'),
+                    'data'  => $Site->getAttribute('content')
+                ));
+
+            } catch ( \QUI\Exception $Exception )
+            {
+                Log::writeException( $Exception );
+            }
         }
+
+
+        $Fulltext->search( 'bank' , $Project );
     }
 
     /**

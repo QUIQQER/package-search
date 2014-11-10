@@ -4,6 +4,7 @@
     <projects>
         <table name="searchQuick" no-auto-update="1" no-site-reference="1">
             <field type="bigint(11)">id</field>
+            <field type="bigint(11)">siteId</field>
             <field type="TEXT">urlParameter</field>
             <field type="TEXT">data</field>
             <field type="TEXT">rights</field>
@@ -11,16 +12,22 @@
 
         <table name="searchFull" no-auto-update="1" no-site-reference="1">
             <field type="bigint(11)">id</field>
+            <field type="bigint(11)">siteId</field>
             <field type="TEXT">urlParameter</field>
             <field type="VARCHAR(256)">name</field>
             <field type="VARCHAR(256)">title</field>
             <field type="TEXT">short</field>
             <field type="TEXT">data</field>
-            <field type="TEXT">short</field>
+            <field type="TEXT">rights</field>
             <field type="VARCHAR(128)">datatype</field>
 
+            <auto_increment>id</auto_increment>
             <primary>id</primary>
             <fulltext>data</fulltext>
+            <fulltext>short</fulltext>
+            <index>siteId</index>
+            <index>name</index>
+            <index>title</index>
         </table>
     </projects>
 
