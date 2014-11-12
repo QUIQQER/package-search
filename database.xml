@@ -23,8 +23,10 @@
 
             <auto_increment>id</auto_increment>
             <primary>id</primary>
+
             <fulltext>data</fulltext>
             <fulltext>short</fulltext>
+
             <index>siteId</index>
             <index>name</index>
             <index>title</index>

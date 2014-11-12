@@ -1,0 +1,110 @@
+@CHARSET "UTF-8";
+
+.form-field-search {
+    float: left;
+    margin-right: 10px;
+}
+
+.qui-search-result form {
+    float: left;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/** result entry
+ * =================================================== */
+
+.qui-search-result-list-entry {
+    background: rgb( 255,255,255 );
+    background: rgba( 255,255,255, 0.7 );
+    border: 1px solid #D0D3D3;
+    border-radius: 3px;
+    clear: both;
+    float: left;
+    margin-top: 10px;
+    padding: 10px 20px 30px 20px;
+    width: 100%;
+
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
+@media screen and (max-width: 767px) {
+    .qui-search-result-list-entry {
+        background: none;
+        border: none;
+        border-radius: none;
+        border-bottom: 1px solid #D0D3D3;
+        padding: 10px 10px 30px 10px;
+    }
+}
+
+.qui-search-result-list-entry h2 {
+    float: left;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.qui-search-result-list-entry-date {
+    color: #527686;
+    float: right;
+    font-size: 10px;
+    margin: 0 0 20px;
+    text-align: right;
+}
+
+
+.qui-search-result-list-entry-imagelink {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: 1px solid #EEEEEE;
+    float: left;
+    height: 100px;
+    padding-left: 0;
+}
+
+.qui-search-result-list-entry-imagelink span {
+    display: none;
+}
+
+.qui-search-result-list-entry-image {
+    margin: 0;
+    padding: 0;
+}
+
+.qui-search-result-list-entry-short {
+    width: 77%;
+}
+
+/** result entry data
+ * =================================================== */
+
+.qui-search-result-list-entry-data {
+    clear: both;
+}
+
+.qui-search-result-list-entry-data .qui-button {
+    float: right;
+}
+
+.qui-search-entry-data-relevance {
+    border-right: 1px solid #D0D3D3;
+    float: right;
+    line-height: 32px;
+    margin-right: 10px;
+    padding-right: 10px;
+}
+
+.qui-search-entry-data-relevance .fa-star {
+    color: #dddddd;
+}
+
+.qui-search-entry-data-relevance-display {
+    margin-right: 10px;
+}
+
+.qui-search-entry-data-relevance-active {
+    color: #42a9d7 !important;
+}

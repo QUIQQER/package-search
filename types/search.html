@@ -1,0 +1,111 @@
+
+
+<div itemscope itemtype="http://schema.org/ItemList">
+    {if $Template->getAttribute('content-header')}
+    <section class="content-header grid-100 mobile-grid-100">
+        <header>
+            <h1>{$Site->getAttribute('title')}</h1>
+        </header>
+
+        {if $Site->getAttribute('short')}
+        <div class="content-short">
+            {$Site->getAttribute('short')}
+        </div>
+        {/if}
+    </section>
+    {/if}
+
+    {if $Template->getAttribute('content-body') && $Site->getAttribute('content')}
+    <section class="content-body grid-100 mobile-grid-100">
+        {$Site->getAttribute('content')}
+    </section>
+    {/if}
+
+
+    <section class="content-template grid-100 mobile-grid-100 qui-search-result">
+
+        <form action="{url site=$Site}" method="GET">
+            <input type="text" name="search"
+                value="{$searchValue}"
+                class="form-field-search"
+                placeholder="{t}quiqqer/search tpl.search.placeholder{/t}"
+            />
+
+            <input type="submit"
+                value="{t}quiqqer/search tpl.search.button{/t}"
+                class="qui-button"
+            />
+        </form>
+
+        {if empty($children)}
+            <div class="qui-search-result-list-message">
+                {locale group="quiqqer/search" value="tpl.search.no.results"}
+            </div>
+        {else}
+            {if $sheets}
+                {control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets search=$searchValue}
+            {/if}
+
+            {foreach from=$children item=Child}
+            {assign var=Child value=$Child->load()}
+
+                <article class="qui-search-result-list-entry">
+
+                    <h2>
+                        <a href="{$Child->getAttribute('search-url')}"
+                           title="{$Child->getAttribute('search-title')|escape:"html"}"
+                        >
+                            <span>{$Child->getAttribute('search-title')}</span>
+                        </a>
+                    </h2>
+
+                    <div class="qui-search-result-list-entry-content grid-100 mobile-grid-100 grid-parent">
+                        {assign var=bg value=""}
+                        {if $Child->getAttribute('image_site')}
+                            {image src=$Child->getAttribute('image_site') width="300" type="resize" onlysrc=1 assign=bg}
+                        {/if}
+
+                        <a href="{$Child->getAttribute('search-url')}"
+                           title="{$Child->getAttribute('search-title')|escape:"html"}"
+                           class="qui-search-result-list-entry-imagelink grid-25 hide-on-mobile content-image-placeholder"
+                           {if $bg}style="background-image: url('{$bg}')"{/if}
+                        >
+                            <span>{$Child->getAttribute('search-title')}</span>
+                        </a>
+
+                        <div class="qui-search-result-list-entry-short grid-75 mobile-grid-100">
+                            {$Child->getAttribute('search-short')}
+                        </div>
+                    </div>
+
+                    <div class="qui-search-result-list-entry-data grid-100 mobile-grid-100 grid-parent">
+
+                        <a href="{$Child->getAttribute('search-url')}" class="qui-button">
+                            {locale group="quiqqer/search" value="tpl.search.list.more"}
+                        </a>
+
+                        <div class="qui-search-entry-data-relevance">
+                            <span class="qui-search-entry-data-relevance-display">
+                                {locale group="quiqqer/search" value="tpl.search.relevance"}
+                                {$Child->getAttribute('search-relevance')}
+                            </span>
+
+                            {assign var=rel value=$Child->getAttribute('search-relevance')}
+                            <span class="fa fa-star{if $rel >= 1} qui-search-entry-data-relevance-active{/if}"></span>
+                            <span class="fa fa-star{if $rel >= 2} qui-search-entry-data-relevance-active{/if}"></span>
+                            <span class="fa fa-star{if $rel >= 3} qui-search-entry-data-relevance-active{/if}"></span>
+                            <span class="fa fa-star{if $rel >= 4} qui-search-entry-data-relevance-active{/if}"></span>
+                            <span class="fa fa-star{if $rel >= 5} qui-search-entry-data-relevance-active{/if}"></span>
+                        </div>
+                    </div>
+                </article>
+            {/foreach}
+
+            {if $sheets}
+                {control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets search=$searchValue}
+            {/if}
+        {/if}
+
+    </section>
+
+</div>

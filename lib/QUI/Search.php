@@ -40,7 +40,10 @@ class Search
      */
     public function createFulltextSearch(Project $Project)
     {
-        $list     = $Project->getSitesIds();
+        $list = $Project->getSitesIds(array(
+            'active'  => 1
+        ));
+
         $Fulltext = new Fulltext();
 
         $Fulltext->clearSearchTable( $Project );
@@ -51,6 +54,15 @@ class Search
             {
                 $siteId = (int)$siteParams['id'];
                 $Site   = new SiteEdit( $Project, (int)$siteId );
+
+                if ( !$Site->getAttribute('active') ) {
+                    continue;
+                }
+
+                if ( $Site->getAttribute('deleted') ) {
+                    continue;
+                }
+
 
                 $Fulltext->addEntry($Project, $siteId, array(
                     'name'  => $Site->getAttribute('name'),

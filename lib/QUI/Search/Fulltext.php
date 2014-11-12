@@ -27,36 +27,74 @@ class Fulltext
      *
      * @param Strng $str
      * @param Project $Project
-     * @return Array
+     * @param Array $params - Query params
+     * 		$params['limit'] = default: 10
+     * @return Array array(
+     * 		'list'   => array list of results
+     * 		'count'  => count of results
+     * )
      */
-    public function search($str, Project $Project)
+    public function search($str, Project $Project, $params=array())
     {
         $PDO   = \QUI::getPDO();
         $table = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
 
+        if ( !is_array( $params ) ) {
+            $params = array();
+        }
+
+        if ( !isset( $params['limit'] ) ) {
+            $params['limit'] = 10;
+        }
+
+        $search = $str.'*';
+        $limit  = \QUI\Database\DB::createQueryLimit( $params['limit'] );
+
         $query = "
             SELECT
                 *,
-                MATCH (name) AGAINST (:search IN BOOLEAN MODE) AS nameRel,
-                MATCH (title) AGAINST (:search IN BOOLEAN MODE) AS titleRel,
-                MATCH (short) AGAINST (:search IN BOOLEAN MODE) AS shortRel,
-                MATCH (data) AGAINST (:search IN BOOLEAN MODE) AS dataRel
+                MATCH(name)  AGAINST (:search IN BOOLEAN MODE) * 1.3 +
+                MATCH(title) AGAINST (:search IN BOOLEAN MODE) * 1.4 +
+                MATCH(short) AGAINST (:search IN BOOLEAN MODE) * 1.2 +
+                MATCH(data)  AGAINST (:search IN BOOLEAN MODE) * 1.1 AS relevance
             FROM
                 {$table}
             WHERE
                 MATCH (name,title,short,data) AGAINST (:search IN BOOLEAN MODE)
+            GROUP BY
+                siteId
             ORDER BY
-                nameRel + titleRel + shortRel + dataRel DESC
+                relevance DESC
         ";
 
-        $Statement = $PDO->prepare( $query );
-        $Statement->bindValue( ':search', $str, \PDO::PARAM_STR );
+        $selectQuery = "{$query} {$limit['limit']}";
+
+        $countQuery = "
+            SELECT COUNT(*) as count
+            FROM ({$query}) as T
+        ";
+
+        // search
+        $Statement = $PDO->prepare( $selectQuery );
+        $Statement->bindValue( ':search', $search, \PDO::PARAM_STR );
+        $Statement->bindValue( ':limit1', $limit['prepare'][':limit1'][0], \PDO::PARAM_INT );
+        $Statement->bindValue( ':limit2', $limit['prepare'][':limit2'][0], \PDO::PARAM_INT );
         $Statement->execute();
 
         $result = $Statement->fetchAll( \PDO::FETCH_ASSOC );
 
+        // count
+        $Statement = $PDO->prepare( $countQuery );
+        $Statement->bindValue( ':search', $search, \PDO::PARAM_STR );
+        $Statement->execute();
 
-        return $result;
+        $count = $Statement->fetchAll( \PDO::FETCH_ASSOC );
+
+
+        return array(
+            'list'   => $result,
+            'count'  => $count[ 0 ]['count']
+        );
     }
 
     /**
