@@ -34,7 +34,7 @@ class Search
 
     /**
      * Create the fulltext search table for the Project
-     * Exceutes events and insert the standard
+     * Excecutes events and insert the standard
      *
      * @param \QUI\Projects\Project $Project
      */
@@ -76,17 +76,52 @@ class Search
                 Log::writeException( $Exception );
             }
         }
-
-
-        $Fulltext->search( 'bank' , $Project );
     }
 
     /**
+     * Create the quicksearch search table for the Project
+     * Excecutes events and insert the standard
      *
      * @param \QUI\Projects\Project $Project
      */
     public function createQuickSearch(Project $Project)
     {
+        $list = $Project->getSitesIds(array(
+            'active'  => 1
+        ));
 
+        $Quicksearch = new Quicksearch();
+
+        $Quicksearch->clearSearchTable( $Project );
+
+        foreach ( $list as $siteParams )
+        {
+            try
+            {
+                $siteId = (int)$siteParams['id'];
+                $Site   = new SiteEdit( $Project, (int)$siteId );
+
+                if ( !$Site->getAttribute('active') ) {
+                    continue;
+                }
+
+                if ( $Site->getAttribute('deleted') ) {
+                    continue;
+                }
+
+
+                $Quicksearch->addEntry($Project, $siteId, array(
+                    'data'  => $Site->getAttribute('name')
+                ));
+
+                $Quicksearch->addEntry($Project, $siteId, array(
+                    'data'  => $Site->getAttribute('title')
+                ));
+
+            } catch ( \QUI\Exception $Exception )
+            {
+                Log::writeException( $Exception );
+            }
+        }
     }
 }

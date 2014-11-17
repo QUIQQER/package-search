@@ -8,6 +8,8 @@
             <field type="TEXT">urlParameter</field>
             <field type="TEXT">data</field>
             <field type="TEXT">rights</field>
+
+            <auto_increment>id</auto_increment>
         </table>
 
         <table name="searchFull" no-auto-update="1" no-site-reference="1">
@@ -22,7 +24,6 @@
             <field type="VARCHAR(128)">datatype</field>
 
             <auto_increment>id</auto_increment>
-            <primary>id</primary>
 
             <fulltext>data</fulltext>
             <fulltext>short</fulltext>

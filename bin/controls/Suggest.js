@@ -102,7 +102,8 @@ define([
             this.$binds.push( Node );
 
             Node.set({
-                list : this.getDataList().get( 'id' )
+                list : this.getDataList().get( 'id' ),
+                autocomplete : "off"
             });
 
             Node.addEvents({
@@ -167,6 +168,8 @@ define([
                 return;
             }
 
+            this.getDataList().set( 'html', '' );
+
             this.$timer = (function()
             {
                 self.$lastSearch = Elm.value;
@@ -183,7 +186,8 @@ define([
                     for ( var i = 0, len = list.length; i < len; i++ )
                     {
                         new Element('option', {
-                            value : list[ i ].title
+                            value : list[ i ].data
+                            // label : ""
                         }).inject( DataList );
                     }
                 });
@@ -208,6 +212,5 @@ define([
                 search    : search
             });
         }
-
     });
 });

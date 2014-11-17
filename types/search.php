@@ -8,7 +8,7 @@ $children = array();
 $sheets   = 0;
 
 if ( !$max ) {
-    $max = 2;
+    $max = 10;
 }
 
 if ( isset( $_REQUEST[ 'sheet' ] ) ) {

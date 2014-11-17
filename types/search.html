@@ -42,7 +42,7 @@
                 {locale group="quiqqer/search" value="tpl.search.no.results"}
             </div>
         {else}
-            {if $sheets}
+            {if $sheets > 1}
                 {control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets search=$searchValue}
             {/if}
 
@@ -99,10 +99,15 @@
                             <span class="fa fa-star{if $rel >= 5} qui-search-entry-data-relevance-active{/if}"></span>
                         </div>
                     </div>
+
+                    <div class="qui-search-result-list-entry-url">
+                        {$Child->getUrlRewrited()}
+                    </div>
+
                 </article>
             {/foreach}
 
-            {if $sheets}
+            {if $sheets > 1}
                 {control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets search=$searchValue}
             {/if}
         {/if}
