@@ -11,6 +11,30 @@
     width: 100%;
 }
 
+/** settings
+ * =================================================== */
+
+.qui-search-settings {
+    clear: both;
+    margin-top: 20px;
+    float: left;
+    width: 100%;
+}
+
+.qui-search-settings label {
+    clear: both;
+    color: #21536f;
+    cursor: pointer;
+    float: left;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.qui-search-settings input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+
 /** result entry
  * =================================================== */
 
@@ -85,6 +109,7 @@
 .qui-search-result-list-entry-short {
     width: 77%;
 }
+
 
 /** result entry data
  * =================================================== */

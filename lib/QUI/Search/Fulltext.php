@@ -8,7 +8,9 @@ namespace QUI\Search;
 
 use QUI\Search;
 use QUI\Projects\Project;
-
+use QUI\Projects\Site;
+use QUI\Projects\Site\Edit as SiteEdit;
+use QUI\System\Log;
 use QUI\Utils\Security\Orthos;
 
 /**
@@ -16,8 +18,24 @@ use QUI\Utils\Security\Orthos;
  *
  * @author www.pcsg.de (Henning Leutz)
  */
-class Fulltext
+class Fulltext extends \QUI\QDOM
 {
+    /**
+     * Constructor
+     * @param Array $params
+     */
+    public function __construct($params=array())
+    {
+        // defaults
+        $this->setAttributes(array(
+            'Project' => false,
+            'limit'   => 10,
+            'fields'  => false
+        ));
+
+        $this->setAttributes( $params );
+    }
+
     /**
      * Search
      */
@@ -25,30 +43,34 @@ class Fulltext
     /**
      * Search something in a project
      *
-     * @param Strng $str
-     * @param Project $Project
-     * @param Array $params - Query params
-     * 		$params['limit'] = default: 10
+     * @param String $str
      * @return Array array(
      * 		'list'   => array list of results
      * 		'count'  => count of results
      * )
      */
-    public function search($str, Project $Project, $params=array())
+    public function search($str)
     {
+        $Project    = $this->getAttribute( 'Project' );
+        $attrLimit  = $this->getAttribute( 'limit' );
+        $attrFields = $this->getAttribute( 'fields' );
+
+        if ( !$Project || get_class( $Project ) !== 'QUI\Projects\Project' ) {
+            $Project = \QUI::getProjectManager()->get();
+        }
+
+        if ( !$attrLimit || is_integer( $attrLimit ) ) {
+            $attrLimit = 10;
+        }
+
+
+
+
         $PDO   = \QUI::getPDO();
         $table = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
 
-        if ( !is_array( $params ) ) {
-            $params = array();
-        }
-
-        if ( !isset( $params['limit'] ) ) {
-            $params['limit'] = 10;
-        }
-
         $search = $str.'*';
-        $limit  = \QUI\Database\DB::createQueryLimit( $params['limit'] );
+        $limit  = \QUI\Database\DB::createQueryLimit( $attrLimit );
 
         $query = "
             SELECT
@@ -112,7 +134,7 @@ class Fulltext
     public static function addEntry(Project $Project, $siteId, $params=array(), $siteParams=array())
     {
         $table  = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
-        $fields = array( 'name', 'title', 'short', 'data' );
+        $fields = self::getFieldList();
 
         $data = array(
             'siteId' => (int)$siteId
@@ -121,11 +143,13 @@ class Fulltext
         // data
         foreach ( $fields as $entry )
         {
-            if ( !isset( $params[ $entry ] ) ) {
+            $field = $entry['field'];
+
+            if ( !isset( $params[ $field ] ) ) {
                 continue;
             }
 
-            $data[ $entry ] = $params[ $entry ];
+            $data[ $field ] = $params[ $field ];
         }
 
         // site params
@@ -159,4 +183,127 @@ class Fulltext
         );
     }
 
+    /**
+     * event : onSearchFulltextCreation
+     *
+     * @param Fulltext $Fulltext
+     * @param Project $Project
+     */
+    public static function onSearchFulltextCreation(Fulltext $Fulltext, Project $Project)
+    {
+        $list = $Project->getSitesIds(array(
+            'active'  => 1
+        ));
+
+        foreach ( $list as $siteParams )
+        {
+            try
+            {
+                $siteId = (int)$siteParams['id'];
+                $Site   = new SiteEdit( $Project, (int)$siteId );
+
+                if ( !$Site->getAttribute('active') ) {
+                    continue;
+                }
+
+                if ( $Site->getAttribute('deleted') ) {
+                    continue;
+                }
+
+
+                $Fulltext->addEntry($Project, $siteId, array(
+                    'name'  => $Site->getAttribute('name'),
+                    'title' => $Site->getAttribute('title'),
+                    'short' => $Site->getAttribute('short'),
+                    'data'  => $Site->getAttribute('content')
+                ));
+
+            } catch ( \QUI\Exception $Exception )
+            {
+                Log::writeException( $Exception );
+            }
+        }
+    }
+
+    /**
+     * Utils
+     */
+
+    /**
+     * Return the search fields
+     *
+     * @return Array
+     */
+    public static function getFieldList()
+    {
+        $cache = 'quiqqer/search/fieldList';
+
+        try
+        {
+            return \QUI\Cache\Manager::get( $cache );
+
+        } catch ( \QUI\Exception $Exception )
+        {
+
+        }
+
+        $result = array();
+        $files  = self::getSearchXmlList();
+
+        foreach ( $files as $file )
+        {
+            $Dom = \QUI\Utils\XML::getDomFromXml( $file );
+            $Path = new \DOMXPath( $Dom );
+
+            $fields = $Path->query( "//quiqqer/search/searchfields/field" );
+
+            foreach ( $fields as $Field )
+            {
+                $result[] = array(
+                    'field'    => trim( $Field->nodeValue ),
+                    'type'     => $Field->getAttribute( 'type' ),
+                    'fulltext' => $Field->getAttribute( 'fulltext' ) ? true : false
+                );
+            }
+        }
+
+        \QUI\Cache\Manager::set( $cache, $result );
+
+        return $result;
+    }
+
+    /**
+     * Return the plugins with a search.xml file
+     *
+     * @return Array
+     */
+    public static function getSearchXmlList()
+    {
+        $cache = 'quiqqer/search/xmlList';
+
+        try
+        {
+            return \QUI\Cache\Manager::get( $cache );
+
+        } catch ( \QUI\Exception $Exception )
+        {
+
+        }
+
+        $packages = \QUI::getPackageManager()->getInstalled();
+        $result   = array();
+
+        foreach ( $packages as $package )
+        {
+            $xmlFile = OPT_DIR . $package['name'] .'/search.xml';
+
+            if ( file_exists( $xmlFile ) ) {
+                $result[] = $xmlFile;
+            }
+        }
+
+        \QUI\Cache\Manager::set( $cache, $result );
+
+        return $result;
+    }
 }

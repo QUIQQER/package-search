@@ -19,15 +19,24 @@ if ( isset( $_REQUEST[ 'search' ] ) ) {
     $searchValue = \QUI\Utils\Security\Orthos::clear( $_REQUEST[ 'search' ] );
 }
 
-
 // search
 if ( !empty( $searchValue ) )
 {
-    $Fulltext = new \QUI\Search\Fulltext();
+    $fields = array();
 
-    $result = $Fulltext->search( $searchValue, $Project, array(
-        'limit' => $start .','. $max
-    ) );
+    if ( isset( $_REQUEST['searchIn'] ) && is_array( $_REQUEST['searchIn'] ) )
+    {
+        foreach ( $_REQUEST['searchIn'] as $field ) {
+            $fields[] = \QUI\Utils\Security\Orthos::clear( $field );
+        }
+    }
+
+    $Fulltext = new \QUI\Search\Fulltext(array(
+        'limit'  => $start .','. $max,
+        'fields' => $fields
+    ));
+
+    $result = $Fulltext->search( $searchValue );
 
     foreach ( $result['list'] as $entry )
     {

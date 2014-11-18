@@ -40,42 +40,13 @@ class Search
      */
     public function createFulltextSearch(Project $Project)
     {
-        $list = $Project->getSitesIds(array(
-            'active'  => 1
-        ));
-
         $Fulltext = new Fulltext();
+        $Fulltext->clearSearchTable( $Project ); // @todo muss raus
 
-        $Fulltext->clearSearchTable( $Project );
-
-        foreach ( $list as $siteParams )
-        {
-            try
-            {
-                $siteId = (int)$siteParams['id'];
-                $Site   = new SiteEdit( $Project, (int)$siteId );
-
-                if ( !$Site->getAttribute('active') ) {
-                    continue;
-                }
-
-                if ( $Site->getAttribute('deleted') ) {
-                    continue;
-                }
-
-
-                $Fulltext->addEntry($Project, $siteId, array(
-                    'name'  => $Site->getAttribute('name'),
-                    'title' => $Site->getAttribute('title'),
-                    'short' => $Site->getAttribute('short'),
-                    'data'  => $Site->getAttribute('content')
-                ));
-
-            } catch ( \QUI\Exception $Exception )
-            {
-                Log::writeException( $Exception );
-            }
-        }
+        \QUI::getEvents()->fireEvent(
+            'searchFulltextCreation',
+            array( $Fulltext, $Project )
+        );
     }
 
     /**
@@ -84,14 +55,13 @@ class Search
      *
      * @param \QUI\Projects\Project $Project
      */
-    public function createQuickSearch(Project $Project)
+    public function createQuicksearch(Project $Project)
     {
         $list = $Project->getSitesIds(array(
             'active'  => 1
         ));
 
         $Quicksearch = new Quicksearch();
-
         $Quicksearch->clearSearchTable( $Project );
 
         foreach ( $list as $siteParams )
@@ -121,6 +91,61 @@ class Search
             } catch ( \QUI\Exception $Exception )
             {
                 Log::writeException( $Exception );
+            }
+        }
+
+        \QUI::getEvents()->fireEvent(
+            'searchQuicksearchCreation',
+            array( $Fulltext, $Project )
+        );
+    }
+
+    /**
+     * Setup, create the extra fields
+     */
+    public static function setup()
+    {
+        $Table    = \QUI::getDataBase()->Table();
+        $Manager  = \QUI::getProjectManager();
+        $projects = $Manager->getProjects( true );
+
+        $fieldList = \QUI\Search\Fulltext::getFieldList();
+        $fields    = array();
+        $fulltext  = array();
+        $index     = array();
+
+        foreach ( $fieldList as $fieldEntry )
+        {
+            $fields[ $fieldEntry['field'] ] = $fieldEntry['type'];
+
+            if ( $fieldEntry['fulltext'] )
+            {
+                $fulltext[] = $fieldEntry['field'];
+            } else
+            {
+                $index[] = $fieldEntry['field'];
+            }
+        }
+
+        foreach ( $projects as $_Project )
+        {
+            $name  = $_Project->getName();
+            $langs = $_Project->getAttribute('langs');
+
+            foreach ( $langs as $lang )
+            {
+                $Project = $Manager->getProject( $name, $lang );
+                $table   = \QUI::getDBProjectTableName( 'searchFull', $Project );
+
+                $Table->appendFields( $table, $fields );
+
+                foreach ( $fulltext as $field ) {
+                    $Table->setFulltext( $table, $field );
+                }
+
+                foreach ( $index as $field ) {
+                    $Table->setIndex( $table, $field );
+                }
             }
         }
     }

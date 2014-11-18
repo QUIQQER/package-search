@@ -15,7 +15,7 @@ Features
 
 - Suggest-Search Elemente
 - Eine Relevanzsuche
-- API für externe Plugins, damit extra Daten durchsucht werden können
+- API für externe Plugins, damit extra Daten durchsucht werden können (XML Events + Schnittstelle)
 - 404 Suchseite - Falls ein Benutzer auf eine nicht existierende Seite gelangt, wird eine Suche als Hilfe angezeigt
 - Cron, damit die Suche in Intervallen aufgebaut wird
 

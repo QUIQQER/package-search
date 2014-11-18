@@ -36,6 +36,6 @@ class Cron
         $Search = new Search();
 
         $Search->createFulltextSearch( $Project );
-        $Search->createQuickSearch( $Project );
+        $Search->createQuicksearch( $Project );
     }
 }

@@ -28,9 +28,9 @@ define([
         ],
 
         options : {
-            name : 'search',
+            name        : 'search',
             placeholder : 'Search...',
-            delay : 300
+            delay       : 300
         },
 
         initialize : function(options)

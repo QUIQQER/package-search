@@ -29,12 +29,39 @@
                 value="{$searchValue}"
                 class="form-field-search"
                 placeholder="{t}quiqqer/search tpl.search.placeholder{/t}"
+                required="required"
             />
 
             <input type="submit"
                 value="{t}quiqqer/search tpl.search.button{/t}"
                 class="qui-button"
             />
+
+
+            <div class="qui-search-settings" style="display: none">
+                <label>
+                    <input type="checkbox" name="searchIn[]" value="name" />
+                    Im Namen suchen.
+                </label>
+
+                <label>
+                    <input type="checkbox" name="searchIn[]" value="title" />
+                    Im Titel suchen.
+                </label>
+
+                <label>
+                    <input type="checkbox" name="searchIn[]" value="short" />
+                    In der Kurzbeschreibung suchen.
+                </label>
+
+                <label>
+                    <input type="checkbox" name="searchIn[]" value="data" />
+                    Im Inhalt suchen.
+                </label>
+
+                <!-- plugins -->
+            </div>
+
         </form>
 
         {if empty($children)}

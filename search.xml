@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiqqer>
+
+    <search>
+        <searchfields>
+            <field type="varchar(256)">name</field>
+            <field type="varchar(256)">title</field>
+            <field type="text" fulltext="1">short</field>
+            <field type="text" fulltext="1">data</field>
+        </searchfields>
+    </search>
+
+</quiqqer>
