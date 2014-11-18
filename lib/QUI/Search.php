@@ -44,7 +44,7 @@ class Search
         $Fulltext->clearSearchTable( $Project ); // @todo muss raus
 
         \QUI::getEvents()->fireEvent(
-            'searchFulltextCreation',
+            'searchFulltextCreate',
             array( $Fulltext, $Project )
         );
     }
@@ -79,13 +79,9 @@ class Search
                     continue;
                 }
 
-
-                $Quicksearch->addEntry($Project, $siteId, array(
-                    'data'  => $Site->getAttribute('name')
-                ));
-
-                $Quicksearch->addEntry($Project, $siteId, array(
-                    'data'  => $Site->getAttribute('title')
+                $Quicksearch->setEntries($Project, $siteId, array(
+                    $Site->getAttribute('name'),
+                    $Site->getAttribute('title')
                 ));
 
             } catch ( \QUI\Exception $Exception )
@@ -95,8 +91,8 @@ class Search
         }
 
         \QUI::getEvents()->fireEvent(
-            'searchQuicksearchCreation',
-            array( $Fulltext, $Project )
+            'searchQuicksearchCreate',
+            array( $Quicksearch, $Project )
         );
     }
 
@@ -135,7 +131,11 @@ class Search
             foreach ( $langs as $lang )
             {
                 $Project = $Manager->getProject( $name, $lang );
-                $table   = \QUI::getDBProjectTableName( 'searchFull', $Project );
+
+                $table = \QUI::getDBProjectTableName(
+                    self::tableSearchFull,
+                    $Project
+                );
 
                 $Table->appendFields( $table, $fields );
 
@@ -148,5 +148,76 @@ class Search
                 }
             }
         }
+    }
+
+    /**
+     * Events
+     */
+
+    /**
+     * event : on site deactivate
+     *
+     * @param \QUI\Projects\Site $Site
+     */
+    public static function onSiteDeactivate($Site)
+    {
+        /* @param $Site \QUI\Projects\Project\Site */
+        $Project = $Site->getProject();
+
+        $tableSearchFull = \QUI::getDBProjectTableName(
+            self::tableSearchFull,
+            $Project
+        );
+
+        $tableQuicksearch = \QUI::getDBProjectTableName(
+            self::tableSearchQuick,
+            $Project
+        );
+
+        // remove entries from tables
+        \QUI::getDataBase()->delete($tableSearchFull, array(
+            'siteId' => $Site->getId()
+        ));
+
+        \QUI::getDataBase()->delete($tableQuicksearch, array(
+            'siteId' => $Site->getId()
+        ));
+    }
+
+    /**
+     * event : on site activate / change
+     *
+     * @param \QUI\Projects\Site $Site
+     */
+    public static function onSiteChange($Site)
+    {
+        if ( !$Site->getAttribute('active') ) {
+            return;
+        }
+
+        if ( $Site->getAttribute('deleted') ) {
+            return;
+        }
+
+
+        /* @param $Site \QUI\Projects\Project\Site */
+        $Project = $Site->getProject();
+
+        $Quicksearch = new Quicksearch();
+        $Fulltext    = new Fulltext();
+
+        // Fulltext
+        $Fulltext->setEntry($Project, $Site->getId(), array(
+            'name'  => $Site->getAttribute('name'),
+            'title' => $Site->getAttribute('title'),
+            'short' => $Site->getAttribute('short'),
+            'data'  => $Site->getAttribute('content')
+        ));
+
+        // Quicksearch
+        $Quicksearch->setEntries($Project, $Site->getId(), array(
+            $Site->getAttribute('name'),
+            $Site->getAttribute('title')
+        ));
     }
 }

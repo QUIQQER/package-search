@@ -3,11 +3,11 @@
 /**
  * This file contains \QUI\Search\Quicksearch
  */
+
 namespace QUI\Search;
 
 use QUI\Search;
 use QUI\Projects\Project;
-
 use QUI\Utils\Security\Orthos;
 
 /**
@@ -46,7 +46,7 @@ class Quicksearch
             $params['limit'] = 10;
         }
 
-        $search = $str.'%';
+        $search = '%'.$str.'%';
         $limit  = \QUI\Database\DB::createQueryLimit( $params['limit'] );
 
         $groupedBy = 'GROUP BY data';
@@ -106,37 +106,36 @@ class Quicksearch
      */
 
     /**
-     * Add an entry to the fulltext search table
+     * Add entries to the quicksearch search table
+     * Removes similar entries, with same siteId and siteParams
      *
      * @param Project $Project
      * @param Integer $siteId
-     * @param Array $params
+     * @param Array $data - data array -> every array entry is a data entry
      * @param Array $siteParams - optional; Parameter for the site link
      */
-    public static function addEntry(Project $Project, $siteId, $params=array(), $siteParams=array())
+    public static function setEntries(Project $Project, $siteId, $data=array(), $siteParams=array())
     {
         $table  = \QUI::getDBProjectTableName( Search::tableSearchQuick, $Project );
-        $fields = array( 'data' );
+        $siteId = (int)$siteId;
 
-        $data = array(
-            'siteId' => (int)$siteId
-        );
-
-        // data
-        foreach ( $fields as $entry )
-        {
-            if ( !isset( $params[ $entry ] ) ) {
-                continue;
-            }
-
-            $data[ $entry ] = $params[ $entry ];
+        if ( !$siteId ) {
+            return;
         }
+
+        if ( empty( $data ) ) {
+            return;
+        }
+
+        // clear the entries
+        self::removeEntries( $Project, $siteId );
+
+        // url params
+        $siteUrlParams = array();
 
         // site params
         if ( is_array( $siteParams ) && !empty( $siteParams ) )
         {
-            $siteUrlParams = array();
-
             foreach ( $siteParams as $value => $value )
             {
                 $param = Orthos::clear( $param );
@@ -144,11 +143,112 @@ class Quicksearch
 
                 $siteUrlParams[ $param ] = $value;
             }
-
-            $data['urlParameter'] = json_encode( $siteUrlParams );
         }
 
-        \QUI::getDataBase()->insert( $table, $data );
+        $urlParameter = json_encode( $siteUrlParams );
+
+        // data
+        foreach ( $data as $dataEntry )
+        {
+            \QUI::getDataBase()->insert($table, array(
+                'siteId'       => $siteId,
+                'urlParameter' => $urlParameter,
+                'data'         => Orthos::clear( $dataEntry )
+            ));
+        }
+
+
+        \QUI::getEvents()->fireEvent(
+            'searchQuicksearchSetEntry',
+            array( $Project, $siteId, $siteParams )
+        );
+    }
+
+    /**
+     * Add an entry to the quicksearch search table
+     *
+     * @param Project $Project
+     * @param Integer $siteId
+     * @param String $data
+     * @param Array $siteParams
+     */
+    public static function addEntry(Project $Project, $siteId, $data, $siteParams=array())
+    {
+        $table  = \QUI::getDBProjectTableName( Search::tableSearchQuick, $Project );
+        $siteId = (int)$siteId;
+
+        if ( !$siteId ) {
+            return;
+        }
+
+        if ( empty( $data ) ) {
+            return;
+        }
+
+        $urlParameter = json_encode( $siteUrlParams );
+
+
+        \QUI::getDataBase()->insert($table, array(
+            'siteId'       => $siteId,
+            'urlParameter' => $urlParameter,
+            'data'         => Orthos::clear( $data )
+        ));
+    }
+
+    /**
+     * Remove an search entry
+     *
+     * @param Project $Project
+     * @param Integer $siteId
+     * @param Array $siteParams
+     */
+    public static function removeEntries(Project $Project, $siteId, $siteParams=array())
+    {
+        $table  = \QUI::getDBProjectTableName( Search::tableSearchQuick, $Project );
+        $siteId = (int)$siteId;
+
+        if ( !$siteId ) {
+            return;
+        }
+
+        \QUI::getDataBase()->delete($table, array(
+            'siteId'       => $siteId,
+            'urlParameter' => json_encode( $siteParams )
+        ));
+    }
+
+    /**
+     * Return an fulltext entry
+     *
+     * @param Project $Project
+     * @param Integer $siteId
+     * @param Array $siteParams
+     */
+    public static function getEntry(Project $Project, $siteId, $siteParams=array())
+    {
+        $table = \QUI::getDBProjectTableName(
+            Search::tableSearchQuick,
+            $Project
+        );
+
+        $urlParameter = json_encode( $siteParams );
+
+        $result = \QUI::getDataBase()->fetch(array(
+            'from'  => $table,
+            'where' => array(
+                'siteId'       => (int)$siteId,
+                'urlParameter' => $urlParameter
+            )
+        ));
+
+        if ( !isset( $result[ 0 ] ) )
+        {
+            throw new \QUI\Exception(
+                'Quicksearch entry not exists'
+            );
+        }
+
+        return $result[ 0 ];
     }
 
     /**

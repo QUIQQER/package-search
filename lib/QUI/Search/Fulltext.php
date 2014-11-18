@@ -28,9 +28,10 @@ class Fulltext extends \QUI\QDOM
     {
         // defaults
         $this->setAttributes(array(
-            'Project' => false,
-            'limit'   => 10,
-            'fields'  => false
+            'Project'    => false,
+            'limit'      => 10,
+            'fields'     => false,
+            'searchtype' => 'OR'
         ));
 
         $this->setAttributes( $params );
@@ -63,14 +64,29 @@ class Fulltext extends \QUI\QDOM
             $attrLimit = 10;
         }
 
+        // search string
+        $strParts = explode(' ', $str );
 
+        foreach ( $strParts as $key => $part ) {
+            $strParts[ $key ] = $part .'*';
+        }
+
+        switch ( $this->getAttribute('searchtype') )
+        {
+            case 'AND':
+            case 'and':
+                $search = '+'. implode( ' +', $strParts );
+            break;
+
+            default:
+                $search = implode( ' ', $strParts );
+            break;
+        }
 
 
         $PDO   = \QUI::getPDO();
         $table = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
-
-        $search = $str.'*';
-        $limit  = \QUI\Database\DB::createQueryLimit( $attrLimit );
+        $limit = \QUI\Database\DB::createQueryLimit( $attrLimit );
 
         $query = "
             SELECT
@@ -124,21 +140,55 @@ class Fulltext extends \QUI\QDOM
      */
 
     /**
-     * Add an entry to the fulltext search table
+     * Add or set an entry to the fulltext search table
      *
      * @param Project $Project
      * @param Integer $siteId
      * @param Array $params
      * @param Array $siteParams - optional; Parameter for the site link
      */
-    public static function addEntry(Project $Project, $siteId, $params=array(), $siteParams=array())
+    public static function setEntry(Project $Project, $siteId, $params=array(), $siteParams=array())
     {
         $table  = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
         $fields = self::getFieldList();
 
-        $data = array(
-            'siteId' => (int)$siteId
-        );
+        $urlParameter = json_encode( $siteParams );
+        $siteId       = (int)$siteId;
+
+        try
+        {
+            $data = self::getEntry( $Project, $siteId, $siteParams );
+
+            unset( $data['siteId'] );
+            unset( $data['urlParameter'] );
+
+        } catch ( \QUI\Exception $Exception )
+        {
+            $siteUrlParams = array();
+
+            // site params
+            if ( is_array( $siteParams ) && !empty( $siteParams ) )
+            {
+                foreach ( $siteParams as $urlKey => $urlValue )
+                {
+                    $urlValue = Orthos::clear( $urlValue );
+                    $urlKey   = Orthos::clear( $urlKey );
+
+                    $siteUrlParams[ $urlKey ] = $urlValue;
+                }
+            }
+
+            $urlParameter = json_encode( $siteUrlParams );
+
+
+            \QUI::getDataBase()->insert($table, array(
+                'siteId'       => (int)$siteId,
+                'urlParameter' => $urlParameter
+            ));
+
+            $data = array();
+        }
+
 
         // data
         foreach ( $fields as $entry )
@@ -152,23 +202,76 @@ class Fulltext extends \QUI\QDOM
             $data[ $field ] = $params[ $field ];
         }
 
-        // site params
-        if ( is_array( $siteParams ) && !empty( $siteParams ) )
+
+        \QUI::getDataBase()->update($table, $data, array(
+            'siteId'       => (int)$siteId,
+            'urlParameter' => $urlParameter
+        ));
+
+
+        \QUI::getEvents()->fireEvent(
+            'searchFulltextSetEntry',
+            array( $Project, $siteId, $siteParams )
+        );
+
+    }
+
+    /**
+     * Append the data field of an specific search entry
+     *
+     * @param Project $Project
+     * @param Integer $siteId
+     * @param String $data
+     * @param Array $siteParams
+     */
+    public static function appendDataEntry(Project $Project, $siteId, $data='', $siteParams=array())
+    {
+        $entry   = self::getEntry($Project, $siteId, $siteParams);
+        $content = $entry['data'];
+
+        $content      = $content .' '. $data;
+        $urlParameter = json_encode( $siteParams );
+
+        \QUI::getDataBase()->update($table, array(
+            'data' => $content
+        ), array(
+            'siteId'       => (int)$siteId,
+            'urlParameter' => $urlParameter
+        ));
+    }
+
+    /**
+     * Return an fulltext entry
+     *
+     * @param Project $Project
+     * @param Integer $siteId
+     * @param Array $siteParams
+     */
+    public static function getEntry(Project $Project, $siteId, $siteParams=array())
+    {
+        $table = \QUI::getDBProjectTableName(
+            Search::tableSearchFull,
+            $Project
+        );
+
+        $urlParameter = json_encode( $siteParams );
+
+        $result = \QUI::getDataBase()->fetch(array(
+            'from'  => $table,
+            'where' => array(
+                'siteId'       => (int)$siteId,
+                'urlParameter' => $urlParameter
+            )
+        ));
+
+        if ( !isset( $result[ 0 ] ) )
         {
-            $siteUrlParams = array();
-
-            foreach ( $siteParams as $value => $value )
-            {
-                $param = Orthos::clear( $param );
-                $value = Orthos::clear( $value );
-
-                $siteUrlParams[ $param ] = $value;
-            }
-
-            $data['urlParameter'] = json_encode( $siteUrlParams );
+            throw new \QUI\Exception(
+                'Search entry not exists'
+            );
         }
 
-        \QUI::getDataBase()->insert( $table, $data );
+        return $result[ 0 ];
     }
 
     /**
@@ -189,7 +292,7 @@ class Fulltext extends \QUI\QDOM
      * @param Fulltext $Fulltext
      * @param Project $Project
      */
-    public static function onSearchFulltextCreation(Fulltext $Fulltext, Project $Project)
+    public static function onSearchFulltextCreate(Fulltext $Fulltext, Project $Project)
     {
         $list = $Project->getSitesIds(array(
             'active'  => 1
@@ -211,7 +314,7 @@ class Fulltext extends \QUI\QDOM
                 }
 
 
-                $Fulltext->addEntry($Project, $siteId, array(
+                $Fulltext->setEntry($Project, $siteId, array(
                     'name'  => $Site->getAttribute('name'),
                     'title' => $Site->getAttribute('title'),
                     'short' => $Site->getAttribute('short'),
