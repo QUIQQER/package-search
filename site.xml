@@ -13,6 +13,7 @@
             <!-- list attributes -->
             <attributes>
                 <attribute>quiqqer.settings.search.list.max</attribute>
+                <attribute>quiqqer.settings.search.list.hideSettings</attribute>
             </attributes>
 
             <!-- list settings -->
@@ -26,6 +27,12 @@
                         <input conf="quiqqer.settings.search.list.max" type="number">
                             <text>
                                 <locale group="quiqqer/search" var="quiqqer.search.list.settings.max" />
+                            </text>
+                        </input>
+
+                        <input conf="quiqqer.settings.search.list.hideSettings" type="checkbox">
+                            <text>
+                                <locale group="quiqqer/search" var="quiqqer.search.list.hideSettings" />
                             </text>
                         </input>
                     </settings>

@@ -14,6 +14,27 @@
     <!-- php locale -->
     <groups name="quiqqer/search" datatype="php">
 
+        <!-- types -->
+        <locale name="admin.types.search">
+            <de><![CDATA[Erweiterte Suche]]></de>
+            <en><![CDATA[Extended search]]></en>
+        </locale>
+
+        <!-- search settings -->
+        <locale name="quiqqer.search.list.settings.title">
+            <de><![CDATA[Such-Einstellungen]]></de>
+            <en><![CDATA[Search settings]]></en>
+        </locale>
+        <locale name="quiqqer.search.list.settings.max">
+            <de><![CDATA[Maximale Anzahl Ergebnisse pro Seite.]]></de>
+            <en><![CDATA[Maximum number of results per page.]]></en>
+        </locale>
+        <locale name="quiqqer.search.list.hideSettings">
+            <de><![CDATA[Erweiterte Einstellungen nicht anzeigen.]]></de>
+            <en><![CDATA[Dont show the extra settings.]]></en>
+        </locale>
+
+
         <!-- search template -->
         <locale name="tpl.search.button">
             <de><![CDATA[Suche starten]]></de>
@@ -70,8 +91,6 @@
             <de><![CDATA[Im Inhalt suchen.]]></de>
             <en><![CDATA[Search in the content]]></en>
         </locale>
-
-
     </groups>
 
 </locales>
