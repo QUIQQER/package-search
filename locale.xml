@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<locales>
+
+    <!-- javascript locale -->
+    <groups name="quiqqer/search" datatype="js">
+
+    </groups>
+
+    <!-- php + javascript locale -->
+    <groups name="quiqqer/search" datatype="php,js">
+
+    </groups>
+
+    <!-- php locale -->
+    <groups name="quiqqer/search" datatype="php">
+
+        <!-- search template -->
+        <locale name="tpl.search.button">
+            <de><![CDATA[Suche starten]]></de>
+            <en><![CDATA[Start search]]></en>
+        </locale>
+        <locale name="tpl.search.placeholder">
+            <de><![CDATA[Bitte hier Ihre Suche eingeben...]]></de>
+            <en><![CDATA[Please insert your search here...]]></en>
+        </locale>
+        <locale name="tpl.search.list.more">
+            <de><![CDATA[mehr]]></de>
+            <en><![CDATA[more]]></en>
+        </locale>
+        <locale name="tpl.search.relevance">
+            <de><![CDATA[Relevanz:]]></de>
+            <en><![CDATA[Relevance:]]></en>
+        </locale>
+
+
+
+    </groups>
+
+</locales>

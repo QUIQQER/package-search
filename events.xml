@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<events>
+    <event on="onSiteDeactivate" fire="\QUI\Search::onSiteDeactivate" />
+    <event on="onSearchFulltextCreate" fire="\QUI\Search\Fulltext::onSearchFulltextCreate" />
+
+    <event on="onSiteActivate" fire="\QUI\Search::onSiteChange" />
+    <event on="onSiteSave" fire="\QUI\Search::onSiteChange" />
+</events>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<crons>
+
+    <cron exec="\QUI\Search\Cron::createSearchDatabase">
+        <title>Search Datenbank aufbauen</title>
+        <description></description>
+
+        <!-- available params -->
+        <params>
+            <param name="project">
+                <locale group="" value="" />
+            </param>
+            <param name="lang">
+                <locale group="" value="" />
+            </param>
+        </params>
+    </cron>
+
+</crons>
