@@ -1,11 +1,23 @@
 <?php
 
-$searchValue = '';
-$start       = 0;
-$max         = $Site->getAttribute( 'quiqqer.settings.search.list.max' );
+use QUI\Search\Fulltext;
+use QUI\Utils\Security\Orthos;
+
+/**
+ * Settings
+ */
+
+$searchValue       = '';
+$searchType        = 'OR';
+$fulltextFieldList = Fulltext::getFieldList();
+
+$start = 0;
+$max   = $Site->getAttribute( 'quiqqer.settings.search.list.max' );
+
 
 $children = array();
 $sheets   = 0;
+$count    = 0;
 
 if ( !$max ) {
     $max = 10;
@@ -16,24 +28,57 @@ if ( isset( $_REQUEST[ 'sheet' ] ) ) {
 }
 
 if ( isset( $_REQUEST[ 'search' ] ) ) {
-    $searchValue = \QUI\Utils\Security\Orthos::clear( $_REQUEST[ 'search' ] );
+    $searchValue = Orthos::clear( $_REQUEST[ 'search' ] );
 }
 
-// search
-if ( !empty( $searchValue ) )
-{
-    $fields = array();
+if ( isset( $_REQUEST[ 'searchType' ] ) && $_REQUEST[ 'searchType' ] == 'AND' ) {
+    $searchType = 'AND';
+}
 
-    if ( isset( $_REQUEST['searchIn'] ) && is_array( $_REQUEST['searchIn'] ) )
+$fields = array();
+
+// available field list
+$availableFields = array();
+
+foreach ( $fulltextFieldList as $field ) {
+    $availableFields[ $field['field'] ] = true;
+}
+
+
+/**
+ * search fields
+ */
+if ( isset( $_REQUEST['searchIn'] ) && is_array( $_REQUEST['searchIn'] ) )
+{
+    foreach ( $_REQUEST['searchIn'] as $field )
     {
-        foreach ( $_REQUEST['searchIn'] as $field ) {
-            $fields[] = \QUI\Utils\Security\Orthos::clear( $field );
+        $field = Orthos::clear( $field );
+
+        if ( isset( $availableFields[ $field ] ) ) {
+            $fields[] = $field;
         }
     }
 
-    $Fulltext = new \QUI\Search\Fulltext(array(
-        'limit'  => $start .','. $max,
-        'fields' => $fields
+} else
+{
+    // nothing selected?
+    // than select all ;-)
+    foreach ( $availableFields as $field => $v ) {
+        $fields[] = $field;
+    }
+}
+
+
+/**
+ * search
+ */
+
+if ( !empty( $searchValue ) )
+{
+    $Fulltext = new Fulltext(array(
+        'limit'      => $start .','. $max,
+        'fields'     => $fields,
+        'searchtype' => $searchType
     ));
 
     $result = $Fulltext->search( $searchValue );
@@ -68,12 +113,17 @@ if ( !empty( $searchValue ) )
     }
 
     $sheets = ceil( $result['count'] / $max );
+    $count  = (int)$result['count'];
 }
 
 
 $Engine->assign(array(
-    'sheets'      => $sheets,
-    'children'    => $children,
-    'searchValue' => $searchValue
+    'fields'          => $fields,
+    'count'           => $count,
+    'sheets'          => $sheets,
+    'children'        => $children,
+    'searchValue'     => $searchValue,
+    'searchType'      => $searchType,
+    'availableFields' => $availableFields
 ));
 

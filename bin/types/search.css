@@ -34,6 +34,14 @@
     margin-right: 5px;
 }
 
+.qui-search-settings fieldset {
+    border-top: 1px solid #999;
+    clear: both;
+    float: left;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
 
 /** result entry
  * =================================================== */

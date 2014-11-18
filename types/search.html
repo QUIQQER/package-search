@@ -25,7 +25,8 @@
     <section class="content-template grid-100 mobile-grid-100 qui-search-result">
 
         <form action="{url site=$Site}" method="GET">
-            <input type="text" name="search"
+            <input type="text"
+                name="search"
                 value="{$searchValue}"
                 class="form-field-search"
                 placeholder="{t}quiqqer/search tpl.search.placeholder{/t}"
@@ -40,26 +41,28 @@
 
             <div class="qui-search-settings" style="display: none">
                 <label>
-                    <input type="checkbox" name="searchIn[]" value="name" />
-                    Im Namen suchen.
+                    <input type="checkbox"
+                           name="searchType"
+                           value="AND"
+                           {if $searchType == 'AND'}checked="checked"{/if}
+                    />
+
+                    {locale group="quiqqer/search" value="tpl.search.and.type"}
                 </label>
 
-                <label>
-                    <input type="checkbox" name="searchIn[]" value="title" />
-                    Im Titel suchen.
-                </label>
+                <fieldset>
+                {foreach from=$availableFields key=field item=itm}
+                    <label>
+                        <input type="checkbox"
+                               name="searchIn[]"
+                               value="{$field}"
+                               {if in_array($field, $fields)}checked="checked"{/if}
+                        />
 
-                <label>
-                    <input type="checkbox" name="searchIn[]" value="short" />
-                    In der Kurzbeschreibung suchen.
-                </label>
-
-                <label>
-                    <input type="checkbox" name="searchIn[]" value="data" />
-                    Im Inhalt suchen.
-                </label>
-
-                <!-- plugins -->
+                        {locale group="quiqqer/search" value="tpl.search.field.`$field`"}
+                    </label>
+                {/foreach}
+                </fieldset>
             </div>
 
         </form>
@@ -69,6 +72,15 @@
                 {locale group="quiqqer/search" value="tpl.search.no.results"}
             </div>
         {else}
+            <p class="qui-search-result-count">
+            {if $count == 1}
+                {locale group="quiqqer/search" value="tpl.search.one.result"}
+            {else}
+                {locale group="quiqqer/search" value="tpl.search.more.result" count=$count}
+            {/if}
+            </p>
+
+
             {if $sheets > 1}
                 {control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets search=$searchValue}
             {/if}
