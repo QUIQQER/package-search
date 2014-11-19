@@ -18,6 +18,7 @@
     clear: both;
     margin-top: 20px;
     float: left;
+    overflow: hidden;
     width: 100%;
 }
 
