@@ -14,6 +14,16 @@ $fulltextFieldList = Fulltext::getFieldList();
 $start = 0;
 $max   = $Site->getAttribute( 'quiqqer.settings.search.list.max' );
 
+$settingsFields         = $Site->getAttribute('quiqqer.settings.search.list.fields');
+$settingsFieldsSelected = $Site->getAttribute('quiqqer.settings.search.list.fields.selected');
+
+if ( !is_array( $settingsFields ) ) {
+    $settingsFields = array();
+}
+
+if ( !is_array( $settingsFieldsSelected ) ) {
+    $settingsFieldsSelected = array();
+}
 
 $children = array();
 $sheets   = 0;
@@ -22,7 +32,6 @@ $count    = 0;
 if ( !$max ) {
     $max = 10;
 }
-
 
 
 /**
@@ -57,9 +66,13 @@ $fields = array();
 
 // available field list
 $availableFields = array();
+$settingsFields  = array_flip( $settingsFields );
 
-foreach ( $fulltextFieldList as $field ) {
-    $availableFields[ $field['field'] ] = true;
+foreach ( $fulltextFieldList as $field )
+{
+    if ( isset( $settingsFields[ $field['field'] ] )  ) {
+        $availableFields[ $field['field'] ] = true;
+    }
 }
 
 // search fields
@@ -77,9 +90,19 @@ if ( isset( $_REQUEST['searchIn'] ) && is_array( $_REQUEST['searchIn'] ) )
 } else
 {
     // nothing selected?
-    // than select all ;-)
-    foreach ( $availableFields as $field => $v ) {
-        $fields[] = $field;
+    // than select the settings ;-)
+    foreach ( $settingsFieldsSelected as $field )
+    {
+        if ( isset( $availableFields[ $field ] ) ) {
+            $fields[] = $field;
+        }
+    }
+
+    if ( empty( $fields ) )
+    {
+        foreach ( $availableFields as $field => $v ) {
+            $fields[] = $field;
+        }
     }
 }
 

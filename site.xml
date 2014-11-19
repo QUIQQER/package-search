@@ -14,6 +14,8 @@
             <attributes>
                 <attribute>quiqqer.settings.search.list.max</attribute>
                 <attribute>quiqqer.settings.search.list.hideSettings</attribute>
+                <attribute>quiqqer.settings.search.list.fields</attribute>
+                <attribute>quiqqer.settings.search.list.fields.selected</attribute>
             </attributes>
 
             <!-- list settings -->
@@ -35,6 +37,18 @@
                                 <locale group="quiqqer/search" var="quiqqer.search.list.hideSettings" />
                             </text>
                         </input>
+
+                        <!-- sichtbar -->
+                        <template>
+                            OPT_DIRquiqqer/search/admin/searchSettings.html
+                        </template>
+
+                        <!-- vorselektiert -->
+                        <template>
+                            OPT_DIRquiqqer/search/admin/searchSettingsSelected.html
+                        </template>
+
+
                     </settings>
                 </category>
             </settings>

@@ -34,6 +34,15 @@
             <en><![CDATA[Dont show the extra settings.]]></en>
         </locale>
 
+        <locale name="quiqqer.search.list.settings.title.fields">
+            <de><![CDATA[Such-Einstellungen - Sichtbare Einstellungen]]></de>
+            <en><![CDATA[Search settings - visible settings]]></en>
+        </locale>
+        <locale name="quiqqer.search.list.settings.title.fields.selected">
+            <de><![CDATA[Such-Einstellungen - Vorselektierte Felder]]></de>
+            <en><![CDATA[Search settings - Selected settings]]></en>
+        </locale>
+
 
         <!-- search template -->
         <locale name="tpl.search.button">
