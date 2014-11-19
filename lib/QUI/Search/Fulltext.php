@@ -28,10 +28,10 @@ class Fulltext extends \QUI\QDOM
     {
         // defaults
         $this->setAttributes(array(
-            'Project'    => false,
-            'limit'      => 10,
-            'fields'     => false,
-            'searchtype' => 'OR'
+            'Project'    => false,	// Project
+            'limit'      => 10,		// limit of results
+            'fields'     => false,	// array list of fields
+            'searchtype' => 'OR'	// search type: OR / AND
         ));
 
         $this->setAttributes( $params );
@@ -84,21 +84,76 @@ class Fulltext extends \QUI\QDOM
         }
 
 
+        // fields
+        $fields    = array();
+        $fieldList = self::getFieldList();
+
+        $availableFields = array_map(function($entry) {
+            return $entry['field'];
+        }, $fieldList);
+
+        if ( !$attrFields || !is_array( $attrFields ) )
+        {
+            $fields = $availableFields;
+
+        } else
+        {
+            $availableFields = array_flip( $availableFields );
+
+            foreach ( $attrFields as $field )
+            {
+                if ( isset( $availableFields[ $field ] ) ) {
+                    $fields[] = Orthos::clearNoneCharacters( $field );
+                }
+            }
+        }
+
+        if ( empty( $fields ) ) {
+            $fields = $availableFields;
+        }
+
+        $fields = array_map( array('\QUI\Utils\Security\Orthos', 'clearNoneCharacters'), $fields );
+
+
+        // sql
+        $count = array(
+            'name'    => 8,
+            'title'   => 10,
+            'short'   => 5,
+            'content' => 3
+        );
+
         $PDO   = \QUI::getPDO();
         $table = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
         $limit = \QUI\Database\DB::createQueryLimit( $attrLimit );
 
+        // relevance match
+        $relevanceMatch = array();
+        $whereMatch     = implode( ',', $fields );
+        $relevanceSum   = 0;
+
+        foreach ( $fields as $field )
+        {
+            $matchCount = 9;
+
+            if ( isset( $count[ $field ] ) ) {
+                $matchCount = $count[ $field ];
+            }
+
+            $relevanceMatch[] = "MATCH({$field}) AGAINST (:search IN BOOLEAN MODE) * {$matchCount}";
+            $relevanceSum     = $relevanceSum + $matchCount;
+        }
+
+        $relevanceMatch = implode( ' + ', $relevanceMatch );
+
         $query = "
             SELECT
                 *,
-                MATCH(name)  AGAINST (:search IN BOOLEAN MODE) * 1.3 +
-                MATCH(title) AGAINST (:search IN BOOLEAN MODE) * 1.4 +
-                MATCH(short) AGAINST (:search IN BOOLEAN MODE) * 1.2 +
-                MATCH(data)  AGAINST (:search IN BOOLEAN MODE) * 1.1 AS relevance
+                100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance
             FROM
                 {$table}
             WHERE
-                MATCH (name,title,short,data) AGAINST (:search IN BOOLEAN MODE)
+                MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE)
             GROUP BY
                 siteId
             ORDER BY

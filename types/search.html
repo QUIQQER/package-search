@@ -128,15 +128,15 @@
                         <div class="qui-search-entry-data-relevance">
                             <span class="qui-search-entry-data-relevance-display">
                                 {locale group="quiqqer/search" value="tpl.search.relevance"}
-                                {$Child->getAttribute('search-relevance')}
+                                {$Child->getAttribute('search-relevance')|round} %
                             </span>
 
                             {assign var=rel value=$Child->getAttribute('search-relevance')}
-                            <span class="fa fa-star{if $rel >= 1} qui-search-entry-data-relevance-active{/if}"></span>
-                            <span class="fa fa-star{if $rel >= 2} qui-search-entry-data-relevance-active{/if}"></span>
-                            <span class="fa fa-star{if $rel >= 3} qui-search-entry-data-relevance-active{/if}"></span>
-                            <span class="fa fa-star{if $rel >= 4} qui-search-entry-data-relevance-active{/if}"></span>
-                            <span class="fa fa-star{if $rel >= 5} qui-search-entry-data-relevance-active{/if}"></span>
+                            <span class="fa fa-star{if $rel >= 10} qui-search-entry-data-relevance-active{/if}"></span>
+                            <span class="fa fa-star{if $rel >= 30} qui-search-entry-data-relevance-active{/if}"></span>
+                            <span class="fa fa-star{if $rel >= 50} qui-search-entry-data-relevance-active{/if}"></span>
+                            <span class="fa fa-star{if $rel >= 70} qui-search-entry-data-relevance-active{/if}"></span>
+                            <span class="fa fa-star{if $rel >= 90} qui-search-entry-data-relevance-active{/if}"></span>
                         </div>
                     </div>
 
