@@ -281,6 +281,11 @@ class Fulltext extends \QUI\QDOM
      */
     public static function appendDataEntry(Project $Project, $siteId, $data='', $siteParams=array())
     {
+        $table = \QUI::getDBProjectTableName(
+            Search::tableSearchFull,
+            $Project
+        );
+
         $entry   = self::getEntry($Project, $siteId, $siteParams);
         $content = $entry['data'];
 
