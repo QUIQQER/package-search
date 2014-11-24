@@ -22,7 +22,7 @@
             <field type="text">urlParameter</field>
             <field type="text">rights</field>
             <field type="varchar(255)">datatype</field>
-            <field type="varchar(128)">icon</field>
+            <field type="varchar(255)">icon</field>
 
             <auto_increment>id</auto_increment>
             <index>siteId</index>

@@ -133,6 +133,7 @@ if ( !empty( $searchValue ) )
             $Site->setAttribute( 'search-short', $entry['short'] );
             $Site->setAttribute( 'search-relevance', $entry['relevance'] );
             $Site->setAttribute( 'search-url', $Site->getUrlRewrited() );
+            $Site->setAttribute( 'search-icon', $entry['icon'] );
 
             if ( !empty( $entry['urlParameter'] ) )
             {

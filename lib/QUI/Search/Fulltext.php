@@ -2,6 +2,8 @@
 
 /**
  * This file contains \QUI\Search\Fulltext
+ *
+ * @todo Search-Entry als Objekt umsetzen
  */
 
 namespace QUI\Search;
@@ -204,6 +206,24 @@ class Fulltext extends \QUI\QDOM
      */
     public static function setEntry(Project $Project, $siteId, $params=array(), $siteParams=array())
     {
+        self::setEntryData( $Project, $siteId, $params, $siteParams );
+
+        \QUI::getEvents()->fireEvent(
+            'searchFulltextSetEntry',
+            array( $Project, $siteId, $siteParams )
+        );
+    }
+
+    /**
+     * Edit an entry to the fulltext search table
+     *
+     * @param Project $Project
+     * @param Integer $siteId
+     * @param Array $params
+     * @param Array $siteParams - optional; Parameter for the site link
+     */
+    public static function setEntryData(Project $Project, $siteId, $params=array(), $siteParams=array())
+    {
         $table  = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
         $fields = self::getFieldList();
 
@@ -244,7 +264,6 @@ class Fulltext extends \QUI\QDOM
             $data = array();
         }
 
-
         // data
         foreach ( $fields as $entry )
         {
@@ -257,18 +276,10 @@ class Fulltext extends \QUI\QDOM
             $data[ $field ] = $params[ $field ];
         }
 
-
         \QUI::getDataBase()->update($table, $data, array(
             'siteId'       => (int)$siteId,
             'urlParameter' => $urlParameter
         ));
-
-
-        \QUI::getEvents()->fireEvent(
-            'searchFulltextSetEntry',
-            array( $Project, $siteId, $siteParams )
-        );
-
     }
 
     /**
@@ -279,7 +290,7 @@ class Fulltext extends \QUI\QDOM
      * @param String $data
      * @param Array $siteParams
      */
-    public static function appendDataEntry(Project $Project, $siteId, $data='', $siteParams=array())
+    public static function appendFulltextSearchString(Project $Project, $siteId, $data='', $siteParams=array())
     {
         $table = \QUI::getDBProjectTableName(
             Search::tableSearchFull,
