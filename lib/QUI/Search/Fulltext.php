@@ -215,6 +215,23 @@ class Fulltext extends \QUI\QDOM
     }
 
     /**
+     * Delete an entry from the search table
+     *
+     * @param Project $Project
+     * @param integer $siteId
+     * @param array $siteParams (optional); Parameter for the site link
+     */
+    public static function removeEntry(Project $Project, $siteId, $siteParams=array())
+    {
+        $tbl = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
+
+        \QUI::getDataBase()->delete($tbl, array(
+            'siteId'       => (int) $siteId,
+            'urlParameter' => json_encode( $siteParams )
+        ));
+    }
+
+    /**
      * Edit an entry to the fulltext search table
      *
      * @param Project $Project
