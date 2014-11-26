@@ -7,7 +7,6 @@
             <field type="varchar(256)">title</field>
             <field type="text" fulltext="1">short</field>
             <field type="text" fulltext="1">data</field>
-            <field type="varchar(255)">icon</field>
         </searchfields>
     </search>
 

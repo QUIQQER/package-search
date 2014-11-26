@@ -3,6 +3,24 @@
 use QUI\Search\Fulltext;
 use QUI\Utils\Security\Orthos;
 
+
+/**
+ * 404 Error Site
+ */
+
+if ( \QUI::getRewrite()->getHeaderCode() === 404 )
+{
+    if ( isset( $_REQUEST[ '_url' ] ) )
+    {
+        $requestUrl = $_REQUEST[ '_url' ];
+        $requestUrl = Orthos::clear( $requestUrl );
+
+        $path = pathinfo( $requestUrl );
+
+        $_REQUEST[ 'search' ] = $path['filename'];
+    }
+}
+
 /**
  * Settings
  */
@@ -166,4 +184,3 @@ $Engine->assign(array(
     'searchType'      => $searchType,
     'availableFields' => $availableFields
 ));
-
