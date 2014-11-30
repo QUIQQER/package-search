@@ -3,7 +3,6 @@
 use QUI\Search\Fulltext;
 use QUI\Utils\Security\Orthos;
 
-
 /**
  * 404 Error Site
  */

@@ -8,6 +8,7 @@
 
 namespace QUI\Search;
 
+use QUI;
 use QUI\Search;
 use QUI\Projects\Project;
 use QUI\Projects\Site;
@@ -20,7 +21,7 @@ use QUI\Utils\Security\Orthos;
  *
  * @author www.pcsg.de (Henning Leutz)
  */
-class Fulltext extends \QUI\QDOM
+class Fulltext extends QUI\QDOM
 {
     /**
      * Constructor
@@ -59,7 +60,7 @@ class Fulltext extends \QUI\QDOM
         $attrFields = $this->getAttribute( 'fields' );
 
         if ( !$Project || get_class( $Project ) !== 'QUI\Projects\Project' ) {
-            $Project = \QUI::getProjectManager()->get();
+            $Project = QUI::getProjectManager()->get();
         }
 
         if ( !$attrLimit || is_integer( $attrLimit ) ) {
@@ -125,9 +126,9 @@ class Fulltext extends \QUI\QDOM
             'content' => 3
         );
 
-        $PDO   = \QUI::getPDO();
-        $table = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
-        $limit = \QUI\Database\DB::createQueryLimit( $attrLimit );
+        $PDO   = QUI::getPDO();
+        $table = QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
+        $limit = QUI\Database\DB::createQueryLimit( $attrLimit );
 
         // relevance match
         $relevanceMatch = array();
@@ -208,7 +209,7 @@ class Fulltext extends \QUI\QDOM
     {
         self::setEntryData( $Project, $siteId, $params, $siteParams );
 
-        \QUI::getEvents()->fireEvent(
+        QUI::getEvents()->fireEvent(
             'searchFulltextSetEntry',
             array( $Project, $siteId, $siteParams )
         );
@@ -223,9 +224,9 @@ class Fulltext extends \QUI\QDOM
      */
     public static function removeEntry(Project $Project, $siteId, $siteParams=array())
     {
-        $tbl = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
+        $tbl = QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
 
-        \QUI::getDataBase()->delete($tbl, array(
+        QUI::getDataBase()->delete($tbl, array(
             'siteId'       => (int) $siteId,
             'urlParameter' => json_encode( $siteParams )
         ));
@@ -241,7 +242,7 @@ class Fulltext extends \QUI\QDOM
      */
     public static function setEntryData(Project $Project, $siteId, $params=array(), $siteParams=array())
     {
-        $table  = \QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
+        $table  = QUI::getDBProjectTableName( Search::tableSearchFull, $Project );
         $fields = self::getFieldList();
 
         $urlParameter = json_encode( $siteParams );
@@ -254,7 +255,7 @@ class Fulltext extends \QUI\QDOM
             unset( $data['siteId'] );
             unset( $data['urlParameter'] );
 
-        } catch ( \QUI\Exception $Exception )
+        } catch ( QUI\Exception $Exception )
         {
             $siteUrlParams = array();
 
@@ -273,7 +274,7 @@ class Fulltext extends \QUI\QDOM
             $urlParameter = json_encode( $siteUrlParams );
 
 
-            \QUI::getDataBase()->insert($table, array(
+            QUI::getDataBase()->insert($table, array(
                 'siteId'       => (int)$siteId,
                 'urlParameter' => $urlParameter
             ));
@@ -293,7 +294,7 @@ class Fulltext extends \QUI\QDOM
             $data[ $field ] = $params[ $field ];
         }
 
-        \QUI::getDataBase()->update($table, $data, array(
+        QUI::getDataBase()->update($table, $data, array(
             'siteId'       => (int)$siteId,
             'urlParameter' => $urlParameter
         ));
@@ -309,7 +310,7 @@ class Fulltext extends \QUI\QDOM
      */
     public static function appendFulltextSearchString(Project $Project, $siteId, $data='', $siteParams=array())
     {
-        $table = \QUI::getDBProjectTableName(
+        $table = QUI::getDBProjectTableName(
             Search::tableSearchFull,
             $Project
         );
@@ -320,7 +321,7 @@ class Fulltext extends \QUI\QDOM
         $content      = $content .' '. $data;
         $urlParameter = json_encode( $siteParams );
 
-        \QUI::getDataBase()->update($table, array(
+        QUI::getDataBase()->update($table, array(
             'data' => $content
         ), array(
             'siteId'       => (int)$siteId,
@@ -334,17 +335,18 @@ class Fulltext extends \QUI\QDOM
      * @param Project $Project
      * @param Integer $siteId
      * @param Array $siteParams
+     * @throws QUI\Exception
      */
     public static function getEntry(Project $Project, $siteId, $siteParams=array())
     {
-        $table = \QUI::getDBProjectTableName(
+        $table = QUI::getDBProjectTableName(
             Search::tableSearchFull,
             $Project
         );
 
         $urlParameter = json_encode( $siteParams );
 
-        $result = \QUI::getDataBase()->fetch(array(
+        $result = QUI::getDataBase()->fetch(array(
             'from'  => $table,
             'where' => array(
                 'siteId'       => (int)$siteId,
@@ -354,7 +356,7 @@ class Fulltext extends \QUI\QDOM
 
         if ( !isset( $result[ 0 ] ) )
         {
-            throw new \QUI\Exception(
+            throw new QUI\Exception(
                 'Search entry not exists'
             );
         }
@@ -369,8 +371,8 @@ class Fulltext extends \QUI\QDOM
      */
     public static function clearSearchTable(Project $Project)
     {
-        \QUI::getDataBase()->Table()->truncate(
-            \QUI::getDBProjectTableName( Search::tableSearchFull, $Project )
+        QUI::getDataBase()->Table()->truncate(
+            QUI::getDBProjectTableName( Search::tableSearchFull, $Project )
         );
     }
 
@@ -409,7 +411,7 @@ class Fulltext extends \QUI\QDOM
                     'data'  => $Site->getAttribute('content')
                 ));
 
-            } catch ( \QUI\Exception $Exception )
+            } catch ( QUI\Exception $Exception )
             {
                 Log::writeException( $Exception );
             }
@@ -431,9 +433,9 @@ class Fulltext extends \QUI\QDOM
 
         try
         {
-            return \QUI\Cache\Manager::get( $cache );
+            return QUI\Cache\Manager::get( $cache );
 
-        } catch ( \QUI\Exception $Exception )
+        } catch ( QUI\Exception $Exception )
         {
 
         }
@@ -443,13 +445,14 @@ class Fulltext extends \QUI\QDOM
 
         foreach ( $files as $file )
         {
-            $Dom = \QUI\Utils\XML::getDomFromXml( $file );
+            $Dom = QUI\Utils\XML::getDomFromXml( $file );
             $Path = new \DOMXPath( $Dom );
 
             $fields = $Path->query( "//quiqqer/search/searchfields/field" );
 
             foreach ( $fields as $Field )
             {
+                /* @var $Field \DOMElement */
                 $result[] = array(
                     'field'    => trim( $Field->nodeValue ),
                     'type'     => $Field->getAttribute( 'type' ),
@@ -458,7 +461,7 @@ class Fulltext extends \QUI\QDOM
             }
         }
 
-        \QUI\Cache\Manager::set( $cache, $result );
+        QUI\Cache\Manager::set( $cache, $result );
 
         return $result;
     }
@@ -474,14 +477,14 @@ class Fulltext extends \QUI\QDOM
 
         try
         {
-            return \QUI\Cache\Manager::get( $cache );
+            return QUI\Cache\Manager::get( $cache );
 
-        } catch ( \QUI\Exception $Exception )
+        } catch ( QUI\Exception $Exception )
         {
 
         }
 
-        $packages = \QUI::getPackageManager()->getInstalled();
+        $packages = QUI::getPackageManager()->getInstalled();
         $result   = array();
 
         foreach ( $packages as $package )
@@ -493,7 +496,7 @@ class Fulltext extends \QUI\QDOM
             }
         }
 
-        \QUI\Cache\Manager::set( $cache, $result );
+        QUI\Cache\Manager::set( $cache, $result );
 
         return $result;
     }
