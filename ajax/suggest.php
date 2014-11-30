@@ -3,15 +3,14 @@
 /**
  * Delete the permalink
  *
- * @param String $project
- * @param String $search
+ * @param string $project - project data
+ * @param string $search - search string
+ * @param string $params - search params
+ * @return array
  */
-
 function package_quiqqer_search_ajax_suggest($project, $search, $params)
 {
-    $project = json_decode( $project, true );
-    $Project = \QUI::getProject( $project['name'], $project['lang'] );
-
+    $Project  = \QUI::getProjectManager()->decode( $project );
     $Fulltext = new \QUI\Search\Quicksearch();
 
     return $Fulltext->search($search, $Project, array(
