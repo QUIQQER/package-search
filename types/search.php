@@ -145,6 +145,10 @@ if ( !empty( $searchValue ) )
         {
             $Site = $Project->get( $entry[ 'siteId' ] );
 
+            if ( $entry['relevance'] > 100 ) {
+                $entry['relevance'] = 100;
+            }
+
             $Site->setAttribute( 'search-name', $entry['name'] );
             $Site->setAttribute( 'search-title', $entry['title'] );
             $Site->setAttribute( 'search-short', $entry['short'] );
