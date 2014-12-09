@@ -54,6 +54,44 @@
             </settings>
         </type>
 
+        <!-- Ergebnisliste -->
+        <type type="types/results" icon="icon-list">
+            <locale group="quiqqer/search" var="admin.types.results" />
+            <desc>
+                <locale group="quiqqer/search" var="admin.types.results.desc" />
+            </desc>
+
+            <attributes>
+                <attribute>quiqqer.settings.results.list.max</attribute>
+                <attribute>quiqqer.settings.results.list.types</attribute>
+            </attributes>
+
+            <!-- list settings -->
+            <settings>
+                <category name="search-list-settings">
+                    <settings>
+                        <title>
+                            <locale group="quiqqer/search" var="quiqqer.search.results.settings.title" />
+                        </title>
+
+                        <input conf="quiqqer.settings.results.list.max" type="number">
+                            <text>
+                                <locale group="quiqqer/search" var="quiqqer.search.results.settings.max" />
+                            </text>
+                        </input>
+
+                        <input conf="quiqqer.settings.results.list.types"
+                               data-qui="controls/projects/project/site/Select"
+                        >
+                            <text>
+                                <locale group="quiqqer/search" var="quiqqer.search.results.settings.types" />
+                            </text>
+                        </input>
+                    </settings>
+                </category>
+            </settings>
+        </type>
+
     </types>
 
 </site>

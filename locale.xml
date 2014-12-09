@@ -19,6 +19,10 @@
             <de><![CDATA[Erweiterte Suche]]></de>
             <en><![CDATA[Extended search]]></en>
         </locale>
+        <locale name="admin.types.results">
+            <de><![CDATA[Erweiterte Suche - Ergebnisliste]]></de>
+            <en><![CDATA[Extended search - result list]]></en>
+        </locale>
 
         <!-- search settings -->
         <locale name="quiqqer.search.list.settings.title">

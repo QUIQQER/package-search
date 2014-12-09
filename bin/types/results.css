@@ -1,0 +1,127 @@
+@CHARSET "UTF-8";
+
+.form-field-search {
+    float: left;
+    margin-right: 10px;
+}
+
+.qui-search-result form {
+    float: left;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/** settings
+ * =================================================== */
+
+.qui-search-settings {
+    clear: both;
+    margin-top: 20px;
+    float: left;
+    overflow: hidden;
+    width: 100%;
+}
+
+.qui-search-settings label {
+    clear: both;
+    color: #21536f;
+    cursor: pointer;
+    float: left;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.qui-search-settings input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.qui-search-settings fieldset {
+    border-top: 1px solid #999;
+    clear: both;
+    float: left;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+
+/** result entry
+ * =================================================== */
+
+.qui-search-result-list-entry {
+    background: rgb( 255,255,255 );
+    background: rgba( 255,255,255, 0.7 );
+    border: 1px solid #D0D3D3;
+    border-radius: 3px;
+    box-sizing: border-box;
+    clear: both;
+    float: left;
+    margin-top: 10px;
+    padding: 10px 20px 20px;
+    width: 100%;
+}
+
+@media screen and (max-width: 767px) {
+    .qui-search-result-list-entry {
+        background: none;
+        border: none;
+        border-radius: 0;
+        border-bottom: 1px solid #D0D3D3;
+        padding: 10px 10px 30px 10px;
+    }
+}
+
+.qui-search-result-list-entry h2 {
+    float: left;
+    margin-bottom: 0;
+}
+
+.qui-search-result-list-entry-url {
+    border-top: 1px solid;
+    margin-top: 20px;
+    opacity: 0.4;
+    padding-top: 5px;
+    width: 100%;
+}
+
+.qui-search-result-list-entry-date {
+    color: #527686;
+    float: right;
+    font-size: 10px;
+    margin: 0 0 20px;
+    text-align: right;
+}
+
+
+.qui-search-result-list-entry-imagelink {
+    background: no-repeat center center;
+    background-size: cover;
+    border: 1px solid #EEEEEE;
+    float: left;
+    height: 100px;
+    padding-left: 0;
+}
+
+.qui-search-result-list-entry-imagelink span {
+    display: none;
+}
+
+.qui-search-result-list-entry-image {
+    margin: 0;
+    padding: 0;
+}
+
+.qui-search-result-list-entry-short {
+    width: 77%;
+}
+
+
+/** result entry data
+ * =================================================== */
+
+.qui-search-result-list-entry-data {
+    clear: both;
+}
+
+.qui-search-result-list-entry-data .qui-button {
+    float: right;
+}

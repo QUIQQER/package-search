@@ -34,7 +34,8 @@ class Fulltext extends QUI\QDOM
             'Project'    => false,	// Project
             'limit'      => 10,		// limit of results
             'fields'     => false,	// array list of fields
-            'searchtype' => 'OR'	// search type: OR / AND
+            'searchtype' => 'OR',	// search type: OR / AND
+            'datatypes'  => false   // only for some site types, can be an array
         ));
 
         $this->setAttributes( $params );
@@ -53,7 +54,7 @@ class Fulltext extends QUI\QDOM
      * 		'count'  => count of results
      * )
      */
-    public function search($str)
+    public function search($str='')
     {
         $Project    = $this->getAttribute( 'Project' );
         $attrLimit  = $this->getAttribute( 'limit' );
@@ -67,7 +68,6 @@ class Fulltext extends QUI\QDOM
             $attrLimit = 10;
         }
 
-        // search string
         $strParts = explode(' ', $str );
 
         foreach ( $strParts as $key => $part ) {
@@ -149,19 +149,65 @@ class Fulltext extends QUI\QDOM
 
         $relevanceMatch = implode( ' + ', $relevanceMatch );
 
+        // site types
+        $datatypes     = $this->getAttribute('datatypes');
+        $datatypeQuery = '';
+
+        if ( $datatypes )
+        {
+            if ( !is_array( $datatypes ) ) {
+                $datatypes = array($datatypes);
+            }
+
+            $datatypeQuery = ' (';
+
+            if ( strlen( $search ) > 2 ) {
+                $datatypeQuery = ' AND (';
+            }
+
+            for ( $i = 0, $len = count( $datatypes ); $i < $len; $i++ )
+            {
+                $datatypeQuery .= ' datatype LIKE :type'. $i;
+
+                if ( $len < $i ) {
+                    $datatypeQuery .= ' OR ';
+                }
+            }
+
+            $datatypeQuery .= ' )';
+        }
+
+
+        // query
         $query = "
-            SELECT
-                *,
-                100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance
+            SELECT *
             FROM
                 {$table}
             WHERE
-                MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE)
+                {$datatypeQuery}
             GROUP BY
-                siteId
+                urlParameter,siteId
             ORDER BY
-                relevance DESC
+                e_date DESC
         ";
+
+        if ( strlen( $search ) > 2 )
+        {
+            $query = "
+                SELECT
+                    *,
+                    100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance
+                FROM
+                    {$table}
+                WHERE
+                    MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE)
+                    {$datatypeQuery}
+                GROUP BY
+                    urlParameter,siteId
+                ORDER BY
+                    relevance DESC
+            ";
+        }
 
         $selectQuery = "{$query} {$limit['limit']}";
 
@@ -170,20 +216,45 @@ class Fulltext extends QUI\QDOM
             FROM ({$query}) as T
         ";
 
-        // search
+
+        /**
+         * search
+         */
         $Statement = $PDO->prepare( $selectQuery );
-        $Statement->bindValue( ':search', $search, \PDO::PARAM_STR );
         $Statement->bindValue( ':limit1', $limit['prepare'][':limit1'][0], \PDO::PARAM_INT );
         $Statement->bindValue( ':limit2', $limit['prepare'][':limit2'][0], \PDO::PARAM_INT );
-        $Statement->execute();
 
+        if ( strlen( $search ) > 2 ) {
+            $Statement->bindValue( ':search', $search, \PDO::PARAM_STR );
+        }
+
+        if ( $datatypes )
+        {
+            for ( $i = 0, $len = count( $datatypes ); $i < $len; $i++ ) {
+                $Statement->bindValue( ':type'.$i, $datatypes[ $i ], \PDO::PARAM_STR );
+            }
+        }
+
+        $Statement->execute();
         $result = $Statement->fetchAll( \PDO::FETCH_ASSOC );
 
-        // count
+        /**
+         * count
+         */
         $Statement = $PDO->prepare( $countQuery );
-        $Statement->bindValue( ':search', $search, \PDO::PARAM_STR );
-        $Statement->execute();
 
+        if ( strlen( $search ) > 2 ) {
+            $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
+        }
+
+        if ( $datatypes )
+        {
+            for ( $i = 0, $len = count( $datatypes ); $i < $len; $i++ ) {
+                $Statement->bindValue( ':type'.$i, $datatypes[ $i ], \PDO::PARAM_STR );
+            }
+        }
+
+        $Statement->execute();
         $count = $Statement->fetchAll( \PDO::FETCH_ASSOC );
 
 
@@ -403,12 +474,22 @@ class Fulltext extends QUI\QDOM
                     continue;
                 }
 
+                $e_date = $Site->getAttribute('e_date');
+                $e_date = strtotime( $e_date );
+
+                if ( !$e_date ) {
+                    $e_date = 0;
+                }
+
+                Log::writeRecursive( $e_date );
 
                 $Fulltext->setEntry($Project, $siteId, array(
-                    'name'  => $Site->getAttribute('name'),
-                    'title' => $Site->getAttribute('title'),
-                    'short' => $Site->getAttribute('short'),
-                    'data'  => $Site->getAttribute('content')
+                    'name'     => $Site->getAttribute('name'),
+                    'title'    => $Site->getAttribute('title'),
+                    'short'    => $Site->getAttribute('short'),
+                    'data'     => $Site->getAttribute('content'),
+                    'datatype' => $Site->getAttribute('type'),
+                    'e_date'   => $e_date
                 ));
 
             } catch ( QUI\Exception $Exception )
