@@ -26,7 +26,7 @@
 
         <!-- search settings -->
         <locale name="quiqqer.search.list.settings.title">
-            <de><![CDATA[Such-Einstellungen]]></de>
+            <de><![CDATA[Suche-Einstellungen]]></de>
             <en><![CDATA[Search settings]]></en>
         </locale>
         <locale name="quiqqer.search.list.settings.max">
@@ -45,6 +45,20 @@
         <locale name="quiqqer.search.list.settings.title.fields.selected">
             <de><![CDATA[Such-Einstellungen - Vorselektierte Felder]]></de>
             <en><![CDATA[Search settings - Selected settings]]></en>
+        </locale>
+
+        <!-- result type settings -->
+        <locale name="quiqqer.search.results.settings.title">
+            <de><![CDATA[Ergebnisliste-Einstellungen]]></de>
+            <en><![CDATA[Resultlist settings]]></en>
+        </locale>
+        <locale name="quiqqer.search.results.settings.max">
+            <de><![CDATA[Maximale Anzahl Ergebnisse pro Seite.]]></de>
+            <en><![CDATA[Maximum number of results per page.]]></en>
+        </locale>
+        <locale name="quiqqer.search.results.settings.types">
+            <de><![CDATA[Stellen Sie hier ein welche Seitentypen in Ihrer Liste angezeigt werden soll.]]></de>
+            <en><![CDATA[Setup the page types which will be displayed in your list.]]></en>
         </locale>
 
 

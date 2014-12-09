@@ -169,7 +169,7 @@ class Fulltext extends QUI\QDOM
             {
                 $datatypeQuery .= ' datatype LIKE :type'. $i;
 
-                if ( $len < $i ) {
+                if ( $len-1 > $i ) {
                     $datatypeQuery .= ' OR ';
                 }
             }

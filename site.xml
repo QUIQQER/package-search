@@ -82,6 +82,8 @@
 
                         <input conf="quiqqer.settings.results.list.types"
                                data-qui="controls/projects/project/site/Select"
+                               data-qui-options-selectIds="0"
+                               data-qui-options-selectTypes="1"
                         >
                             <text>
                                 <locale group="quiqqer/search" var="quiqqer.search.results.settings.types" />
