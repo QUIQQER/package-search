@@ -73,7 +73,7 @@ if ( isset( $_REQUEST[ 'search' ] ) )
 
     $searchValue = trim( $searchValue );
     $searchValue = preg_replace( "/[^a-zA-Z0-9]/", " ", $searchValue );
-    $searchValue = Orthos::clear( $_REQUEST[ 'search' ] );
+    $searchValue = Orthos::clear( $searchValue );
     $searchValue = preg_replace( '#([ ]){2,}#', "$1", $searchValue );
 }
 
