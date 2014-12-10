@@ -69,12 +69,11 @@ if ( isset( $_REQUEST[ 'search' ] ) )
     {
         $searchValue = $_REQUEST[ 'search' ];
     }
-
-
-    $searchValue = trim( $searchValue );
-    $searchValue = preg_replace( "/[^a-zA-Z0-9]/", " ", $searchValue );
+    
+    $searchValue = preg_replace( "/[^a-zA-Z0-9äöüß]/", " ", $searchValue );
     $searchValue = Orthos::clear( $searchValue );
     $searchValue = preg_replace( '#([ ]){2,}#', "$1", $searchValue );
+    $searchValue = trim( $searchValue );
 }
 
 if ( isset( $_REQUEST[ 'searchType' ] ) && $_REQUEST[ 'searchType' ] == 'AND' ) {
