@@ -63,16 +63,18 @@ if ( isset( $_REQUEST[ 'search' ] ) )
 {
     if ( is_array( $_REQUEST[ 'search' ] ) )
     {
-        foreach ( $_REQUEST[ 'search' ] as $search ) {
-            $searchValue .= Orthos::clear( $search ) .' ';
-        }
-
-        $searchValue = trim( $searchValue );
+        $searchValue = implode( ' ', $_REQUEST[ 'search' ] );
 
     } else
     {
-        $searchValue = Orthos::clear( $_REQUEST[ 'search' ] );
+        $searchValue = $_REQUEST[ 'search' ];
     }
+
+
+    $searchValue = trim( $searchValue );
+    $searchValue = preg_replace( "/[^a-zA-Z0-9]/", " ", $searchValue );
+    $searchValue = Orthos::clear( $_REQUEST[ 'search' ] );
+    $searchValue = preg_replace( '#([ ]){2,}#', "$1", $searchValue );
 }
 
 if ( isset( $_REQUEST[ 'searchType' ] ) && $_REQUEST[ 'searchType' ] == 'AND' ) {
