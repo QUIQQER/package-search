@@ -145,6 +145,15 @@ if ( !empty( $searchValue ) )
         {
             $Site = $Project->get( $entry[ 'siteId' ] );
 
+            $urlParams = json_decode( $entry[ 'urlParameter' ], true );
+
+            if ( !is_array( $urlParams ) ) {
+                $urlParams = array();
+            }
+
+            $url = URL_DIR . $Site->getUrlRewrited( $urlParams );
+            $url = \QUI\Utils\String::replaceDblSlashes( $url );
+
             if ( $entry['relevance'] > 100 ) {
                 $entry['relevance'] = 100;
             }
@@ -153,7 +162,7 @@ if ( !empty( $searchValue ) )
             $Site->setAttribute( 'search-title', $entry['title'] );
             $Site->setAttribute( 'search-short', $entry['short'] );
             $Site->setAttribute( 'search-relevance', $entry['relevance'] );
-            $Site->setAttribute( 'search-url', $Site->getUrlRewrited() );
+            $Site->setAttribute( 'search-url', $url );
             $Site->setAttribute( 'search-icon', $entry['icon'] );
 
             if ( !empty( $entry['urlParameter'] ) )
