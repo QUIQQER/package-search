@@ -165,15 +165,6 @@ if ( !empty( $searchValue ) )
             $Site->setAttribute( 'search-url', $url );
             $Site->setAttribute( 'search-icon', $entry['icon'] );
 
-            if ( !empty( $entry['urlParameter'] ) )
-            {
-                $urlParams = json_decode( $entry['urlParameter'], true );
-
-                if ( is_array( $urlParams ) ) {
-                    $Site->setAttribute( 'search-url', $Site->getUrlRewrited( $urlParams ) );
-                }
-            }
-
             $children[] = $Site;
 
         } catch ( \QUI\Exception $Exception )
