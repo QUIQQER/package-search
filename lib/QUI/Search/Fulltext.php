@@ -159,11 +159,7 @@ class Fulltext extends QUI\QDOM
                 $datatypes = array($datatypes);
             }
 
-            $datatypeQuery = ' (';
-
-            if ( strlen( $search ) > 2 ) {
-                $datatypeQuery = ' AND (';
-            }
+            $datatypeQuery = ' AND (';
 
             for ( $i = 0, $len = count( $datatypes ); $i < $len; $i++ )
             {
@@ -184,6 +180,10 @@ class Fulltext extends QUI\QDOM
             FROM
                 {$table}
             WHERE
+                (name LIKE :search OR
+                title LIKE :search OR
+                short LIKE :search OR
+                data  LIKE :search)
                 {$datatypeQuery}
             GROUP BY
                 urlParameter,siteId
@@ -207,6 +207,11 @@ class Fulltext extends QUI\QDOM
                 ORDER BY
                     relevance DESC
             ";
+
+        } else
+        {
+            $search = str_replace(array('*', '+'), '', $search);
+            $search = "%{$search}%";
         }
 
         $selectQuery = "{$query} {$limit['limit']}";
@@ -216,6 +221,7 @@ class Fulltext extends QUI\QDOM
             FROM ({$query}) as T
         ";
 
+Log::writeRecursive( $search );
 
         /**
          * search
@@ -223,10 +229,7 @@ class Fulltext extends QUI\QDOM
         $Statement = $PDO->prepare( $selectQuery );
         $Statement->bindValue( ':limit1', $limit['prepare'][':limit1'][0], \PDO::PARAM_INT );
         $Statement->bindValue( ':limit2', $limit['prepare'][':limit2'][0], \PDO::PARAM_INT );
-
-        if ( strlen( $search ) > 2 ) {
-            $Statement->bindValue( ':search', $search, \PDO::PARAM_STR );
-        }
+        $Statement->bindValue( ':search', $search, \PDO::PARAM_STR );
 
         if ( $datatypes )
         {
@@ -481,14 +484,13 @@ class Fulltext extends QUI\QDOM
                     $e_date = 0;
                 }
 
-                Log::writeRecursive( $e_date );
-
                 $Fulltext->setEntry($Project, $siteId, array(
                     'name'     => $Site->getAttribute('name'),
                     'title'    => $Site->getAttribute('title'),
                     'short'    => $Site->getAttribute('short'),
                     'data'     => $Site->getAttribute('content'),
                     'datatype' => $Site->getAttribute('type'),
+                    'icon'     => $Site->getAttribute('image_site'),
                     'e_date'   => $e_date
                 ));
 

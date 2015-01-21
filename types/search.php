@@ -153,7 +153,7 @@ if ( !empty( $searchValue ) )
             $url = URL_DIR . $Site->getUrlRewrited( $urlParams );
             $url = \QUI\Utils\String::replaceDblSlashes( $url );
 
-            if ( $entry['relevance'] > 100 ) {
+            if ( !isset($entry['relevance']) || $entry['relevance'] > 100 ) {
                 $entry['relevance'] = 100;
             }
 
