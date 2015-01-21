@@ -213,7 +213,8 @@ class Search
             'name'  => $Site->getAttribute('name'),
             'title' => $Site->getAttribute('title'),
             'short' => $Site->getAttribute('short'),
-            'data'  => $Site->getAttribute('content')
+            'data'  => $Site->getAttribute('content'),
+            'icon'  => $Site->getAttribute('image_site')
         ));
 
         // Quicksearch
