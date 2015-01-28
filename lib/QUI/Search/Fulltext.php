@@ -221,8 +221,6 @@ class Fulltext extends QUI\QDOM
             FROM ({$query}) as T
         ";
 
-Log::writeRecursive( $search );
-
         /**
          * search
          */
