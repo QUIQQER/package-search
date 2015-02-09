@@ -10,8 +10,13 @@ use QUI\Utils\Security\Orthos;
 $max   = $Site->getAttribute( 'quiqqer.settings.results.list.max' );
 $types = $Site->getAttribute( 'quiqqer.settings.results.list.types' );
 
+$count = 0;
 $start = 0;
 $types = explode(';', $types);
+
+if ( !$max ) {
+    $max = 10;
+}
 
 
 /**
@@ -29,7 +34,8 @@ if ( isset( $_REQUEST[ 'sheet' ] ) ) {
 
 $Fulltext = new Fulltext(array(
     'limit'     => $start .','. $max,
-    'datatypes' => $types
+    'datatypes' => $types,
+    'Project'   => $Project
 ));
 
 $result   = $Fulltext->search();
@@ -64,8 +70,11 @@ foreach ( $result['list'] as $entry )
     }
 }
 
-$sheets = ceil( $result['count'] / $max );
-$count  = (int)$result['count'];
+if ( $result['count'] )
+{
+    $sheets = ceil( $result['count'] / $max );
+    $count  = (int)$result['count'];
+}
 
 
 // assign

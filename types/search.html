@@ -38,7 +38,8 @@
                 class="qui-button"
             />
 
-            {if $Site->getAttribute('quiqqer.settings.search.list.hideSettings') != true}
+            {if count( $availableFields ) &&
+                $Site->getAttribute('quiqqer.settings.search.list.hideSettings') != true}
             <div class="qui-search-settings" style="display: none">
                 <label>
                     <input type="checkbox"

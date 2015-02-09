@@ -115,8 +115,9 @@ class Fulltext extends QUI\QDOM
             $fields = $availableFields;
         }
 
-        $fields = array_map( array('\QUI\Utils\Security\Orthos', 'clearNoneCharacters'), $fields );
-
+        foreach ( $fields as $key => $value ) {
+            $fields[ $key ] = Orthos::clearNoneCharacters( $fields[ $key ], array('_') );
+        }
 
         // sql
         $count = array(
@@ -227,12 +228,20 @@ class Fulltext extends QUI\QDOM
         $Statement = $PDO->prepare( $selectQuery );
         $Statement->bindValue( ':limit1', $limit['prepare'][':limit1'][0], \PDO::PARAM_INT );
         $Statement->bindValue( ':limit2', $limit['prepare'][':limit2'][0], \PDO::PARAM_INT );
-        $Statement->bindValue( ':search', $search, \PDO::PARAM_STR );
+
+        if ( strlen( $search ) > 2 || $search == '%%' ) {
+            $Statement->bindValue( ':search', $search, \PDO::PARAM_STR );
+        }
 
         if ( $datatypes )
         {
-            for ( $i = 0, $len = count( $datatypes ); $i < $len; $i++ ) {
-                $Statement->bindValue( ':type'.$i, $datatypes[ $i ], \PDO::PARAM_STR );
+            for ( $i = 0, $len = count( $datatypes ); $i < $len; $i++ )
+            {
+                $Statement->bindValue(
+                    ':type'.$i,
+                    $datatypes[ $i ],
+                    \PDO::PARAM_STR
+                );
             }
         }
 
@@ -244,26 +253,31 @@ class Fulltext extends QUI\QDOM
          */
         $Statement = $PDO->prepare( $countQuery );
 
-        if ( strlen( $search ) > 2 ) {
-            $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
+        if ( strlen( $search ) > 2 || $search == '%%' ) {
+            $Statement->bindValue( ':search', $search, \PDO::PARAM_STR );
         }
 
         if ( $datatypes )
         {
-            for ( $i = 0, $len = count( $datatypes ); $i < $len; $i++ ) {
-                $Statement->bindValue( ':type'.$i, $datatypes[ $i ], \PDO::PARAM_STR );
+            for ( $i = 0, $len = count( $datatypes ); $i < $len; $i++ )
+            {
+                $Statement->bindValue(
+                    ':type'.$i,
+                    $datatypes[ $i ],
+                    \PDO::PARAM_STR
+                );
             }
         }
 
         $Statement->execute();
         $count = $Statement->fetchAll( \PDO::FETCH_ASSOC );
 
-
         return array(
             'list'   => $result,
             'count'  => $count[ 0 ]['count']
         );
     }
+
 
     /**
      * Creation

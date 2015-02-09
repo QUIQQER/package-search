@@ -121,6 +121,14 @@
             <de><![CDATA[In Schwerpunkte suchen.]]></de>
             <en><![CDATA[]]></en>
         </locale>
+        <locale name="tpl.search.field.datatype">
+            <de><![CDATA[Nach Seitentyp suchen.]]></de>
+            <en><![CDATA[Search as sitetypes.]]></en>
+        </locale>
+        <locale name="tpl.search.field.e_date">
+            <de><![CDATA[In Editierungsdatum suchen.]]></de>
+            <en><![CDATA[Search in edit date.]]></en>
+        </locale>
 
     </groups>
 

@@ -133,7 +133,8 @@ if ( !empty( $searchValue ) )
     $Fulltext = new Fulltext(array(
         'limit'      => $start .','. $max,
         'fields'     => $fields,
-        'searchtype' => $searchType
+        'searchtype' => $searchType,
+        'Project'    => $Project
     ));
 
     $result = $Fulltext->search( $searchValue );
@@ -168,7 +169,7 @@ if ( !empty( $searchValue ) )
 
         } catch ( \QUI\Exception $Exception )
         {
-
+            \QUI\System\Log::addDebug( $Exception->getMessage() );
         }
     }
 
