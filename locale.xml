@@ -8,7 +8,10 @@
 
     <!-- php + javascript locale -->
     <groups name="quiqqer/search" datatype="php,js">
-
+        <locale name="package.title">
+            <de><![CDATA[QUIQQER - Suche]]></de>
+            <en><![CDATA[QUIQQER - Search]]></en>
+        </locale>
     </groups>
 
     <!-- php locale -->
