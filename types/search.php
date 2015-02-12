@@ -143,6 +143,8 @@ if ( !empty( $searchValue ) )
     {
         try
         {
+            // immer neues site objekt
+            // falls die gleiche seite mit unterschiedlichen url params existiert
             $Site = new \QUI\Projects\Site( $Project, (int)$entry[ 'siteId' ] );
 
             $urlParams = json_decode( $entry[ 'urlParameter' ], true );
