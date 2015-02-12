@@ -88,8 +88,6 @@
             {/if}
 
             {foreach from=$children item=Child}
-            {assign var=Child value=$Child->load()}
-
                 <article class="qui-search-result-list-entry">
 
                     <h2>
@@ -142,7 +140,7 @@
                     </div>
 
                     <div class="qui-search-result-list-entry-url">
-                        {$Child->getUrlRewrited()}
+                        {$Child->getAttribute('search-url')}
                     </div>
 
                 </article>

@@ -143,7 +143,7 @@ if ( !empty( $searchValue ) )
     {
         try
         {
-            $Site = $Project->get( $entry[ 'siteId' ] );
+            $Site = new \QUI\Projects\Site( $Project, (int)$entry[ 'siteId' ] );
 
             $urlParams = json_decode( $entry[ 'urlParameter' ], true );
 
