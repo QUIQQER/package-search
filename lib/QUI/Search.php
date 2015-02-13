@@ -80,6 +80,10 @@ class Search
                     continue;
                 }
 
+                if ( $Site->getAttribute('quiqqer.settings.search.not.indexed') ) {
+                    continue;
+                }
+
                 $Quicksearch->setEntries($Project, $siteId, array(
                     $Site->getAttribute('name'),
                     $Site->getAttribute('title')

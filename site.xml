@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
 
+    <attributes>
+        <attribute>quiqqer.settings.search.not.indexed</attribute>
+    </attributes>
+
+    <!-- global site settings -->
+    <settings>
+        <category name="search-settings">
+            <settings>
+                <title>
+                    <locale group="quiqqer/search" var="quiqqer.search.settings.title" />
+                </title>
+
+                <input conf="quiqqer.settings.search.not.indexed" type="checkbox">
+                    <text>
+                        <locale group="quiqqer/search" var="quiqqer.package.search.not.indexed" />
+                    </text>
+                </input>
+            </settings>
+        </category>
+    </settings>
+
     <types>
 
         <!-- Suche -->

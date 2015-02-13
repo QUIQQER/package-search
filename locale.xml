@@ -28,6 +28,15 @@
         </locale>
 
         <!-- search settings -->
+        <locale name="quiqqer.search.settings.title">
+            <de><![CDATA[Globale Suche-Einstellungen]]></de>
+            <en><![CDATA[Global search settings]]></en>
+        </locale>
+        <locale name="quiqqer.package.search.not.indexed">
+            <de><![CDATA[Seite nicht in die Suche mit aufnehmen.]]></de>
+            <en><![CDATA[Page add to the search.]]></en>
+        </locale>
+
         <locale name="quiqqer.search.list.settings.title">
             <de><![CDATA[Suche-Einstellungen]]></de>
             <en><![CDATA[Search settings]]></en>

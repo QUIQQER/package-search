@@ -489,6 +489,10 @@ class Fulltext extends QUI\QDOM
                     continue;
                 }
 
+                if ( $Site->getAttribute('quiqqer.settings.search.not.indexed') ) {
+                    continue;
+                }
+
                 $e_date = $Site->getAttribute('e_date');
                 $e_date = strtotime( $e_date );
 
