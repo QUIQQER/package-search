@@ -24,7 +24,6 @@
 
 .qui-search-settings label {
     clear: both;
-    color: #21536f;
     cursor: pointer;
     float: left;
     margin-bottom: 5px;
@@ -36,7 +35,6 @@
 }
 
 .qui-search-settings fieldset {
-    border-top: 1px solid #999;
     clear: both;
     float: left;
     margin-top: 10px;
