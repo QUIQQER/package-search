@@ -1,0 +1,15 @@
+
+<p>{locale group="quiqqer/search" value="quiqqer.search.list.settings.title.fields"}</p>
+
+{object class="\QUI\Search\Fulltext" assign=Fulltext}
+{assign var=fieldList value=$Fulltext->getFieldList()}
+
+{foreach from=$fieldList item=field}
+    <label style="width: 100%; clear: both;">
+        <input type="checkbox"
+               value="{$field.field}"
+               name="quiqqer.settings.search.list.fields"
+        />
+        {locale group="quiqqer/search" value="tpl.search.field.`$field.field`"}
+    </label>
+{/foreach}

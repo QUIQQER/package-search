@@ -6,6 +6,7 @@
 
 namespace QUI\Search;
 
+use QUI;
 use QUI\Search;
 use QUI\Projects\Project;
 use QUI\Utils\Security\Orthos;
@@ -24,11 +25,11 @@ class Quicksearch
     /**
      * Search something in a project
      *
-     * @param Strng $str
+     * @param string $str
      * @param Project $Project
-     * @param Array $params - Query params
+     * @param array $params - Query params
      * 		$params['limit'] = default: 10
-     * @return Array array(
+     * @return array array(
      * 		'list'   => array list of results
      * 		'count'  => count of results
      * )
@@ -47,7 +48,7 @@ class Quicksearch
         }
 
         $search = '%'.$str.'%';
-        $limit  = \QUI\Database\DB::createQueryLimit( $params['limit'] );
+        $limit  = QUI\Database\DB::createQueryLimit( $params['limit'] );
 
         $groupedBy = 'GROUP BY data';
 
@@ -136,12 +137,12 @@ class Quicksearch
         // site params
         if ( is_array( $siteParams ) && !empty( $siteParams ) )
         {
-            foreach ( $siteParams as $value => $value )
+            foreach ( $siteParams as $key => $value )
             {
-                $param = Orthos::clear( $param );
+                $key   = Orthos::clear( $key );
                 $value = Orthos::clear( $value );
 
-                $siteUrlParams[ $param ] = $value;
+                $siteUrlParams[ $key ] = $value;
             }
         }
 
@@ -185,7 +186,7 @@ class Quicksearch
             return;
         }
 
-        $urlParameter = json_encode( $siteUrlParams );
+        $urlParameter = json_encode( $siteParams );
 
 
         \QUI::getDataBase()->insert($table, array(
@@ -211,7 +212,7 @@ class Quicksearch
             return;
         }
 
-        \QUI::getDataBase()->delete($table, array(
+        QUI::getDataBase()->delete($table, array(
             'siteId'       => $siteId,
             'urlParameter' => json_encode( $siteParams )
         ));
@@ -221,19 +222,22 @@ class Quicksearch
      * Return an fulltext entry
      *
      * @param Project $Project
-     * @param Integer $siteId
-     * @param Array $siteParams
+     * @param integer $siteId
+     * @param array $siteParams
+     * @return array
+     *
+     * @throws QUI\Exception
      */
     public static function getEntry(Project $Project, $siteId, $siteParams=array())
     {
-        $table = \QUI::getDBProjectTableName(
+        $table = QUI::getDBProjectTableName(
             Search::tableSearchQuick,
             $Project
         );
 
         $urlParameter = json_encode( $siteParams );
 
-        $result = \QUI::getDataBase()->fetch(array(
+        $result = QUI::getDataBase()->fetch(array(
             'from'  => $table,
             'where' => array(
                 'siteId'       => (int)$siteId,
@@ -243,7 +247,7 @@ class Quicksearch
 
         if ( !isset( $result[ 0 ] ) )
         {
-            throw new \QUI\Exception(
+            throw new QUI\Exception(
                 'Quicksearch entry not exists'
             );
         }

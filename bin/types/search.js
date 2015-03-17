@@ -68,13 +68,8 @@ window.addEvent('domready', function()
                                 duration : 250,
                                 callback : function()
                                 {
-                                    (function()
-                                    {
-                                        Settings.setStyles({
-                                            display : 'none',
-                                            height  : null
-                                        });
-                                    }).delay( 100 )
+                                    Settings.setStyle.delay( 10, Settings, [ 'display', 'none' ] );
+                                    Settings.setStyle.delay( 20, Settings, [ 'height', null ] );
                                 }
                             });
                         }

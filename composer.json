@@ -1,6 +1,6 @@
 {
     "name" : "quiqqer/search",
-    "type" : "quiqqer-library",
+    "type" : "quiqqer-module",
     "description" : "Extra Search - provided extra Search functionality. Not the standard search. Search Package provieded an extra API and support MATCH searches.",
 
     "version" : "dev-master",

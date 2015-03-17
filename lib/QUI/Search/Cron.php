@@ -17,8 +17,8 @@ class Cron
 {
     /**
      *
-     * @param unknown $params
-     * @param unknown $CronManager
+     * @param array $params
+     * @param \QUI\Cron\Manager $CronManager
      */
     static function createSearchDatabase($params, $CronManager)
     {
@@ -30,10 +30,8 @@ class Cron
             return;
         }
 
-        $Project  = \QUI::getProject( $params['project'], $params['lang'] );
-        $DataBase = \QUI::getDataBase();
-
-        $Search = new Search();
+        $Project = \QUI::getProject( $params['project'], $params['lang'] );
+        $Search  = new Search();
 
         $Search->createFulltextSearch( $Project );
         $Search->createQuicksearch( $Project );

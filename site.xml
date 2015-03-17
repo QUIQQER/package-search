@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
 
+    <attributes>
+        <attribute>quiqqer.settings.search.not.indexed</attribute>
+    </attributes>
+
+    <!-- global site settings -->
+    <settings>
+        <category name="search-settings">
+            <settings>
+                <title>
+                    <locale group="quiqqer/search" var="quiqqer.search.settings.title" />
+                </title>
+
+                <input conf="quiqqer.settings.search.not.indexed" type="checkbox">
+                    <text>
+                        <locale group="quiqqer/search" var="quiqqer.package.search.not.indexed" />
+                    </text>
+                </input>
+            </settings>
+        </category>
+    </settings>
+
     <types>
 
         <!-- Suche -->
@@ -13,6 +34,9 @@
             <!-- list attributes -->
             <attributes>
                 <attribute>quiqqer.settings.search.list.max</attribute>
+                <attribute>quiqqer.settings.search.list.hideSettings</attribute>
+                <attribute>quiqqer.settings.search.list.fields</attribute>
+                <attribute>quiqqer.settings.search.list.fields.selected</attribute>
             </attributes>
 
             <!-- list settings -->
@@ -26,6 +50,64 @@
                         <input conf="quiqqer.settings.search.list.max" type="number">
                             <text>
                                 <locale group="quiqqer/search" var="quiqqer.search.list.settings.max" />
+                            </text>
+                        </input>
+
+                        <input conf="quiqqer.settings.search.list.hideSettings" type="checkbox">
+                            <text>
+                                <locale group="quiqqer/search" var="quiqqer.search.list.hideSettings" />
+                            </text>
+                        </input>
+
+                        <!-- sichtbar -->
+                        <template>
+                            OPT_DIRquiqqer/search/admin/searchSettings.html
+                        </template>
+
+                        <!-- vorselektiert -->
+                        <template>
+                            OPT_DIRquiqqer/search/admin/searchSettingsSelected.html
+                        </template>
+
+
+                    </settings>
+                </category>
+            </settings>
+        </type>
+
+        <!-- Ergebnisliste -->
+        <type type="types/results" icon="icon-list">
+            <locale group="quiqqer/search" var="admin.types.results" />
+            <desc>
+                <locale group="quiqqer/search" var="admin.types.results.desc" />
+            </desc>
+
+            <attributes>
+                <attribute>quiqqer.settings.results.list.max</attribute>
+                <attribute>quiqqer.settings.results.list.types</attribute>
+            </attributes>
+
+            <!-- list settings -->
+            <settings>
+                <category name="search-list-settings">
+                    <settings>
+                        <title>
+                            <locale group="quiqqer/search" var="quiqqer.search.results.settings.title" />
+                        </title>
+
+                        <input conf="quiqqer.settings.results.list.max" type="number">
+                            <text>
+                                <locale group="quiqqer/search" var="quiqqer.search.results.settings.max" />
+                            </text>
+                        </input>
+
+                        <input conf="quiqqer.settings.results.list.types"
+                               data-qui="controls/projects/project/site/Select"
+                               data-qui-options-selectIds="0"
+                               data-qui-options-selectTypes="1"
+                        >
+                            <text>
+                                <locale group="quiqqer/search" var="quiqqer.search.results.settings.types" />
                             </text>
                         </input>
                     </settings>

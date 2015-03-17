@@ -8,11 +8,71 @@
 
     <!-- php + javascript locale -->
     <groups name="quiqqer/search" datatype="php,js">
-
+        <locale name="package.title">
+            <de><![CDATA[QUIQQER - Suche]]></de>
+            <en><![CDATA[QUIQQER - Search]]></en>
+        </locale>
     </groups>
 
     <!-- php locale -->
     <groups name="quiqqer/search" datatype="php">
+
+        <!-- types -->
+        <locale name="admin.types.search">
+            <de><![CDATA[Erweiterte Suche]]></de>
+            <en><![CDATA[Extended search]]></en>
+        </locale>
+        <locale name="admin.types.results">
+            <de><![CDATA[Erweiterte Suche - Ergebnisliste]]></de>
+            <en><![CDATA[Extended search - result list]]></en>
+        </locale>
+
+        <!-- search settings -->
+        <locale name="quiqqer.search.settings.title">
+            <de><![CDATA[Globale Suche-Einstellungen]]></de>
+            <en><![CDATA[Global search settings]]></en>
+        </locale>
+        <locale name="quiqqer.package.search.not.indexed">
+            <de><![CDATA[Seite nicht in die Suche mit aufnehmen.]]></de>
+            <en><![CDATA[Page add to the search.]]></en>
+        </locale>
+
+        <locale name="quiqqer.search.list.settings.title">
+            <de><![CDATA[Suche-Einstellungen]]></de>
+            <en><![CDATA[Search settings]]></en>
+        </locale>
+        <locale name="quiqqer.search.list.settings.max">
+            <de><![CDATA[Maximale Anzahl Ergebnisse pro Seite.]]></de>
+            <en><![CDATA[Maximum number of results per page.]]></en>
+        </locale>
+        <locale name="quiqqer.search.list.hideSettings">
+            <de><![CDATA[Erweiterte Einstellungen nicht anzeigen.]]></de>
+            <en><![CDATA[Dont show the extra settings.]]></en>
+        </locale>
+
+        <locale name="quiqqer.search.list.settings.title.fields">
+            <de><![CDATA[Such-Einstellungen - Sichtbare Einstellungen]]></de>
+            <en><![CDATA[Search settings - visible settings]]></en>
+        </locale>
+        <locale name="quiqqer.search.list.settings.title.fields.selected">
+            <de><![CDATA[Such-Einstellungen - Vorselektierte Felder]]></de>
+            <en><![CDATA[Search settings - Selected settings]]></en>
+        </locale>
+
+        <!-- result type settings -->
+        <locale name="quiqqer.search.results.settings.title">
+            <de><![CDATA[Ergebnisliste-Einstellungen]]></de>
+            <en><![CDATA[Resultlist settings]]></en>
+        </locale>
+        <locale name="quiqqer.search.results.settings.max">
+            <de><![CDATA[Maximale Anzahl Ergebnisse pro Seite.]]></de>
+            <en><![CDATA[Maximum number of results per page.]]></en>
+        </locale>
+        <locale name="quiqqer.search.results.settings.types">
+            <de><![CDATA[Stellen Sie hier ein welche Seitentypen in Ihrer Liste angezeigt werden soll.]]></de>
+            <en><![CDATA[Setup the page types which will be displayed in your list.]]></en>
+        </locale>
+
 
         <!-- search template -->
         <locale name="tpl.search.button">
@@ -32,7 +92,52 @@
             <en><![CDATA[Relevance:]]></en>
         </locale>
 
+        <locale name="tpl.search.no.results">
+            <de><![CDATA[Keine Ergebnisse gefunden. Bitte nutzen Sie einen anderen Suchbegriff.]]></de>
+            <en><![CDATA[No results found. Please use a different search.]]></en>
+        </locale>
+        <locale name="tpl.search.one.result">
+            <de><![CDATA[Es wurde ein Ergebnis gefunden.]]></de>
+            <en><![CDATA[One result has been found.]]></en>
+        </locale>
+        <locale name="tpl.search.more.result">
+            <de><![CDATA[Es wurden [count] Ergebnisse gefunden.]]></de>
+            <en><![CDATA[[count] results has been found.]]></en>
+        </locale>
 
+
+        <locale name="tpl.search.and.type">
+            <de><![CDATA[Alle Begriffe müssen im Ergebnis enthalten sein.]]></de>
+            <en><![CDATA[All words must be included in the result.]]></en>
+        </locale>
+        <locale name="tpl.search.field.name">
+            <de><![CDATA[In Namen suchen.]]></de>
+            <en><![CDATA[Search in names.]]></en>
+        </locale>
+        <locale name="tpl.search.field.title">
+            <de><![CDATA[In Titeln suchen.]]></de>
+            <en><![CDATA[Search in titles.]]></en>
+        </locale>
+        <locale name="tpl.search.field.short">
+            <de><![CDATA[In der Kurzbeschreibung suchen.]]></de>
+            <en><![CDATA[Search in short description.]]></en>
+        </locale>
+        <locale name="tpl.search.field.data">
+            <de><![CDATA[Im Inhalt suchen.]]></de>
+            <en><![CDATA[Search in the content]]></en>
+        </locale>
+        <locale name="tpl.search.field.icon ">
+            <de><![CDATA[In Schwerpunkte suchen.]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="tpl.search.field.datatype">
+            <de><![CDATA[Nach Seitentyp suchen.]]></de>
+            <en><![CDATA[Search as sitetypes.]]></en>
+        </locale>
+        <locale name="tpl.search.field.e_date">
+            <de><![CDATA[In Editierungsdatum suchen.]]></de>
+            <en><![CDATA[Search in edit date.]]></en>
+        </locale>
 
     </groups>
 

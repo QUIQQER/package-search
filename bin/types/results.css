@@ -24,6 +24,7 @@
 
 .qui-search-settings label {
     clear: both;
+    color: #21536f;
     cursor: pointer;
     float: left;
     margin-bottom: 5px;
@@ -35,6 +36,7 @@
 }
 
 .qui-search-settings fieldset {
+    border-top: 1px solid #999;
     clear: both;
     float: left;
     margin-top: 10px;
@@ -50,22 +52,19 @@
     background: rgba( 255,255,255, 0.7 );
     border: 1px solid #D0D3D3;
     border-radius: 3px;
+    box-sizing: border-box;
     clear: both;
     float: left;
     margin-top: 10px;
     padding: 10px 20px 20px;
     width: 100%;
-
-    -webkit-box-sizing: border-box;
-       -moz-box-sizing: border-box;
-            box-sizing: border-box;
 }
 
 @media screen and (max-width: 767px) {
     .qui-search-result-list-entry {
         background: none;
         border: none;
-        border-radius: none;
+        border-radius: 0;
         border-bottom: 1px solid #D0D3D3;
         padding: 10px 10px 30px 10px;
     }
@@ -77,8 +76,7 @@
 }
 
 .qui-search-result-list-entry-url {
-    border-top-style: solid;
-    border-top-width: 1px;
+    border-top: 1px solid;
     margin-top: 20px;
     opacity: 0.4;
     padding-top: 5px;
@@ -95,8 +93,7 @@
 
 
 .qui-search-result-list-entry-imagelink {
-    background-position: center center;
-    background-repeat: no-repeat;
+    background: no-repeat center center;
     background-size: cover;
     border: 1px solid #EEEEEE;
     float: left;
@@ -127,24 +124,4 @@
 
 .qui-search-result-list-entry-data .qui-button {
     float: right;
-}
-
-.qui-search-entry-data-relevance {
-    border-right: 1px solid #D0D3D3;
-    float: right;
-    line-height: 32px;
-    margin-right: 10px;
-    padding-right: 10px;
-}
-
-.qui-search-entry-data-relevance .fa-star {
-    color: #dddddd;
-}
-
-.qui-search-entry-data-relevance-display {
-    margin-right: 10px;
-}
-
-.qui-search-entry-data-relevance-active {
-    color: #42a9d7 !important;
 }
