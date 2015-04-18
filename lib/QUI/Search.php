@@ -17,18 +17,21 @@ use QUI\Search\Quicksearch;
 
 /**
  * Hauptsuche
+ *
  * @author www.pcsg.de (Henning Leutz)
  */
 class Search
 {
     /**
      * quick search table
+     *
      * @var String
      */
     const tableSearchQuick = 'searchQuick';
 
     /**
      * fulltext search table
+     *
      * @var String
      */
     const tableSearchFull = 'searchFull';
@@ -42,11 +45,11 @@ class Search
     public function createFulltextSearch(Project $Project)
     {
         $Fulltext = new Fulltext();
-        $Fulltext->clearSearchTable( $Project ); // @todo muss raus
+        $Fulltext->clearSearchTable($Project); // @todo muss raus
 
         QUI::getEvents()->fireEvent(
             'searchFulltextCreate',
-            array( $Fulltext, $Project )
+            array($Fulltext, $Project)
         );
     }
 
@@ -59,28 +62,26 @@ class Search
     public function createQuicksearch(Project $Project)
     {
         $list = $Project->getSitesIds(array(
-            'active'  => 1
+            'active' => 1
         ));
 
         $Quicksearch = new Quicksearch();
-        $Quicksearch->clearSearchTable( $Project );
+        $Quicksearch->clearSearchTable($Project);
 
-        foreach ( $list as $siteParams )
-        {
-            try
-            {
+        foreach ($list as $siteParams) {
+            try {
                 $siteId = (int)$siteParams['id'];
-                $Site   = new SiteEdit( $Project, (int)$siteId );
+                $Site = new SiteEdit($Project, (int)$siteId);
 
-                if ( !$Site->getAttribute('active') ) {
+                if (!$Site->getAttribute('active')) {
                     continue;
                 }
 
-                if ( $Site->getAttribute('deleted') ) {
+                if ($Site->getAttribute('deleted')) {
                     continue;
                 }
 
-                if ( $Site->getAttribute('quiqqer.settings.search.not.indexed') ) {
+                if ($Site->getAttribute('quiqqer.settings.search.not.indexed')) {
                     continue;
                 }
 
@@ -89,15 +90,14 @@ class Search
                     $Site->getAttribute('title')
                 ));
 
-            } catch ( QUI\Exception $Exception )
-            {
-                Log::writeException( $Exception );
+            } catch (QUI\Exception $Exception) {
+                Log::writeException($Exception);
             }
         }
 
         QUI::getEvents()->fireEvent(
             'searchQuicksearchCreate',
-            array( $Quicksearch, $Project )
+            array($Quicksearch, $Project)
         );
     }
 
@@ -106,51 +106,46 @@ class Search
      */
     public static function setup()
     {
-        $Table    = QUI::getDataBase()->Table();
-        $Manager  = QUI::getProjectManager();
-        $projects = $Manager->getProjects( true );
+        $Table = QUI::getDataBase()->Table();
+        $Manager = QUI::getProjectManager();
+        $projects = $Manager->getProjects(true);
 
         $fieldList = Search\Fulltext::getFieldList();
-        $fields    = array();
-        $fulltext  = array();
-        $index     = array();
+        $fields = array();
+        $fulltext = array();
+        $index = array();
 
-        foreach ( $fieldList as $fieldEntry )
-        {
-            $fields[ $fieldEntry['field'] ] = $fieldEntry['type'];
+        foreach ($fieldList as $fieldEntry) {
+            $fields[$fieldEntry['field']] = $fieldEntry['type'];
 
-            if ( $fieldEntry['fulltext'] )
-            {
+            if ($fieldEntry['fulltext']) {
                 $fulltext[] = $fieldEntry['field'];
-            } else
-            {
+            } else {
                 $index[] = $fieldEntry['field'];
             }
         }
 
-        foreach ( $projects as $_Project )
-        {
+        foreach ($projects as $_Project) {
             /* @var $_Project Project */
-            $name  = $_Project->getName();
+            $name = $_Project->getName();
             $langs = $_Project->getAttribute('langs');
 
-            foreach ( $langs as $lang )
-            {
-                $Project = $Manager->getProject( $name, $lang );
+            foreach ($langs as $lang) {
+                $Project = $Manager->getProject($name, $lang);
 
                 $table = QUI::getDBProjectTableName(
                     self::tableSearchFull,
                     $Project
                 );
 
-                $Table->appendFields( $table, $fields );
+                $Table->appendFields($table, $fields);
 
-                foreach ( $fulltext as $field ) {
-                    $Table->setFulltext( $table, $field );
+                foreach ($fulltext as $field) {
+                    $Table->setFulltext($table, $field);
                 }
 
-                foreach ( $index as $field ) {
-                    $Table->setIndex( $table, $field );
+                foreach ($index as $field) {
+                    $Table->setIndex($table, $field);
                 }
             }
         }
@@ -197,11 +192,11 @@ class Search
      */
     public static function onSiteChange($Site)
     {
-        if ( !$Site->getAttribute('active') ) {
+        if (!$Site->getAttribute('active')) {
             return;
         }
 
-        if ( $Site->getAttribute('deleted') ) {
+        if ($Site->getAttribute('deleted')) {
             return;
         }
 
@@ -210,7 +205,7 @@ class Search
         $Project = $Site->getProject();
 
         $Quicksearch = new Quicksearch();
-        $Fulltext    = new Fulltext();
+        $Fulltext = new Fulltext();
 
         // Fulltext
         $Fulltext->setEntry($Project, $Site->getId(), array(

@@ -17,23 +17,23 @@ class Cron
 {
     /**
      *
-     * @param array $params
+     * @param array             $params
      * @param \QUI\Cron\Manager $CronManager
      */
     static function createSearchDatabase($params, $CronManager)
     {
-        if ( !isset( $params['project'] ) ) {
+        if (!isset($params['project'])) {
             return;
         }
 
-        if ( !isset( $params['lang'] ) ) {
+        if (!isset($params['lang'])) {
             return;
         }
 
-        $Project = \QUI::getProject( $params['project'], $params['lang'] );
-        $Search  = new Search();
+        $Project = \QUI::getProject($params['project'], $params['lang']);
+        $Search = new Search();
 
-        $Search->createFulltextSearch( $Project );
-        $Search->createQuicksearch( $Project );
+        $Search->createFulltextSearch($Project);
+        $Search->createQuicksearch($Project);
     }
 }
