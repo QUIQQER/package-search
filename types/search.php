@@ -10,9 +10,13 @@ use QUI\Utils\Security\Orthos;
 if (\QUI::getRewrite()->getHeaderCode() === 404) {
     if (isset($_REQUEST['_url'])) {
         $requestUrl = $_REQUEST['_url'];
-        $path = pathinfo($requestUrl);
+        $path       = pathinfo($requestUrl);
 
-        $_REQUEST['search'] = $path['dirname'].' '.$path['filename'];
+        if (isset($path['dirname'])) {
+            $_REQUEST['search'] = $path['dirname'] . ' ' . $path['filename'];
+        } else {
+            $_REQUEST['search'] = $path['filename'];
+        }
     }
 }
 
@@ -20,16 +24,16 @@ if (\QUI::getRewrite()->getHeaderCode() === 404) {
  * Settings
  */
 
-$searchValue = '';
-$searchType = 'OR';
+$searchValue       = '';
+$searchType        = 'OR';
 $fulltextFieldList = Fulltext::getFieldList();
 
 $start = 0;
-$max = $Site->getAttribute('quiqqer.settings.search.list.max');
+$max   = $Site->getAttribute('quiqqer.settings.search.list.max');
 
 $settingsFields = $Site->getAttribute('quiqqer.settings.search.list.fields');
 $settingsFieldsSelected
-    = $Site->getAttribute('quiqqer.settings.search.list.fields.selected');
+                = $Site->getAttribute('quiqqer.settings.search.list.fields.selected');
 
 if (!is_array($settingsFields)) {
     $settingsFields = array();
@@ -40,8 +44,8 @@ if (!is_array($settingsFieldsSelected)) {
 }
 
 $children = array();
-$sheets = 0;
-$count = 0;
+$sheets   = 0;
+$count    = 0;
 
 if (!$max) {
     $max = 10;
@@ -78,7 +82,7 @@ $fields = array();
 
 // available field list
 $availableFields = array();
-$settingsFields = array_flip($settingsFields);
+$settingsFields  = array_flip($settingsFields);
 
 foreach ($fulltextFieldList as $field) {
     if (isset($settingsFields[$field['field']])) {
@@ -119,7 +123,7 @@ if (isset($_REQUEST['searchIn']) && is_array($_REQUEST['searchIn'])) {
 
 if (!empty($searchValue)) {
     $Fulltext = new Fulltext(array(
-        'limit'      => $start.','.$max,
+        'limit'      => $start . ',' . $max,
         'fields'     => $fields,
         'searchtype' => $searchType,
         'Project'    => $Project
@@ -139,7 +143,7 @@ if (!empty($searchValue)) {
                 $urlParams = array();
             }
 
-            $url = URL_DIR.$Site->getUrlRewrited($urlParams);
+            $url = URL_DIR . $Site->getUrlRewrited($urlParams);
             $url = \QUI\Utils\String::replaceDblSlashes($url);
 
             if (!isset($entry['relevance']) || $entry['relevance'] > 100) {
@@ -161,7 +165,7 @@ if (!empty($searchValue)) {
     }
 
     $sheets = ceil($result['count'] / $max);
-    $count = (int)$result['count'];
+    $count  = (int)$result['count'];
 }
 
 
