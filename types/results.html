@@ -23,9 +23,7 @@
 
 
     <section class="content-template grid-100 mobile-grid-100 qui-search-result">
-    {if $sheets > 1}
-        {control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets}
-    {/if}
+    {$Pagination->create()}
 
     {foreach from=$children item=Child}
     {assign var=Child value=$Child->load()}
@@ -70,8 +68,6 @@
     </article>
     {/foreach}
 
-    {if $sheets > 1}
-        {control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets}
-    {/if}
+    {$Pagination->create()}
     </section>
 </div>

@@ -43,24 +43,24 @@ $children = array();
 
 foreach ($result['list'] as $entry) {
     try {
-        $Site = $Project->get($entry['siteId']);
+        $_Site = $Project->get($entry['siteId']);
 
-        $Site->setAttribute('search-name', $entry['name']);
-        $Site->setAttribute('search-title', $entry['title']);
-        $Site->setAttribute('search-short', $entry['short']);
-        $Site->setAttribute('search-url', $Site->getUrlRewrited());
-        $Site->setAttribute('search-icon', $entry['icon']);
+        $_Site->setAttribute('search-name', $entry['name']);
+        $_Site->setAttribute('search-title', $entry['title']);
+        $_Site->setAttribute('search-short', $entry['short']);
+        $_Site->setAttribute('search-url', $Site->getUrlRewrited());
+        $_Site->setAttribute('search-icon', $entry['icon']);
 
         if (!empty($entry['urlParameter'])) {
             $urlParams = json_decode($entry['urlParameter'], true);
 
             if (is_array($urlParams)) {
-                $Site->setAttribute('search-url',
-                    $Site->getUrlRewrited($urlParams));
+                $_Site->setAttribute('search-url',
+                    $_Site->getUrlRewrited($urlParams));
             }
         }
 
-        $children[] = $Site;
+        $children[] = $_Site;
 
     } catch (\QUI\Exception $Exception) {
 
@@ -72,10 +72,18 @@ if ($result['count']) {
     $count = (int)$result['count'];
 }
 
+$Pagination = new \QUI\Bricks\Controls\Pagination(array(
+    'count'     => $count,
+    'Site'      => $Site,
+    'showLimit' => false,
+    'limit'     => $max,
+    'useAjax'   => false
+));
+
+$Pagination->loadFromRequest();
 
 // assign
 $Engine->assign(array(
-    'count'    => $count,
-    'sheets'   => $sheets,
+    'Pagination' => $Pagination,
     'children' => $children
 ));
