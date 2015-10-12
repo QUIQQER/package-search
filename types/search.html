@@ -69,8 +69,8 @@
 
         </form>
 
-        {if empty($children)}
-            <div class="qui-search-result-list-message">
+        {if empty($children) && isset($smarty.request.search)}
+            <div class="content-message-attention qui-search-no-result">
                 {locale group="quiqqer/search" value="tpl.search.no.results"}
             </div>
         {else}

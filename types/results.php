@@ -7,14 +7,14 @@ use QUI\Utils\Security\Orthos;
  * settings
  */
 
-$max   = $Site->getAttribute( 'quiqqer.settings.results.list.max' );
-$types = $Site->getAttribute( 'quiqqer.settings.results.list.types' );
+$max = $Site->getAttribute('quiqqer.settings.results.list.max');
+$types = $Site->getAttribute('quiqqer.settings.results.list.types');
 
 $count = 0;
 $start = 0;
 $types = explode(';', $types);
 
-if ( !$max ) {
+if (!$max) {
     $max = 10;
 }
 
@@ -23,8 +23,8 @@ if ( !$max ) {
  * request
  */
 
-if ( isset( $_REQUEST[ 'sheet' ] ) ) {
-    $start = ( (int)$_REQUEST[ 'sheet' ] - 1 ) * $max;
+if (isset($_REQUEST['sheet'])) {
+    $start = ((int)$_REQUEST['sheet'] - 1) * $max;
 }
 
 
@@ -33,53 +33,57 @@ if ( isset( $_REQUEST[ 'sheet' ] ) ) {
  */
 
 $Fulltext = new Fulltext(array(
-    'limit'     => $start .','. $max,
+    'limit'     => $start.','.$max,
     'datatypes' => $types,
     'Project'   => $Project
 ));
 
-$result   = $Fulltext->search();
+$result = $Fulltext->search();
 $children = array();
 
-foreach ( $result['list'] as $entry )
-{
-    try
-    {
-        $Site = $Project->get( $entry[ 'siteId' ] );
+foreach ($result['list'] as $entry) {
+    try {
+        $_Site = $Project->get($entry['siteId']);
 
-        $Site->setAttribute( 'search-name', $entry['name'] );
-        $Site->setAttribute( 'search-title', $entry['title'] );
-        $Site->setAttribute( 'search-short', $entry['short'] );
-        $Site->setAttribute( 'search-url', $Site->getUrlRewrited() );
-        $Site->setAttribute( 'search-icon', $entry['icon'] );
+        $_Site->setAttribute('search-name', $entry['name']);
+        $_Site->setAttribute('search-title', $entry['title']);
+        $_Site->setAttribute('search-short', $entry['short']);
+        $_Site->setAttribute('search-url', $Site->getUrlRewrited());
+        $_Site->setAttribute('search-icon', $entry['icon']);
 
-        if ( !empty( $entry['urlParameter'] ) )
-        {
-            $urlParams = json_decode( $entry['urlParameter'], true );
+        if (!empty($entry['urlParameter'])) {
+            $urlParams = json_decode($entry['urlParameter'], true);
 
-            if ( is_array( $urlParams ) ) {
-                $Site->setAttribute( 'search-url', $Site->getUrlRewrited( $urlParams ) );
+            if (is_array($urlParams)) {
+                $_Site->setAttribute('search-url',
+                    $_Site->getUrlRewrited($urlParams));
             }
         }
 
-        $children[] = $Site;
+        $children[] = $_Site;
 
-    } catch ( \QUI\Exception $Exception )
-    {
+    } catch (\QUI\Exception $Exception) {
 
     }
 }
 
-if ( $result['count'] )
-{
-    $sheets = ceil( $result['count'] / $max );
-    $count  = (int)$result['count'];
+if ($result['count']) {
+    $sheets = ceil($result['count'] / $max);
+    $count = (int)$result['count'];
 }
 
+$Pagination = new \QUI\Bricks\Controls\Pagination(array(
+    'count'     => $count,
+    'Site'      => $Site,
+    'showLimit' => false,
+    'limit'     => $max,
+    'useAjax'   => false
+));
+
+$Pagination->loadFromRequest();
 
 // assign
 $Engine->assign(array(
-    'count'    => $count,
-    'sheets'   => $sheets,
+    'Pagination' => $Pagination,
     'children' => $children
 ));
