@@ -7,7 +7,7 @@ use QUI\Utils\Security\Orthos;
  * settings
  */
 
-$max = $Site->getAttribute('quiqqer.settings.results.list.max');
+$max   = $Site->getAttribute('quiqqer.settings.results.list.max');
 $types = $Site->getAttribute('quiqqer.settings.results.list.types');
 
 $count = 0;
@@ -33,12 +33,12 @@ if (isset($_REQUEST['sheet'])) {
  */
 
 $Fulltext = new Fulltext(array(
-    'limit'     => $start.','.$max,
+    'limit'     => $start . ',' . $max,
     'datatypes' => $types,
     'Project'   => $Project
 ));
 
-$result = $Fulltext->search();
+$result   = $Fulltext->search();
 $children = array();
 
 foreach ($result['list'] as $entry) {
@@ -48,31 +48,33 @@ foreach ($result['list'] as $entry) {
         $_Site->setAttribute('search-name', $entry['name']);
         $_Site->setAttribute('search-title', $entry['title']);
         $_Site->setAttribute('search-short', $entry['short']);
-        $_Site->setAttribute('search-url', $Site->getUrlRewrited());
+        $_Site->setAttribute('search-url', $_Site->getUrlRewritten());
         $_Site->setAttribute('search-icon', $entry['icon']);
 
         if (!empty($entry['urlParameter'])) {
             $urlParams = json_decode($entry['urlParameter'], true);
 
             if (is_array($urlParams)) {
-                $_Site->setAttribute('search-url',
-                    $_Site->getUrlRewrited($urlParams));
+                $_Site->setAttribute(
+                    'search-url',
+                    $_Site->getUrlRewritten($urlParams)
+                );
             }
         }
 
         $children[] = $_Site;
 
-    } catch (\QUI\Exception $Exception) {
+    } catch (QUI\Exception $Exception) {
 
     }
 }
 
 if ($result['count']) {
     $sheets = ceil($result['count'] / $max);
-    $count = (int)$result['count'];
+    $count  = (int)$result['count'];
 }
 
-$Pagination = new \QUI\Bricks\Controls\Pagination(array(
+$Pagination = new QUI\Bricks\Controls\Pagination(array(
     'count'     => $count,
     'Site'      => $Site,
     'showLimit' => false,
@@ -85,5 +87,5 @@ $Pagination->loadFromRequest();
 // assign
 $Engine->assign(array(
     'Pagination' => $Pagination,
-    'children' => $children
+    'children'   => $children
 ));

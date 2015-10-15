@@ -58,8 +58,8 @@ class Fulltext extends QUI\QDOM
      */
     public function search($str = '')
     {
-        $Project = $this->getAttribute('Project');
-        $attrLimit = $this->getAttribute('limit');
+        $Project    = $this->getAttribute('Project');
+        $attrLimit  = $this->getAttribute('limit');
         $attrFields = $this->getAttribute('fields');
 
         if (!$Project || get_class($Project) !== 'QUI\Projects\Project') {
@@ -73,13 +73,13 @@ class Fulltext extends QUI\QDOM
         $strParts = explode(' ', $str);
 
         foreach ($strParts as $key => $part) {
-            $strParts[$key] = $part.'*';
+            $strParts[$key] = $part . '*';
         }
 
         switch ($this->getAttribute('searchtype')) {
             case 'AND':
             case 'and':
-                $search = '+'.implode(' +', $strParts);
+                $search = '+' . implode(' +', $strParts);
                 break;
 
             default:
@@ -89,7 +89,7 @@ class Fulltext extends QUI\QDOM
 
 
         // fields
-        $fields = array();
+        $fields    = array();
         $fieldList = self::getFieldList();
 
         $availableFields = array_map(function ($entry) {
@@ -126,14 +126,14 @@ class Fulltext extends QUI\QDOM
             'content' => 3
         );
 
-        $PDO = QUI::getPDO();
+        $PDO   = QUI::getPDO();
         $table = QUI::getDBProjectTableName(Search::tableSearchFull, $Project);
         $limit = QUI\Database\DB::createQueryLimit($attrLimit);
 
         // relevance match
         $relevanceMatch = array();
-        $whereMatch = implode(',', $fields);
-        $relevanceSum = 0;
+        $whereMatch     = implode(',', $fields);
+        $relevanceSum   = 0;
 
         foreach ($fields as $field) {
             $matchCount = 9;
@@ -143,14 +143,14 @@ class Fulltext extends QUI\QDOM
             }
 
             $relevanceMatch[]
-                = "MATCH({$field}) AGAINST (:search IN BOOLEAN MODE) * {$matchCount}";
+                          = "MATCH({$field}) AGAINST (:search IN BOOLEAN MODE) * {$matchCount}";
             $relevanceSum = $relevanceSum + $matchCount;
         }
 
         $relevanceMatch = implode(' + ', $relevanceMatch);
 
         // site types
-        $datatypes = $this->getAttribute('datatypes');
+        $datatypes     = $this->getAttribute('datatypes');
         $datatypeQuery = '';
 
         if ($datatypes) {
@@ -161,7 +161,7 @@ class Fulltext extends QUI\QDOM
             $datatypeQuery = ' AND (';
 
             for ($i = 0, $len = count($datatypes); $i < $len; $i++) {
-                $datatypeQuery .= ' datatype LIKE :type'.$i;
+                $datatypeQuery .= ' datatype LIKE :type' . $i;
 
                 if ($len - 1 > $i) {
                     $datatypeQuery .= ' OR ';
@@ -236,7 +236,7 @@ class Fulltext extends QUI\QDOM
         if ($datatypes) {
             for ($i = 0, $len = count($datatypes); $i < $len; $i++) {
                 $Statement->bindValue(
-                    ':type'.$i,
+                    ':type' . $i,
                     $datatypes[$i],
                     \PDO::PARAM_STR
                 );
@@ -258,7 +258,7 @@ class Fulltext extends QUI\QDOM
         if ($datatypes) {
             for ($i = 0, $len = count($datatypes); $i < $len; $i++) {
                 $Statement->bindValue(
-                    ':type'.$i,
+                    ':type' . $i,
                     $datatypes[$i],
                     \PDO::PARAM_STR
                 );
@@ -284,8 +284,8 @@ class Fulltext extends QUI\QDOM
      *
      * @param Project $Project
      * @param Integer $siteId
-     * @param Array   $params
-     * @param Array   $siteParams - optional; Parameter for the site link
+     * @param Array $params
+     * @param Array $siteParams - optional; Parameter for the site link
      */
     public static function setEntry(
         Project $Project,
@@ -306,7 +306,7 @@ class Fulltext extends QUI\QDOM
      *
      * @param Project $Project
      * @param integer $siteId
-     * @param array   $siteParams (optional); Parameter for the site link
+     * @param array $siteParams (optional); Parameter for the site link
      */
     public static function removeEntry(
         Project $Project,
@@ -326,8 +326,8 @@ class Fulltext extends QUI\QDOM
      *
      * @param Project $Project
      * @param Integer $siteId
-     * @param Array   $params
-     * @param Array   $siteParams - optional; Parameter for the site link
+     * @param Array $params
+     * @param Array $siteParams - optional; Parameter for the site link
      */
     public static function setEntryData(
         Project $Project,
@@ -335,11 +335,11 @@ class Fulltext extends QUI\QDOM
         $params = array(),
         $siteParams = array()
     ) {
-        $table = QUI::getDBProjectTableName(Search::tableSearchFull, $Project);
+        $table  = QUI::getDBProjectTableName(Search::tableSearchFull, $Project);
         $fields = self::getFieldList();
 
         $urlParameter = json_encode($siteParams);
-        $siteId = (int)$siteId;
+        $siteId       = (int)$siteId;
 
         try {
             $data = self::getEntry($Project, $siteId, $siteParams);
@@ -354,7 +354,7 @@ class Fulltext extends QUI\QDOM
             if (is_array($siteParams) && !empty($siteParams)) {
                 foreach ($siteParams as $urlKey => $urlValue) {
                     $urlValue = Orthos::clear($urlValue);
-                    $urlKey = Orthos::clear($urlKey);
+                    $urlKey   = Orthos::clear($urlKey);
 
                     $siteUrlParams[$urlKey] = $urlValue;
                 }
@@ -393,8 +393,8 @@ class Fulltext extends QUI\QDOM
      *
      * @param Project $Project
      * @param Integer $siteId
-     * @param String  $data
-     * @param Array   $siteParams
+     * @param String $data
+     * @param Array $siteParams
      */
     public static function appendFulltextSearchString(
         Project $Project,
@@ -407,10 +407,10 @@ class Fulltext extends QUI\QDOM
             $Project
         );
 
-        $entry = self::getEntry($Project, $siteId, $siteParams);
+        $entry   = self::getEntry($Project, $siteId, $siteParams);
         $content = $entry['data'];
 
-        $content = $content.' '.$data;
+        $content      = $content . ' ' . $data;
         $urlParameter = json_encode($siteParams);
 
         QUI::getDataBase()->update($table, array(
@@ -426,7 +426,7 @@ class Fulltext extends QUI\QDOM
      *
      * @param Project $Project
      * @param Integer $siteId
-     * @param Array   $siteParams
+     * @param Array $siteParams
      *
      * @throws QUI\Exception
      */
@@ -475,7 +475,7 @@ class Fulltext extends QUI\QDOM
      * event : onSearchFulltextCreation
      *
      * @param Fulltext $Fulltext
-     * @param Project  $Project
+     * @param Project $Project
      */
     public static function onSearchFulltextCreate(
         Fulltext $Fulltext,
@@ -488,7 +488,7 @@ class Fulltext extends QUI\QDOM
         foreach ($list as $siteParams) {
             try {
                 $siteId = (int)$siteParams['id'];
-                $Site = new SiteEdit($Project, (int)$siteId);
+                $Site   = new SiteEdit($Project, (int)$siteId);
 
                 if (!$Site->getAttribute('active')) {
                     continue;
@@ -546,10 +546,10 @@ class Fulltext extends QUI\QDOM
         }
 
         $result = array();
-        $files = self::getSearchXmlList();
+        $files  = self::getSearchXmlList();
 
         foreach ($files as $file) {
-            $Dom = QUI\Utils\XML::getDomFromXml($file);
+            $Dom  = QUI\Utils\XML::getDomFromXml($file);
             $Path = new \DOMXPath($Dom);
 
             $fields = $Path->query("//quiqqer/search/searchfields/field");
@@ -587,10 +587,10 @@ class Fulltext extends QUI\QDOM
         }
 
         $packages = QUI::getPackageManager()->getInstalled();
-        $result = array();
+        $result   = array();
 
         foreach ($packages as $package) {
-            $xmlFile = OPT_DIR.$package['name'].'/search.xml';
+            $xmlFile = OPT_DIR . $package['name'] . '/search.xml';
 
             if (file_exists($xmlFile)) {
                 $result[] = $xmlFile;

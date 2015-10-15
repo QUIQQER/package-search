@@ -7,7 +7,7 @@ use QUI\Utils\Security\Orthos;
  * 404 Error Site
  */
 
-if (\QUI::getRewrite()->getHeaderCode() === 404) {
+if (QUI::getRewrite()->getHeaderCode() === 404) {
     if (isset($_REQUEST['_url'])) {
         $requestUrl = $_REQUEST['_url'];
         $path       = pathinfo($requestUrl);
@@ -91,6 +91,10 @@ foreach ($fulltextFieldList as $field) {
 }
 
 // search fields
+if (isset($_REQUEST['searchIn']) && !is_array($_REQUEST['searchIn'])) {
+    $_REQUEST['searchIn'] = explode(',', urldecode($_REQUEST['searchIn']));
+}
+
 if (isset($_REQUEST['searchIn']) && is_array($_REQUEST['searchIn'])) {
     foreach ($_REQUEST['searchIn'] as $field) {
         $field = Orthos::clear($field);
@@ -122,6 +126,7 @@ if (isset($_REQUEST['searchIn']) && is_array($_REQUEST['searchIn'])) {
  */
 
 if (!empty($searchValue)) {
+
     $Fulltext = new Fulltext(array(
         'limit'      => $start . ',' . $max,
         'fields'     => $fields,
@@ -135,7 +140,7 @@ if (!empty($searchValue)) {
         try {
             // immer neues site objekt
             // falls die gleiche seite mit unterschiedlichen url params existiert
-            $Site = new \QUI\Projects\Site($Project, (int)$entry['siteId']);
+            $_Site = new QUI\Projects\Site($Project, (int)$entry['siteId']);
 
             $urlParams = json_decode($entry['urlParameter'], true);
 
@@ -143,29 +148,45 @@ if (!empty($searchValue)) {
                 $urlParams = array();
             }
 
-            $url = URL_DIR . $Site->getUrlRewrited($urlParams);
-            $url = \QUI\Utils\String::replaceDblSlashes($url);
+            $url = $_Site->getUrlRewritten($urlParams);
+            $url = QUI\Utils\String::replaceDblSlashes($url);
 
             if (!isset($entry['relevance']) || $entry['relevance'] > 100) {
                 $entry['relevance'] = 100;
             }
 
-            $Site->setAttribute('search-name', $entry['name']);
-            $Site->setAttribute('search-title', $entry['title']);
-            $Site->setAttribute('search-short', $entry['short']);
-            $Site->setAttribute('search-relevance', $entry['relevance']);
-            $Site->setAttribute('search-url', $url);
-            $Site->setAttribute('search-icon', $entry['icon']);
+            $_Site->setAttribute('search-name', $entry['name']);
+            $_Site->setAttribute('search-title', $entry['title']);
+            $_Site->setAttribute('search-short', $entry['short']);
+            $_Site->setAttribute('search-relevance', $entry['relevance']);
+            $_Site->setAttribute('search-url', $url);
+            $_Site->setAttribute('search-icon', $entry['icon']);
 
-            $children[] = $Site;
+            $children[] = $_Site;
 
-        } catch (\QUI\Exception $Exception) {
-            \QUI\System\Log::addDebug($Exception->getMessage());
+        } catch (QUI\Exception $Exception) {
+            QUI\System\Log::addDebug($Exception->getMessage());
         }
     }
 
     $sheets = ceil($result['count'] / $max);
     $count  = (int)$result['count'];
+
+
+    $Pagination = new QUI\Bricks\Controls\Pagination(array(
+        'Site'      => $Site,
+        'count'     => $count,
+        'showLimit' => false,
+        'limit'     => $max,
+        'useAjax'   => false
+    ));
+
+    $Pagination->loadFromRequest();
+
+    $Pagination->setGetParams('search', $searchValue);
+    $Pagination->setGetParams('searchIn', implode(',', $fields));
+
+    $Engine->assign('Pagination', $Pagination);
 }
 
 
@@ -176,5 +197,5 @@ $Engine->assign(array(
     'children'        => $children,
     'searchValue'     => $searchValue,
     'searchType'      => $searchType,
-    'availableFields' => $availableFields
+    'availableFields' => $availableFields,
 ));
