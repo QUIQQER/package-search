@@ -84,7 +84,8 @@
 
 
             {if $sheets > 1}
-                {control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets search=$searchValue}
+                {*control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets search=$searchValue*}
+                {$Pagination->create()}
             {/if}
 
             {foreach from=$children item=Child}
@@ -147,7 +148,8 @@
             {/foreach}
 
             {if $sheets > 1}
-                {control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets search=$searchValue}
+                {*control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets search=$searchValue*}
+                {$Pagination->create()}
             {/if}
         {/if}
 
