@@ -1,7 +1,6 @@
 <?php
 
 use QUI\Search\Fulltext;
-use QUI\Utils\Security\Orthos;
 
 /**
  * settings
