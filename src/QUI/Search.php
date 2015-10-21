@@ -230,19 +230,46 @@ class Search
      */
     static function onTemplateGetHeader(QUI\Template $Template)
     {
+        $Project = QUI::getProjectManager()->get();
+
+        $result = $Project->getSites(array(
+            'where' => array(
+                'type' => 'quiqqer/search:types/search'
+            ),
+            'limit' => 1
+        ));
+
+        if (!isset($result[0])) {
+            return;
+        }
+
+        $host = $Project->getVHost(true, true);
+
+        /* @var $SearchSite QUI\Projects\Site */
+        $SearchSite = $result[0];
+        $searchUrl  = $SearchSite->getUrlRewritten();
+        $start      = $Project->firstChild()->getUrlRewritten();
+
+        if (strpos($searchUrl, 'http') !== 0) {
+            $searchUrl = $host . $searchUrl;
+            $start     = $host . $start;
+        }
+
         $Template->extendHeader(
-            '<script type="application/ld+json">
+            '
+            <script type="application/ld+json">
             {
                 "@context": "http://schema.org",
-              "@type": "WebSite",
-              "url": "https://www.example.com/",
-              "potentialAction": {
-                "@type": "SearchAction",
-                "target": "https://query.example.com/search?q={search_term_string}",
-                "query-input": "required name=search_term_string"
-              }
+                "@type": "WebSite",
+                "url": "' . $start . '",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": "' . $searchUrl . '?search={search_term_string}",
+                    "query-input": "required name=search"
+                }
             }
-            </script>'
+            </script>
+            '
         );
 
     }
