@@ -264,7 +264,7 @@ class Search
                 "url": "' . $start . '",
                 "potentialAction": {
                     "@type": "SearchAction",
-                    "target": "' . $searchUrl . '?search={search_term_string}",
+                    "target": "' . $searchUrl . '?search={search}",
                     "query-input": "required name=search"
                 }
             }
