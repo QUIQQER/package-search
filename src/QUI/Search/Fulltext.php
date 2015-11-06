@@ -92,9 +92,17 @@ class Fulltext extends QUI\QDOM
         $fields    = array();
         $fieldList = self::getFieldList();
 
-        $availableFields = array_map(function ($entry) {
-            return $entry['field'];
-        }, $fieldList);
+        $availableFields = array();
+
+        // filter
+        foreach ($fieldList as $entry) {
+            if (mb_strpos($entry['type'], 'varchar') !== false
+                || mb_strpos($entry['type'], 'text') !== false
+            ) {
+                $availableFields[] = $entry['field'];
+            }
+        }
+
 
         if (!$attrFields || !is_array($attrFields)) {
             $fields = $availableFields;
@@ -114,9 +122,12 @@ class Fulltext extends QUI\QDOM
         }
 
         foreach ($fields as $key => $value) {
-            $fields[$key] = Orthos::clearNoneCharacters($fields[$key],
-                array('_'));
+            $fields[$key] = Orthos::clearNoneCharacters(
+                $fields[$key],
+                array('_')
+            );
         }
+
 
         // sql
         $count = array(
@@ -142,9 +153,8 @@ class Fulltext extends QUI\QDOM
                 $matchCount = $count[$field];
             }
 
-            $relevanceMatch[]
-                          = "MATCH({$field}) AGAINST (:search IN BOOLEAN MODE) * {$matchCount}";
-            $relevanceSum = $relevanceSum + $matchCount;
+            $relevanceMatch[] = "MATCH({$field}) AGAINST (:search IN BOOLEAN MODE) * {$matchCount}";
+            $relevanceSum     = $relevanceSum + $matchCount;
         }
 
         $relevanceMatch = implode(' + ', $relevanceMatch);
@@ -190,7 +200,7 @@ class Fulltext extends QUI\QDOM
                 e_date DESC
         ";
 
-        if (strlen($search) > 2) {
+        if (strlen($search) >= 2) {
             $query
                 = "
                 SELECT
@@ -224,10 +234,17 @@ class Fulltext extends QUI\QDOM
          * search
          */
         $Statement = $PDO->prepare($selectQuery);
-        $Statement->bindValue(':limit1', $limit['prepare'][':limit1'][0],
-            \PDO::PARAM_INT);
-        $Statement->bindValue(':limit2', $limit['prepare'][':limit2'][0],
-            \PDO::PARAM_INT);
+        $Statement->bindValue(
+            ':limit1',
+            $limit['prepare'][':limit1'][0],
+            \PDO::PARAM_INT
+        );
+
+        $Statement->bindValue(
+            ':limit2',
+            $limit['prepare'][':limit2'][0],
+            \PDO::PARAM_INT
+        );
 
         if (strlen($search) > 2 || $search == '%%') {
             $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
