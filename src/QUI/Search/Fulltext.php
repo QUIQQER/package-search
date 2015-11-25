@@ -574,8 +574,7 @@ class Fulltext extends QUI\QDOM
                 $result[] = array(
                     'field'    => trim($Field->nodeValue),
                     'type'     => $Field->getAttribute('type'),
-                    'fulltext' => $Field->getAttribute('fulltext') ? true
-                        : false
+                    'fulltext' => $Field->getAttribute('fulltext') ? true : false
                 );
             }
         }

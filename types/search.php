@@ -72,7 +72,8 @@ if (isset($_REQUEST['search'])) {
     $searchValue = trim($searchValue);
 }
 
-if (isset($_REQUEST['searchType']) && $_REQUEST['searchType'] == 'AND') {
+if (isset($_REQUEST['searchType']) && $_REQUEST['searchType'] == 'AND' ||
+    isset($settingsFields['searchTypeAnd'])) {
     $searchType = 'AND';
 }
 
