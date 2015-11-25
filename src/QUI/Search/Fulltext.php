@@ -19,14 +19,15 @@ use QUI\Utils\Security\Orthos;
 /**
  * Fulltextsearch Manager
  *
- * @author www.pcsg.de (Henning Leutz)
+ * @package QUI\Search\Fulltext
+ * @author  www.pcsg.de (Henning Leutz) <info@pcsg.de>
  */
 class Fulltext extends QUI\QDOM
 {
     /**
      * Constructor
      *
-     * @param Array $params
+     * @param array $params - Attributes
      */
     public function __construct($params = array())
     {
@@ -51,7 +52,7 @@ class Fulltext extends QUI\QDOM
      *
      * @param String $str
      *
-     * @return Array array(
+     * @return array array(
      *        'list'   => array list of results
      *        'count'  => count of results
      * )
@@ -230,9 +231,7 @@ class Fulltext extends QUI\QDOM
             FROM ({$query}) as T
         ";
 
-        /**
-         * search
-         */
+        // search
         $Statement = $PDO->prepare($selectQuery);
         $Statement->bindValue(
             ':limit1',
@@ -263,9 +262,7 @@ class Fulltext extends QUI\QDOM
         $Statement->execute();
         $result = $Statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        /**
-         * count
-         */
+        // count
         $Statement = $PDO->prepare($countQuery);
 
         if (strlen($search) > 2 || $search == '%%') {
@@ -301,8 +298,8 @@ class Fulltext extends QUI\QDOM
      *
      * @param Project $Project
      * @param Integer $siteId
-     * @param Array $params
-     * @param Array $siteParams - optional; Parameter for the site link
+     * @param array $params
+     * @param array $siteParams - optional; Parameter for the site link
      */
     public static function setEntry(
         Project $Project,
@@ -321,9 +318,11 @@ class Fulltext extends QUI\QDOM
     /**
      * Delete an entry from the search table
      *
-     * @param Project $Project
-     * @param integer $siteId
-     * @param array $siteParams (optional); Parameter for the site link
+     * @param Project $Project    - Project
+     * @param integer $siteId     - ID of the site
+     * @param array   $siteParams - (optional); Parameter for the site link
+     *
+     * @return void
      */
     public static function removeEntry(
         Project $Project,
@@ -342,9 +341,9 @@ class Fulltext extends QUI\QDOM
      * Edit an entry to the fulltext search table
      *
      * @param Project $Project
-     * @param Integer $siteId
-     * @param Array $params
-     * @param Array $siteParams - optional; Parameter for the site link
+     * @param integer $siteId
+     * @param array $params
+     * @param array $siteParams - optional; Parameter for the site link
      */
     public static function setEntryData(
         Project $Project,
@@ -409,9 +408,9 @@ class Fulltext extends QUI\QDOM
      * Append the data field of an specific search entry
      *
      * @param Project $Project
-     * @param Integer $siteId
-     * @param String $data
-     * @param Array $siteParams
+     * @param integer $siteId
+     * @param string  $data
+     * @param array   $siteParams
      */
     public static function appendFulltextSearchString(
         Project $Project,
@@ -442,8 +441,8 @@ class Fulltext extends QUI\QDOM
      * Return an fulltext entry
      *
      * @param Project $Project
-     * @param Integer $siteId
-     * @param Array $siteParams
+     * @param integer $siteId
+     * @param array   $siteParams
      *
      * @throws QUI\Exception
      */
@@ -549,7 +548,7 @@ class Fulltext extends QUI\QDOM
     /**
      * Return the search fields
      *
-     * @return Array
+     * @return array
      */
     public static function getFieldList()
     {
@@ -590,7 +589,7 @@ class Fulltext extends QUI\QDOM
     /**
      * Return the plugins with a search.xml file
      *
-     * @return Array
+     * @return array
      */
     public static function getSearchXmlList()
     {
