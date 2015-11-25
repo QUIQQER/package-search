@@ -50,7 +50,7 @@ class Fulltext extends QUI\QDOM
     /**
      * Search something in a project
      *
-     * @param String $str
+     * @param String $str - search string
      *
      * @return array array(
      *        'list'   => array list of results
@@ -318,9 +318,9 @@ class Fulltext extends QUI\QDOM
     /**
      * Delete an entry from the search table
      *
-     * @param Project $Project    - Project
-     * @param integer $siteId     - ID of the site
-     * @param array   $siteParams - (optional); Parameter for the site link
+     * @param Project $Project - Project
+     * @param integer $siteId - ID of the site
+     * @param array $siteParams - (optional); Parameter for the site link
      *
      * @return void
      */
@@ -409,8 +409,8 @@ class Fulltext extends QUI\QDOM
      *
      * @param Project $Project
      * @param integer $siteId
-     * @param string  $data
-     * @param array   $siteParams
+     * @param string $data
+     * @param array $siteParams
      */
     public static function appendFulltextSearchString(
         Project $Project,
@@ -442,7 +442,7 @@ class Fulltext extends QUI\QDOM
      *
      * @param Project $Project
      * @param integer $siteId
-     * @param array   $siteParams
+     * @param array $siteParams
      *
      * @throws QUI\Exception
      */
@@ -558,7 +558,6 @@ class Fulltext extends QUI\QDOM
             return QUI\Cache\Manager::get($cache);
 
         } catch (QUI\Exception $Exception) {
-
         }
 
         $result = array();
@@ -599,7 +598,6 @@ class Fulltext extends QUI\QDOM
             return QUI\Cache\Manager::get($cache);
 
         } catch (QUI\Exception $Exception) {
-
         }
 
         $packages = QUI::getPackageManager()->getInstalled();

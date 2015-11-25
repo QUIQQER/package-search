@@ -1,69 +1,69 @@
-
 /**
  * Suggest search utils
  * Helper for node elements
  *
  * @module package/quiqqer/search/bin/controls/Suggest
  * @author www.pcsg.de (Henning Leutz)
+ *
+ * @require qui/QUI
+ * @require qui/controls/Control
+ * @require Ajax
  */
-
-define([
+define('package/quiqqer/search/bin/controls/Suggest', [
 
     'qui/QUI',
     'qui/controls/Control',
     'Ajax'
 
-], function(QUI, QUIControl, Ajax)
-{
+], function (QUI, QUIControl, Ajax) {
     "use strict";
 
     return new Class({
 
-        Extends : QUIControl,
-        Type    : 'package/quiqqer/search/bin/controls/Suggest',
+        Extends: QUIControl,
+        Type   : 'package/quiqqer/search/bin/controls/Suggest',
 
-        Binds :[
+        Binds: [
             '$onImport',
+            '$onInsert',
             '$keyUp'
         ],
 
-        options : {
-            name        : 'search',
-            placeholder : 'Search...',
-            delay       : 300
+        options: {
+            name       : 'search',
+            placeholder: 'Search...',
+            delay      : 300
         },
 
-        initialize : function(options)
-        {
+        initialize: function (options) {
             this.$binds      = [];
             this.$timer      = null;
             this.$lastSearch = '';
 
             this.$Datalist = null;
 
-            this.parent( options );
+            this.parent(options);
 
             this.addEvents({
-                onImport : this.$onImport,
-                onInsert : this.$onInsert
+                onImport: this.$onImport,
+                onInsert: this.$onInsert
             });
         },
 
         /**
          * Create the node element
          *
-         * @return {DOMNode}
+         * @return {HTMLInputElement}
          */
-        create : function()
-        {
+        create: function () {
             this.$Elm = new Element('input', {
-                type         : 'text',
-                required     : 'required',
-                placeholder  : this.getAttribute( 'placeholder' ),
-                name         : this.getAttribute( 'name' )
+                type       : 'text',
+                required   : 'required',
+                placeholder: this.getAttribute('placeholder'),
+                name       : this.getAttribute('name')
             });
 
-            this.bindElement( this.$Elm );
+            this.bindElement(this.$Elm);
 
             return this.$Elm;
         },
@@ -71,15 +71,14 @@ define([
         /**
          * Return the datalist
          */
-        getDataList : function()
-        {
-            if ( this.$Datalist ) {
+        getDataList: function () {
+            if (this.$Datalist) {
                 return this.$Datalist;
             }
 
             this.$Datalist = new Element('datalist', {
-                id : 'datalist'+ this.getId()
-            }).inject( document.body );
+                id: 'datalist' + this.getId()
+            }).inject(document.body);
 
             return this.$Datalist;
         },
@@ -87,53 +86,49 @@ define([
         /**
          * event : on import
          */
-        $onImport : function(self, Elm)
-        {
-            this.bindElement( Elm );
+        $onImport: function (self, Elm) {
+            this.bindElement(Elm);
         },
 
         /**
          * Bind the suggest to an input element
          *
-         * @param {DOMNode} Node
+         * @param {HTMLFormElement} Node
          */
-        bindElement : function(Node)
-        {
-            this.$binds.push( Node );
+        bindElement: function (Node) {
+            this.$binds.push(Node);
 
             Node.set({
-                list : this.getDataList().get( 'id' ),
-                autocomplete : "off"
+                list        : this.getDataList().get('id'),
+                autocomplete: "off"
             });
 
             Node.addEvents({
-                keyup : this.$keyUp
+                keyup: this.$keyUp
             });
         },
 
         /**
          * Unbind the suggest from an input element
          *
-         * @param {DOMNode} Node
+         * @param {HTMLFormElement} Node
          */
-        unbindElement : function(Node)
-        {
+        unbindElement: function (Node) {
             Node.removeEvents({
-                keyup : this.$keyUp
+                keyup: this.$keyUp
             });
 
             Node.set({
-                list : null
+                list: null
             });
 
             var binds = [];
 
-            this.$binds.push( Node );
+            this.$binds.push(Node);
 
-            for ( var i = 0, len = this.$binds.length; i < len; i++ )
-            {
-                if ( this.$binds[ i ] != Node ) {
-                    binds.push( Node );
+            for (var i = 0, len = this.$binds.length; i < len; i++) {
+                if (this.$binds[i] != Node) {
+                    binds.push(Node);
                 }
             }
 
@@ -145,8 +140,7 @@ define([
          *
          * @return {Array}
          */
-        getBindedElements : function()
-        {
+        getBindedElements: function () {
             return this.$binds;
         },
 
@@ -155,44 +149,39 @@ define([
          *
          * @param {DOMEvent} event
          */
-        $keyUp : function(event)
-        {
-            if ( this.$timer ) {
-                clearTimeout( this.$timer );
+        $keyUp: function (event) {
+            if (this.$timer) {
+                clearTimeout(this.$timer);
             }
 
             var self = this,
                 Elm  = event.target;
 
-            if ( this.$lastSearch == Elm.value ) {
+            if (this.$lastSearch == Elm.value) {
                 return;
             }
 
-            this.getDataList().set( 'html', '' );
+            this.getDataList().set('html', '');
 
-            this.$timer = (function()
-            {
+            this.$timer = (function () {
                 self.$lastSearch = Elm.value;
 
-                self.search( Elm.value, function(result)
-                {
-                    var str  = '',
-                        list = result.list;
+                self.search(Elm.value, function (result) {
+                    var list = result.list;
 
                     var DataList = self.getDataList();
 
-                    DataList.set( 'html', '' );
+                    DataList.set('html', '');
 
-                    for ( var i = 0, len = list.length; i < len; i++ )
-                    {
+                    for (var i = 0, len = list.length; i < len; i++) {
                         new Element('option', {
-                            value : list[ i ].data
+                            value: list[i].data
                             // label : ""
-                        }).inject( DataList );
+                        }).inject(DataList);
                     }
                 });
 
-            }).delay( this.getAttribute( 'delay' ) );
+            }).delay(this.getAttribute('delay'));
         },
 
         /**
@@ -201,15 +190,13 @@ define([
          * @param {String} search - search string
          * @param {Function} callback - callback function function( result ){}
          */
-        search : function(search, callback)
-        {
-            Ajax.get('package_quiqqer_search_ajax_suggest', function(result)
-            {
-                callback( result );
+        search: function (search, callback) {
+            Ajax.get('package_quiqqer_search_ajax_suggest', function (result) {
+                callback(result);
             }, {
-                'package' : 'quiqqer/search',
-                project   : JSON.encode( QUIQQER_PROJECT ),
-                search    : search
+                'package': 'quiqqer/search',
+                project  : JSON.encode(QUIQQER_PROJECT),
+                search   : search
             });
         }
     });

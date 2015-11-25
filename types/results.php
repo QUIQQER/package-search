@@ -64,7 +64,6 @@ foreach ($result['list'] as $entry) {
         $children[] = $_Site;
 
     } catch (QUI\Exception $Exception) {
-
     }
 }
 

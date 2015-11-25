@@ -226,9 +226,9 @@ class Search
     /**
      * event onTemplateGetHeader
      *
-     * @param Template $Template
+     * @param QUI\Template $Template - Template object
      */
-    static function onTemplateGetHeader(QUI\Template $Template)
+    public static function onTemplateGetHeader(QUI\Template $Template)
     {
         $Project = QUI::getProjectManager()->get();
 

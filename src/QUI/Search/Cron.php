@@ -17,10 +17,10 @@ class Cron
 {
     /**
      *
-     * @param array             $params
+     * @param array $params
      * @param \QUI\Cron\Manager $CronManager
      */
-    static function createSearchDatabase($params, $CronManager)
+    public static function createSearchDatabase($params, $CronManager)
     {
         if (!isset($params['project'])) {
             return;
@@ -31,7 +31,7 @@ class Cron
         }
 
         $Project = \QUI::getProject($params['project'], $params['lang']);
-        $Search = new Search();
+        $Search  = new Search();
 
         $Search->createFulltextSearch($Project);
         $Search->createQuicksearch($Project);
