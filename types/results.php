@@ -1,7 +1,6 @@
 <?php
 
 use QUI\Search\Fulltext;
-use QUI\Utils\Security\Orthos;
 
 /**
  * settings
@@ -65,7 +64,6 @@ foreach ($result['list'] as $entry) {
         $children[] = $_Site;
 
     } catch (QUI\Exception $Exception) {
-
     }
 }
 

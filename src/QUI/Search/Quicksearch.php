@@ -25,9 +25,9 @@ class Quicksearch
     /**
      * Search something in a project
      *
-     * @param string  $str
+     * @param string $str
      * @param Project $Project
-     * @param array   $params - Query params
+     * @param array $params - Query params
      *                        $params['limit'] = default: 10
      *
      * @return array array(
@@ -37,9 +37,11 @@ class Quicksearch
      */
     public function search($str, Project $Project, $params = array())
     {
-        $PDO = \QUI::getPDO();
-        $table = \QUI::getDBProjectTableName(Search::tableSearchQuick,
-            $Project);
+        $PDO   = QUI::getPDO();
+        $table = QUI::getDBProjectTableName(
+            Search::tableSearchQuick,
+            $Project
+        );
 
         if (!is_array($params)) {
             $params = array();
@@ -49,8 +51,8 @@ class Quicksearch
             $params['limit'] = 10;
         }
 
-        $search = '%'.$str.'%';
-        $limit = QUI\Database\DB::createQueryLimit($params['limit']);
+        $search = '%' . $str . '%';
+        $limit  = QUI\Database\DB::createQueryLimit($params['limit']);
 
         $groupedBy = 'GROUP BY data';
 
@@ -81,13 +83,19 @@ class Quicksearch
         $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
 
         if (isset($limit['prepare'][':limit1'])) {
-            $Statement->bindValue(':limit1', $limit['prepare'][':limit1'][0],
-                \PDO::PARAM_INT);
+            $Statement->bindValue(
+                ':limit1',
+                $limit['prepare'][':limit1'][0],
+                \PDO::PARAM_INT
+            );
         }
 
         if (isset($limit['prepare'][':limit2'])) {
-            $Statement->bindValue(':limit2', $limit['prepare'][':limit2'][0],
-                \PDO::PARAM_INT);
+            $Statement->bindValue(
+                ':limit2',
+                $limit['prepare'][':limit2'][0],
+                \PDO::PARAM_INT
+            );
         }
 
         $Statement->execute();
@@ -118,8 +126,8 @@ class Quicksearch
      *
      * @param Project $Project
      * @param Integer $siteId
-     * @param Array   $data       - data array -> every array entry is a data entry
-     * @param Array   $siteParams - optional; Parameter for the site link
+     * @param array $data - data array -> every array entry is a data entry
+     * @param array $siteParams - optional; Parameter for the site link
      */
     public static function setEntries(
         Project $Project,
@@ -127,8 +135,11 @@ class Quicksearch
         $data = array(),
         $siteParams = array()
     ) {
-        $table = \QUI::getDBProjectTableName(Search::tableSearchQuick,
-            $Project);
+        $table = QUI::getDBProjectTableName(
+            Search::tableSearchQuick,
+            $Project
+        );
+
         $siteId = (int)$siteId;
 
         if (!$siteId) {
@@ -148,7 +159,7 @@ class Quicksearch
         // site params
         if (is_array($siteParams) && !empty($siteParams)) {
             foreach ($siteParams as $key => $value) {
-                $key = Orthos::clear($key);
+                $key   = Orthos::clear($key);
                 $value = Orthos::clear($value);
 
                 $siteUrlParams[$key] = $value;
@@ -159,7 +170,7 @@ class Quicksearch
 
         // data
         foreach ($data as $dataEntry) {
-            \QUI::getDataBase()->insert($table, array(
+            QUI::getDataBase()->insert($table, array(
                 'siteId'       => $siteId,
                 'urlParameter' => $urlParameter,
                 'data'         => Orthos::clear($dataEntry)
@@ -167,7 +178,7 @@ class Quicksearch
         }
 
 
-        \QUI::getEvents()->fireEvent(
+        QUI::getEvents()->fireEvent(
             'searchQuicksearchSetEntry',
             array($Project, $siteId, $siteParams)
         );
@@ -178,8 +189,8 @@ class Quicksearch
      *
      * @param Project $Project
      * @param Integer $siteId
-     * @param String  $data
-     * @param Array   $siteParams
+     * @param String $data
+     * @param array $siteParams
      */
     public static function addEntry(
         Project $Project,
@@ -187,8 +198,11 @@ class Quicksearch
         $data,
         $siteParams = array()
     ) {
-        $table = \QUI::getDBProjectTableName(Search::tableSearchQuick,
-            $Project);
+        $table = QUI::getDBProjectTableName(
+            Search::tableSearchQuick,
+            $Project
+        );
+
         $siteId = (int)$siteId;
 
         if (!$siteId) {
@@ -202,7 +216,7 @@ class Quicksearch
         $urlParameter = json_encode($siteParams);
 
 
-        \QUI::getDataBase()->insert($table, array(
+        QUI::getDataBase()->insert($table, array(
             'siteId'       => $siteId,
             'urlParameter' => $urlParameter,
             'data'         => Orthos::clear($data)
@@ -214,15 +228,18 @@ class Quicksearch
      *
      * @param Project $Project
      * @param Integer $siteId
-     * @param Array   $siteParams
+     * @param array $siteParams
      */
     public static function removeEntries(
         Project $Project,
         $siteId,
         $siteParams = array()
     ) {
-        $table = \QUI::getDBProjectTableName(Search::tableSearchQuick,
-            $Project);
+        $table = QUI::getDBProjectTableName(
+            Search::tableSearchQuick,
+            $Project
+        );
+
         $siteId = (int)$siteId;
 
         if (!$siteId) {
@@ -240,7 +257,7 @@ class Quicksearch
      *
      * @param Project $Project
      * @param integer $siteId
-     * @param array   $siteParams
+     * @param array $siteParams
      *
      * @return array
      *
@@ -282,8 +299,8 @@ class Quicksearch
      */
     public static function clearSearchTable(Project $Project)
     {
-        \QUI::getDataBase()->Table()->truncate(
-            \QUI::getDBProjectTableName(Search::tableSearchQuick, $Project)
+        QUI::getDataBase()->Table()->truncate(
+            QUI::getDBProjectTableName(Search::tableSearchQuick, $Project)
         );
     }
 }

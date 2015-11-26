@@ -32,8 +32,10 @@ $start = 0;
 $max   = $Site->getAttribute('quiqqer.settings.search.list.max');
 
 $settingsFields = $Site->getAttribute('quiqqer.settings.search.list.fields');
-$settingsFieldsSelected
-                = $Site->getAttribute('quiqqer.settings.search.list.fields.selected');
+
+$settingsFieldsSelected = $Site->getAttribute(
+    'quiqqer.settings.search.list.fields.selected'
+);
 
 if (!is_array($settingsFields)) {
     $settingsFields = array();
@@ -52,10 +54,7 @@ if (!$max) {
 }
 
 
-/**
- * requests
- */
-
+// requests
 if (isset($_REQUEST['sheet'])) {
     $start = ((int)$_REQUEST['sheet'] - 1) * $max;
 }
@@ -63,7 +62,6 @@ if (isset($_REQUEST['sheet'])) {
 if (isset($_REQUEST['search'])) {
     if (is_array($_REQUEST['search'])) {
         $searchValue = implode(' ', $_REQUEST['search']);
-
     } else {
         $searchValue = $_REQUEST['search'];
     }
@@ -74,7 +72,8 @@ if (isset($_REQUEST['search'])) {
     $searchValue = trim($searchValue);
 }
 
-if (isset($_REQUEST['searchType']) && $_REQUEST['searchType'] == 'AND') {
+if (isset($_REQUEST['searchType']) && $_REQUEST['searchType'] == 'AND' ||
+    isset($settingsFields['searchTypeAnd'])) {
     $searchType = 'AND';
 }
 
@@ -121,12 +120,8 @@ if (isset($_REQUEST['searchIn']) && is_array($_REQUEST['searchIn'])) {
 }
 
 
-/**
- * search
- */
-
+// search
 if (!empty($searchValue)) {
-
     $Fulltext = new Fulltext(array(
         'limit'      => $start . ',' . $max,
         'fields'     => $fields,

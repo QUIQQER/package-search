@@ -19,14 +19,15 @@ use QUI\Utils\Security\Orthos;
 /**
  * Fulltextsearch Manager
  *
- * @author www.pcsg.de (Henning Leutz)
+ * @package QUI\Search\Fulltext
+ * @author  www.pcsg.de (Henning Leutz) <info@pcsg.de>
  */
 class Fulltext extends QUI\QDOM
 {
     /**
      * Constructor
      *
-     * @param Array $params
+     * @param array $params - Attributes
      */
     public function __construct($params = array())
     {
@@ -49,9 +50,9 @@ class Fulltext extends QUI\QDOM
     /**
      * Search something in a project
      *
-     * @param String $str
+     * @param String $str - search string
      *
-     * @return Array array(
+     * @return array array(
      *        'list'   => array list of results
      *        'count'  => count of results
      * )
@@ -92,9 +93,17 @@ class Fulltext extends QUI\QDOM
         $fields    = array();
         $fieldList = self::getFieldList();
 
-        $availableFields = array_map(function ($entry) {
-            return $entry['field'];
-        }, $fieldList);
+        $availableFields = array();
+
+        // filter
+        foreach ($fieldList as $entry) {
+            if (mb_strpos($entry['type'], 'varchar') !== false
+                || mb_strpos($entry['type'], 'text') !== false
+            ) {
+                $availableFields[] = $entry['field'];
+            }
+        }
+
 
         if (!$attrFields || !is_array($attrFields)) {
             $fields = $availableFields;
@@ -114,9 +123,12 @@ class Fulltext extends QUI\QDOM
         }
 
         foreach ($fields as $key => $value) {
-            $fields[$key] = Orthos::clearNoneCharacters($fields[$key],
-                array('_'));
+            $fields[$key] = Orthos::clearNoneCharacters(
+                $fields[$key],
+                array('_')
+            );
         }
+
 
         // sql
         $count = array(
@@ -142,9 +154,8 @@ class Fulltext extends QUI\QDOM
                 $matchCount = $count[$field];
             }
 
-            $relevanceMatch[]
-                          = "MATCH({$field}) AGAINST (:search IN BOOLEAN MODE) * {$matchCount}";
-            $relevanceSum = $relevanceSum + $matchCount;
+            $relevanceMatch[] = "MATCH({$field}) AGAINST (:search IN BOOLEAN MODE) * {$matchCount}";
+            $relevanceSum     = $relevanceSum + $matchCount;
         }
 
         $relevanceMatch = implode(' + ', $relevanceMatch);
@@ -190,7 +201,7 @@ class Fulltext extends QUI\QDOM
                 e_date DESC
         ";
 
-        if (strlen($search) > 2) {
+        if (strlen($search) >= 2) {
             $query
                 = "
                 SELECT
@@ -220,14 +231,19 @@ class Fulltext extends QUI\QDOM
             FROM ({$query}) as T
         ";
 
-        /**
-         * search
-         */
+        // search
         $Statement = $PDO->prepare($selectQuery);
-        $Statement->bindValue(':limit1', $limit['prepare'][':limit1'][0],
-            \PDO::PARAM_INT);
-        $Statement->bindValue(':limit2', $limit['prepare'][':limit2'][0],
-            \PDO::PARAM_INT);
+        $Statement->bindValue(
+            ':limit1',
+            $limit['prepare'][':limit1'][0],
+            \PDO::PARAM_INT
+        );
+
+        $Statement->bindValue(
+            ':limit2',
+            $limit['prepare'][':limit2'][0],
+            \PDO::PARAM_INT
+        );
 
         if (strlen($search) > 2 || $search == '%%') {
             $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
@@ -246,9 +262,7 @@ class Fulltext extends QUI\QDOM
         $Statement->execute();
         $result = $Statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        /**
-         * count
-         */
+        // count
         $Statement = $PDO->prepare($countQuery);
 
         if (strlen($search) > 2 || $search == '%%') {
@@ -284,8 +298,8 @@ class Fulltext extends QUI\QDOM
      *
      * @param Project $Project
      * @param Integer $siteId
-     * @param Array $params
-     * @param Array $siteParams - optional; Parameter for the site link
+     * @param array $params
+     * @param array $siteParams - optional; Parameter for the site link
      */
     public static function setEntry(
         Project $Project,
@@ -304,9 +318,11 @@ class Fulltext extends QUI\QDOM
     /**
      * Delete an entry from the search table
      *
-     * @param Project $Project
-     * @param integer $siteId
-     * @param array $siteParams (optional); Parameter for the site link
+     * @param Project $Project - Project
+     * @param integer $siteId - ID of the site
+     * @param array $siteParams - (optional); Parameter for the site link
+     *
+     * @return void
      */
     public static function removeEntry(
         Project $Project,
@@ -325,9 +341,9 @@ class Fulltext extends QUI\QDOM
      * Edit an entry to the fulltext search table
      *
      * @param Project $Project
-     * @param Integer $siteId
-     * @param Array $params
-     * @param Array $siteParams - optional; Parameter for the site link
+     * @param integer $siteId
+     * @param array $params
+     * @param array $siteParams - optional; Parameter for the site link
      */
     public static function setEntryData(
         Project $Project,
@@ -392,9 +408,9 @@ class Fulltext extends QUI\QDOM
      * Append the data field of an specific search entry
      *
      * @param Project $Project
-     * @param Integer $siteId
-     * @param String $data
-     * @param Array $siteParams
+     * @param integer $siteId
+     * @param string $data
+     * @param array $siteParams
      */
     public static function appendFulltextSearchString(
         Project $Project,
@@ -425,8 +441,8 @@ class Fulltext extends QUI\QDOM
      * Return an fulltext entry
      *
      * @param Project $Project
-     * @param Integer $siteId
-     * @param Array $siteParams
+     * @param integer $siteId
+     * @param array $siteParams
      *
      * @throws QUI\Exception
      */
@@ -532,7 +548,7 @@ class Fulltext extends QUI\QDOM
     /**
      * Return the search fields
      *
-     * @return Array
+     * @return array
      */
     public static function getFieldList()
     {
@@ -542,7 +558,6 @@ class Fulltext extends QUI\QDOM
             return QUI\Cache\Manager::get($cache);
 
         } catch (QUI\Exception $Exception) {
-
         }
 
         $result = array();
@@ -559,8 +574,7 @@ class Fulltext extends QUI\QDOM
                 $result[] = array(
                     'field'    => trim($Field->nodeValue),
                     'type'     => $Field->getAttribute('type'),
-                    'fulltext' => $Field->getAttribute('fulltext') ? true
-                        : false
+                    'fulltext' => $Field->getAttribute('fulltext') ? true : false
                 );
             }
         }
@@ -573,7 +587,7 @@ class Fulltext extends QUI\QDOM
     /**
      * Return the plugins with a search.xml file
      *
-     * @return Array
+     * @return array
      */
     public static function getSearchXmlList()
     {
@@ -583,7 +597,6 @@ class Fulltext extends QUI\QDOM
             return QUI\Cache\Manager::get($cache);
 
         } catch (QUI\Exception $Exception) {
-
         }
 
         $packages = QUI::getPackageManager()->getInstalled();

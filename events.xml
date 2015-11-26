@@ -5,4 +5,5 @@
 
     <event on="onSiteActivate" fire="\QUI\Search::onSiteChange" />
     <event on="onSiteSave" fire="\QUI\Search::onSiteChange" />
+    <event on="onTemplateGetHeader" fire="\QUI\Search::onTemplateGetHeader" />
 </events>

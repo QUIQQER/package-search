@@ -71,7 +71,7 @@ class Search
         foreach ($list as $siteParams) {
             try {
                 $siteId = (int)$siteParams['id'];
-                $Site = new SiteEdit($Project, (int)$siteId);
+                $Site   = new SiteEdit($Project, (int)$siteId);
 
                 if (!$Site->getAttribute('active')) {
                     continue;
@@ -106,14 +106,14 @@ class Search
      */
     public static function setup()
     {
-        $Table = QUI::getDataBase()->Table();
-        $Manager = QUI::getProjectManager();
+        $Table    = QUI::getDataBase()->Table();
+        $Manager  = QUI::getProjectManager();
         $projects = $Manager->getProjects(true);
 
         $fieldList = Search\Fulltext::getFieldList();
-        $fields = array();
-        $fulltext = array();
-        $index = array();
+        $fields    = array();
+        $fulltext  = array();
+        $index     = array();
 
         foreach ($fieldList as $fieldEntry) {
             $fields[$fieldEntry['field']] = $fieldEntry['type'];
@@ -127,7 +127,7 @@ class Search
 
         foreach ($projects as $_Project) {
             /* @var $_Project Project */
-            $name = $_Project->getName();
+            $name  = $_Project->getName();
             $langs = $_Project->getAttribute('langs');
 
             foreach ($langs as $lang) {
@@ -205,7 +205,7 @@ class Search
         $Project = $Site->getProject();
 
         $Quicksearch = new Quicksearch();
-        $Fulltext = new Fulltext();
+        $Fulltext    = new Fulltext();
 
         // Fulltext
         $Fulltext->setEntry($Project, $Site->getId(), array(
@@ -221,5 +221,56 @@ class Search
             $Site->getAttribute('name'),
             $Site->getAttribute('title')
         ));
+    }
+
+    /**
+     * event onTemplateGetHeader
+     *
+     * @param QUI\Template $Template - Template object
+     */
+    public static function onTemplateGetHeader(QUI\Template $Template)
+    {
+        $Project = QUI::getProjectManager()->get();
+
+        $result = $Project->getSites(array(
+            'where' => array(
+                'type' => 'quiqqer/search:types/search'
+            ),
+            'limit' => 1
+        ));
+
+        if (!isset($result[0])) {
+            return;
+        }
+
+        $host = $Project->getVHost(true, true);
+
+        /* @var $SearchSite QUI\Projects\Site */
+        $SearchSite = $result[0];
+        $searchUrl  = $SearchSite->getUrlRewritten();
+        $start      = $Project->firstChild()->getUrlRewritten();
+
+        if (strpos($searchUrl, 'http') !== 0) {
+            $searchUrl = $host . $searchUrl;
+            $start     = $host . $start;
+        }
+
+        $Template->extendHeader(
+            '
+            <script type="application/ld+json">
+            {
+                "@context": "http://schema.org",
+                "@type": "WebSite",
+                "url": "' . $start . '",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": "' . $searchUrl . '?search={search}",
+                    "query-input": "required name=search"
+                }
+            }
+            </script>
+            '
+        );
+
     }
 }
