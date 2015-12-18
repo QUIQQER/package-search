@@ -50,7 +50,7 @@ class Fulltext extends QUI\QDOM
     /**
      * Search something in a project
      *
-     * @param String $str - search string
+     * @param string $str - search string
      *
      * @return array array(
      *        'list'   => array list of results
@@ -139,7 +139,7 @@ class Fulltext extends QUI\QDOM
         );
 
         $PDO   = QUI::getPDO();
-        $table = QUI::getDBProjectTableName(Search::tableSearchFull, $Project);
+        $table = QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project);
         $limit = QUI\Database\DB::createQueryLimit($attrLimit);
 
         // relevance match
@@ -297,7 +297,7 @@ class Fulltext extends QUI\QDOM
      * Add or set an entry to the fulltext search table
      *
      * @param Project $Project
-     * @param Integer $siteId
+     * @param integer $siteId
      * @param array $params
      * @param array $siteParams - optional; Parameter for the site link
      */
@@ -329,7 +329,7 @@ class Fulltext extends QUI\QDOM
         $siteId,
         $siteParams = array()
     ) {
-        $tbl = QUI::getDBProjectTableName(Search::tableSearchFull, $Project);
+        $tbl = QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project);
 
         QUI::getDataBase()->delete($tbl, array(
             'siteId'       => (int)$siteId,
@@ -351,7 +351,7 @@ class Fulltext extends QUI\QDOM
         $params = array(),
         $siteParams = array()
     ) {
-        $table  = QUI::getDBProjectTableName(Search::tableSearchFull, $Project);
+        $table  = QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project);
         $fields = self::getFieldList();
 
         $urlParameter = json_encode($siteParams);
@@ -419,7 +419,7 @@ class Fulltext extends QUI\QDOM
         $siteParams = array()
     ) {
         $table = QUI::getDBProjectTableName(
-            Search::tableSearchFull,
+            Search::TABLE_SEARCH_FULL,
             $Project
         );
 
@@ -452,7 +452,7 @@ class Fulltext extends QUI\QDOM
         $siteParams = array()
     ) {
         $table = QUI::getDBProjectTableName(
-            Search::tableSearchFull,
+            Search::TABLE_SEARCH_FULL,
             $Project
         );
 
@@ -483,7 +483,7 @@ class Fulltext extends QUI\QDOM
     public static function clearSearchTable(Project $Project)
     {
         QUI::getDataBase()->Table()->truncate(
-            QUI::getDBProjectTableName(Search::tableSearchFull, $Project)
+            QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project)
         );
     }
 

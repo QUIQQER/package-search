@@ -74,7 +74,8 @@ if (isset($_REQUEST['search'])) {
 
 if (isset($_REQUEST['searchType']) && $_REQUEST['searchType'] == 'AND' ||
     isset($settingsFields['searchTypeAnd']) ||
-    in_array('searchTypeAnd', $settingsFields)) {
+    in_array('searchTypeAnd', $settingsFields)
+) {
     $searchType = 'AND';
 }
 
@@ -124,10 +125,10 @@ if (isset($_REQUEST['searchIn']) && is_array($_REQUEST['searchIn'])) {
 // search
 if (!empty($searchValue)) {
     $Fulltext = new Fulltext(array(
-        'limit'      => $start . ',' . $max,
-        'fields'     => $fields,
+        'limit' => $start . ',' . $max,
+        'fields' => $fields,
         'searchtype' => $searchType,
-        'Project'    => $Project
+        'Project' => $Project
     ));
 
     $result = $Fulltext->search($searchValue);
@@ -145,7 +146,7 @@ if (!empty($searchValue)) {
             }
 
             $url = $_Site->getUrlRewritten($urlParams);
-            $url = QUI\Utils\String::replaceDblSlashes($url);
+            $url = QUI\Utils\StringHelper::replaceDblSlashes($url);
 
             if (!isset($entry['relevance']) || $entry['relevance'] > 100) {
                 $entry['relevance'] = 100;
@@ -170,11 +171,11 @@ if (!empty($searchValue)) {
 
 
     $Pagination = new QUI\Bricks\Controls\Pagination(array(
-        'Site'      => $Site,
-        'count'     => $count,
+        'Site' => $Site,
+        'count' => $count,
         'showLimit' => false,
-        'limit'     => $max,
-        'useAjax'   => false
+        'limit' => $max,
+        'useAjax' => false
     ));
 
     $Pagination->loadFromRequest();
@@ -187,11 +188,11 @@ if (!empty($searchValue)) {
 
 
 $Engine->assign(array(
-    'fields'          => $fields,
-    'count'           => $count,
-    'sheets'          => $sheets,
-    'children'        => $children,
-    'searchValue'     => $searchValue,
-    'searchType'      => $searchType,
+    'fields' => $fields,
+    'count' => $count,
+    'sheets' => $sheets,
+    'children' => $children,
+    'searchValue' => $searchValue,
+    'searchType' => $searchType,
     'availableFields' => $availableFields,
 ));

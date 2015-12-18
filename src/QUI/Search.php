@@ -25,16 +25,16 @@ class Search
     /**
      * quick search table
      *
-     * @var String
+     * @var string
      */
-    const tableSearchQuick = 'searchQuick';
+    const TABLE_SEARCH_QUICK = 'searchQuick';
 
     /**
      * fulltext search table
      *
-     * @var String
+     * @var string
      */
-    const tableSearchFull = 'searchFull';
+    const TABLE_SEARCH_FULL = 'searchFull';
 
     /**
      * Create the fulltext search table for the Project
@@ -134,7 +134,7 @@ class Search
                 $Project = $Manager->getProject($name, $lang);
 
                 $table = QUI::getDBProjectTableName(
-                    self::tableSearchFull,
+                    self::TABLE_SEARCH_FULL,
                     $Project
                 );
 
@@ -166,12 +166,12 @@ class Search
         $Project = $Site->getProject();
 
         $tableSearchFull = QUI::getDBProjectTableName(
-            self::tableSearchFull,
+            self::TABLE_SEARCH_FULL,
             $Project
         );
 
         $tableQuicksearch = QUI::getDBProjectTableName(
-            self::tableSearchQuick,
+            self::TABLE_SEARCH_QUICK,
             $Project
         );
 
@@ -271,6 +271,5 @@ class Search
             </script>
             '
         );
-
     }
 }

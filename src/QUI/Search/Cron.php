@@ -16,6 +16,7 @@ use QUI\Search;
 class Cron
 {
     /**
+     * Cron : create search database
      *
      * @param array $params
      * @param \QUI\Cron\Manager $CronManager
