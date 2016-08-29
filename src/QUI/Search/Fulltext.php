@@ -198,7 +198,17 @@ class Fulltext extends QUI\QDOM
                 e_date DESC
         ";
 
-        if (strlen($search) >= 2) {
+        $minWordLength = QUI::getPackage('quiqqer/search')
+            ->getConfig()
+            ->get('search', 'booleanSearchMaxLength');
+
+        if (!$minWordLength) {
+            $minWordLength = 3;
+        }
+
+        $match = str_replace(array('*', '+'), '', $search);
+
+        if (strlen($match) >= $minWordLength) {
             $query = "
                 SELECT
                     *,
@@ -214,8 +224,7 @@ class Fulltext extends QUI\QDOM
                     relevance DESC
             ";
         } else {
-            $search = str_replace(array('*', '+'), '', $search);
-            $search = "%{$search}%";
+            $search = "%{$match}%";
         }
 
         $selectQuery = "{$query} {$limit['limit']}";

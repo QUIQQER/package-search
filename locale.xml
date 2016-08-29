@@ -27,6 +27,21 @@
             <en><![CDATA[Extended search - result list]]></en>
         </locale>
 
+        <!-- search global settings -->
+        <locale name="quiqqer.search.globale.settings.title">
+            <de><![CDATA[Such-Einstellungen]]></de>
+            <en><![CDATA[Search settings]]></en>
+        </locale>
+        <locale name="quiqqer.search.globale.settings.booleanSearchMaxLength.text">
+            <de><![CDATA[Minimale Länge der Fulltext-Anfrage]]></de>
+            <en><![CDATA[Minimum length of the full-text query]]></en>
+        </locale>
+        <locale name="quiqqer.search.globale.settings.booleanSearchMaxLength.description">
+            <de><![CDATA[Legt fest ab welcher Wortlänge die Volltextsuche verwendet wird.]]></de>
+            <en><![CDATA[Specifies from which word length full-text search is used.]]></en>
+        </locale>
+
+
         <!-- search settings -->
         <locale name="quiqqer.search.settings.title">
             <de><![CDATA[Globale Suche-Einstellungen]]></de>
