@@ -104,7 +104,6 @@ if (isset($_REQUEST['searchIn']) && is_array($_REQUEST['searchIn'])) {
             $fields[] = $field;
         }
     }
-
 } else {
     // nothing selected?
     // than select the settings ;-)
@@ -125,10 +124,10 @@ if (isset($_REQUEST['searchIn']) && is_array($_REQUEST['searchIn'])) {
 // search
 if (!empty($searchValue)) {
     $Fulltext = new Fulltext(array(
-        'limit' => $start . ',' . $max,
-        'fields' => $fields,
+        'limit'      => $start . ',' . $max,
+        'fields'     => $fields,
         'searchtype' => $searchType,
-        'Project' => $Project
+        'Project'    => $Project
     ));
 
     $result = $Fulltext->search($searchValue);
@@ -137,8 +136,7 @@ if (!empty($searchValue)) {
         try {
             // immer neues site objekt
             // falls die gleiche seite mit unterschiedlichen url params existiert
-            $_Site = new QUI\Projects\Site($Project, (int)$entry['siteId']);
-
+            $_Site     = new QUI\Projects\Site($Project, (int)$entry['siteId']);
             $urlParams = json_decode($entry['urlParameter'], true);
 
             if (!is_array($urlParams)) {
@@ -160,7 +158,6 @@ if (!empty($searchValue)) {
             $_Site->setAttribute('search-icon', $entry['icon']);
 
             $children[] = $_Site;
-
         } catch (QUI\Exception $Exception) {
             QUI\System\Log::addDebug($Exception->getMessage());
         }
@@ -169,13 +166,12 @@ if (!empty($searchValue)) {
     $sheets = ceil($result['count'] / $max);
     $count  = (int)$result['count'];
 
-
     $Pagination = new QUI\Bricks\Controls\Pagination(array(
-        'Site' => $Site,
-        'count' => $count,
+        'Site'      => $Site,
+        'count'     => $count,
         'showLimit' => false,
-        'limit' => $max,
-        'useAjax' => false
+        'limit'     => $max,
+        'useAjax'   => false
     ));
 
     $Pagination->loadFromRequest();
@@ -186,13 +182,12 @@ if (!empty($searchValue)) {
     $Engine->assign('Pagination', $Pagination);
 }
 
-
 $Engine->assign(array(
-    'fields' => $fields,
-    'count' => $count,
-    'sheets' => $sheets,
-    'children' => $children,
-    'searchValue' => $searchValue,
-    'searchType' => $searchType,
+    'fields'          => $fields,
+    'count'           => $count,
+    'sheets'          => $sheets,
+    'children'        => $children,
+    'searchValue'     => $searchValue,
+    'searchType'      => $searchType,
     'availableFields' => $availableFields,
 ));

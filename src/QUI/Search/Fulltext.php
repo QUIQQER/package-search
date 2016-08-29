@@ -11,7 +11,6 @@ namespace QUI\Search;
 use QUI;
 use QUI\Search;
 use QUI\Projects\Project;
-use QUI\Projects\Site;
 use QUI\Projects\Site\Edit as SiteEdit;
 use QUI\System\Log;
 use QUI\Utils\Security\Orthos;
@@ -74,7 +73,7 @@ class Fulltext extends QUI\QDOM
         $strParts = explode(' ', $str);
 
         foreach ($strParts as $key => $part) {
-            $strParts[$key] = $part . '*';
+            $strParts[$key] = '*' . $part . '*';
         }
 
         switch ($this->getAttribute('searchtype')) {
@@ -107,7 +106,6 @@ class Fulltext extends QUI\QDOM
 
         if (!$attrFields || !is_array($attrFields)) {
             $fields = $availableFields;
-
         } else {
             $availableFields = array_flip($availableFields);
 
@@ -184,8 +182,7 @@ class Fulltext extends QUI\QDOM
 
 
         // query
-        $query
-            = "
+        $query = "
             SELECT *
             FROM
                 {$table}
@@ -202,8 +199,7 @@ class Fulltext extends QUI\QDOM
         ";
 
         if (strlen($search) >= 2) {
-            $query
-                = "
+            $query = "
                 SELECT
                     *,
                     100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance
@@ -217,7 +213,6 @@ class Fulltext extends QUI\QDOM
                 ORDER BY
                     relevance DESC
             ";
-
         } else {
             $search = str_replace(array('*', '+'), '', $search);
             $search = "%{$search}%";
@@ -225,8 +220,7 @@ class Fulltext extends QUI\QDOM
 
         $selectQuery = "{$query} {$limit['limit']}";
 
-        $countQuery
-            = "
+        $countQuery = "
             SELECT COUNT(*) as count
             FROM ({$query}) as T
         ";
@@ -362,7 +356,6 @@ class Fulltext extends QUI\QDOM
 
             unset($data['siteId']);
             unset($data['urlParameter']);
-
         } catch (QUI\Exception $Exception) {
             $siteUrlParams = array();
 
@@ -482,7 +475,7 @@ class Fulltext extends QUI\QDOM
      */
     public static function clearSearchTable(Project $Project)
     {
-        QUI::getDataBase()->Table()->truncate(
+        QUI::getDataBase()->table()->truncate(
             QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project)
         );
     }
@@ -502,6 +495,8 @@ class Fulltext extends QUI\QDOM
         ));
 
         foreach ($list as $siteParams) {
+            set_time_limit(0);
+
             try {
                 $siteId = (int)$siteParams['id'];
                 $Site   = new SiteEdit($Project, (int)$siteId);
@@ -534,7 +529,6 @@ class Fulltext extends QUI\QDOM
                     'icon'     => $Site->getAttribute('image_site'),
                     'e_date'   => $e_date
                 ));
-
             } catch (QUI\Exception $Exception) {
                 Log::writeException($Exception);
             }
@@ -556,7 +550,6 @@ class Fulltext extends QUI\QDOM
 
         try {
             return QUI\Cache\Manager::get($cache);
-
         } catch (QUI\Exception $Exception) {
         }
 
@@ -595,7 +588,6 @@ class Fulltext extends QUI\QDOM
 
         try {
             return QUI\Cache\Manager::get($cache);
-
         } catch (QUI\Exception $Exception) {
         }
 

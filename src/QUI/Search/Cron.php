@@ -6,12 +6,14 @@
 
 namespace QUI\Search;
 
+use QUI;
 use QUI\Search;
 
 /**
  * Search cron
  *
  * @author www.pcsg.de (Henning Leutz)
+ * @todo search as jobs
  */
 class Cron
 {
@@ -31,7 +33,7 @@ class Cron
             return;
         }
 
-        $Project = \QUI::getProject($params['project'], $params['lang']);
+        $Project = QUI::getProject($params['project'], $params['lang']);
         $Search  = new Search();
 
         $Search->createFulltextSearch($Project);

@@ -70,6 +70,8 @@ class Search
 
         foreach ($list as $siteParams) {
             try {
+                set_time_limit(0);
+
                 $siteId = (int)$siteParams['id'];
                 $Site   = new SiteEdit($Project, (int)$siteId);
 
@@ -89,7 +91,6 @@ class Search
                     $Site->getAttribute('name'),
                     $Site->getAttribute('title')
                 ));
-
             } catch (QUI\Exception $Exception) {
                 Log::writeException($Exception);
             }
@@ -106,7 +107,7 @@ class Search
      */
     public static function setup()
     {
-        $Table    = QUI::getDataBase()->Table();
+        $Table    = QUI::getDataBase()->table();
         $Manager  = QUI::getProjectManager();
         $projects = $Manager->getProjects(true);
 
@@ -128,7 +129,7 @@ class Search
         foreach ($projects as $_Project) {
             /* @var $_Project Project */
             $name  = $_Project->getName();
-            $langs = $_Project->getAttribute('langs');
+            $langs = $_Project->getLanguages();
 
             foreach ($langs as $lang) {
                 $Project = $Manager->getProject($name, $lang);
@@ -138,7 +139,7 @@ class Search
                     $Project
                 );
 
-                $Table->appendFields($table, $fields);
+                $Table->addColumn($table, $fields);
 
                 foreach ($fulltext as $field) {
                     $Table->setFulltext($table, $field);

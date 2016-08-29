@@ -111,7 +111,7 @@ class Quicksearch
 
 
         return array(
-            'list' => $result,
+            'list'  => $result,
             'count' => $count[0]['count']
         );
     }
@@ -171,9 +171,9 @@ class Quicksearch
         // data
         foreach ($data as $dataEntry) {
             QUI::getDataBase()->insert($table, array(
-                'siteId' => $siteId,
+                'siteId'       => $siteId,
                 'urlParameter' => $urlParameter,
-                'data' => Orthos::clear($dataEntry)
+                'data'         => Orthos::clear($dataEntry)
             ));
         }
 
@@ -217,9 +217,9 @@ class Quicksearch
 
 
         QUI::getDataBase()->insert($table, array(
-            'siteId' => $siteId,
+            'siteId'       => $siteId,
             'urlParameter' => $urlParameter,
-            'data' => Orthos::clear($data)
+            'data'         => Orthos::clear($data)
         ));
     }
 
@@ -247,7 +247,7 @@ class Quicksearch
         }
 
         QUI::getDataBase()->delete($table, array(
-            'siteId' => $siteId,
+            'siteId'       => $siteId,
             'urlParameter' => json_encode($siteParams)
         ));
     }
@@ -276,9 +276,9 @@ class Quicksearch
         $urlParameter = json_encode($siteParams);
 
         $result = QUI::getDataBase()->fetch(array(
-            'from' => $table,
+            'from'  => $table,
             'where' => array(
-                'siteId' => (int)$siteId,
+                'siteId'       => (int)$siteId,
                 'urlParameter' => $urlParameter
             )
         ));
@@ -299,7 +299,7 @@ class Quicksearch
      */
     public static function clearSearchTable(Project $Project)
     {
-        QUI::getDataBase()->Table()->truncate(
+        QUI::getDataBase()->table()->truncate(
             QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project)
         );
     }

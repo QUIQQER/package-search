@@ -32,9 +32,9 @@ if (isset($_REQUEST['sheet'])) {
  */
 
 $Fulltext = new Fulltext(array(
-    'limit' => $start . ',' . $max,
+    'limit'     => $start . ',' . $max,
     'datatypes' => $types,
-    'Project' => $Project
+    'Project'   => $Project
 ));
 
 $result   = $Fulltext->search();
@@ -62,7 +62,6 @@ foreach ($result['list'] as $entry) {
         }
 
         $children[] = $_Site;
-
     } catch (QUI\Exception $Exception) {
     }
 }
@@ -73,11 +72,11 @@ if ($result['count']) {
 }
 
 $Pagination = new QUI\Bricks\Controls\Pagination(array(
-    'count' => $count,
-    'Site' => $Site,
+    'count'     => $count,
+    'Site'      => $Site,
     'showLimit' => false,
-    'limit' => $max,
-    'useAjax' => false
+    'limit'     => $max,
+    'useAjax'   => false
 ));
 
 $Pagination->loadFromRequest();
@@ -85,5 +84,5 @@ $Pagination->loadFromRequest();
 // assign
 $Engine->assign(array(
     'Pagination' => $Pagination,
-    'children' => $children
+    'children'   => $children
 ));
