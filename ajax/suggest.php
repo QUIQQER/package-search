@@ -12,8 +12,8 @@
 QUI::$Ajax->registerFunction(
     'package_quiqqer_search_ajax_suggest',
     function ($project, $search, $params) {
-        $Project  = \QUI::getProjectManager()->decode($project);
-        $Fulltext = new \QUI\Search\Quicksearch();
+        $Project  = QUI::getProjectManager()->decode($project);
+        $Fulltext = new QUI\Search\Quicksearch();
 
         return $Fulltext->search($search, $Project, array(
             'limit' => 10
