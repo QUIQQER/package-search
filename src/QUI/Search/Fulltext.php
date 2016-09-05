@@ -566,7 +566,7 @@ class Fulltext extends QUI\QDOM
         $files  = self::getSearchXmlList();
 
         foreach ($files as $file) {
-            $Dom  = QUI\Utils\XML::getDomFromXml($file);
+            $Dom  = QUI\Utils\Text\XML::getDomFromXml($file);
             $Path = new \DOMXPath($Dom);
 
             $fields = $Path->query("//quiqqer/search/searchfields/field");
