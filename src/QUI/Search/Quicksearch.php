@@ -60,8 +60,7 @@ class Quicksearch
             $groupedBy = '';
         }
 
-        $query
-            = "
+        $query = "
             SELECT *
             FROM
                 {$table}
@@ -72,8 +71,7 @@ class Quicksearch
 
         $selectQuery = "{$query} {$limit['limit']}";
 
-        $countQuery
-            = "
+        $countQuery = "
             SELECT COUNT(*) as count
             FROM ({$query}) as T
         ";

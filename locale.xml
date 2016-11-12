@@ -29,8 +29,8 @@
 
         <!-- search global settings -->
         <locale name="quiqqer.search.globale.settings.title">
-            <de><![CDATA[Such-Einstellungen]]></de>
-            <en><![CDATA[Search settings]]></en>
+            <de><![CDATA[Suche]]></de>
+            <en><![CDATA[Search]]></en>
         </locale>
         <locale name="quiqqer.search.globale.settings.booleanSearchMaxLength.text">
             <de><![CDATA[Minimale Länge der Fulltext-Anfrage]]></de>
