@@ -182,8 +182,10 @@ class Fulltext extends QUI\QDOM
 
 
         // query
+        $selectedFields = implode(',', array_keys($availableFields));
+
         $query = "
-            SELECT *
+            SELECT e_date,urlParameter,siteId,{$selectedFields}
             FROM
                 {$table}
             WHERE
@@ -193,7 +195,7 @@ class Fulltext extends QUI\QDOM
                 data  LIKE :search)
                 {$datatypeQuery}
             GROUP BY
-                urlParameter,siteId
+                urlParameter,siteId,e_date,{$selectedFields}
             ORDER BY
                 e_date DESC
         ";
@@ -209,21 +211,19 @@ class Fulltext extends QUI\QDOM
         $match = str_replace(array('*', '+'), '', $search);
 
         if (strlen($match) >= $minWordLength) {
-            $selectFields = implode(',', $availableFields);
-
             $query = "
                 SELECT
                     siteId,
                     urlParameter,
                     100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance,
-                    {$selectFields}
+                    {$selectedFields}
                 FROM
                     {$table}
                 WHERE
                     MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE)
                     {$datatypeQuery}
                 GROUP BY
-                    urlParameter,siteId,{$selectFields}
+                    urlParameter,siteId,{$selectedFields}
                 ORDER BY
                     relevance DESC
             ";
