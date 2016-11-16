@@ -209,20 +209,21 @@ class Fulltext extends QUI\QDOM
         $match = str_replace(array('*', '+'), '', $search);
 
         if (strlen($match) >= $minWordLength) {
+            $selectFields = implode(',', $availableFields);
+
             $query = "
                 SELECT
                     siteId,
                     urlParameter,
-                    icon,
                     100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance,
-                    {$whereMatch}
+                    {$selectFields}
                 FROM
                     {$table}
                 WHERE
                     MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE)
                     {$datatypeQuery}
                 GROUP BY
-                    urlParameter,siteId,icon,{$whereMatch}
+                    urlParameter,siteId,{$selectFields}
                 ORDER BY
                     relevance DESC
             ";
