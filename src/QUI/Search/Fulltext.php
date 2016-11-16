@@ -211,15 +211,17 @@ class Fulltext extends QUI\QDOM
         if (strlen($match) >= $minWordLength) {
             $query = "
                 SELECT
-                    *,
-                    100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance
+                    siteId,
+                    urlParameter,
+                    100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance,
+                    {$whereMatch}
                 FROM
                     {$table}
                 WHERE
                     MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE)
                     {$datatypeQuery}
                 GROUP BY
-                    urlParameter,siteId
+                    urlParameter,siteId,{$whereMatch}
                 ORDER BY
                     relevance DESC
             ";
