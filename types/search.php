@@ -182,6 +182,24 @@ if (!empty($searchValue)) {
     $Engine->assign('Pagination', $Pagination);
 }
 
+$ChildrenList = new QUI\Controls\ChildrenList(array(
+    'showTitle'      => false,
+    'Site'           => $Site,
+    'limit'          => $max,
+    'showDate'       => true,
+    'showCreator'    => true,
+    'showTime'       => true,
+    'showSheets'     => true,
+    'showImages'     => true,
+    'showShort'      => true,
+    'showHeader'     => true,
+    'showContent'    => false,
+    'itemtype'       => 'http://schema.org/ItemList',
+    'child-itemtype' => 'http://schema.org/ListItem',
+    'display'        => $Site->getAttribute('quiqqer.settings.sitetypes.list.template'),
+    'children'       => $children
+));
+
 $Engine->assign(array(
     'fields'          => $fields,
     'count'           => $count,
@@ -190,4 +208,5 @@ $Engine->assign(array(
     'searchValue'     => $searchValue,
     'searchType'      => $searchType,
     'availableFields' => $availableFields,
+    'ChildrenList'    => $ChildrenList
 ));

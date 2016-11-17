@@ -182,7 +182,11 @@ class Fulltext extends QUI\QDOM
 
 
         // query
-        $selectedFields = implode(',', array_keys($availableFields));
+        if (is_int(key($availableFields))) {
+            $selectedFields = implode(',', $availableFields);
+        } else {
+            $selectedFields = implode(',', array_keys($availableFields));
+        }
 
         $query = "
             SELECT e_date,urlParameter,siteId,{$selectedFields}
