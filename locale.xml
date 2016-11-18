@@ -73,6 +73,11 @@
             <de><![CDATA[Such-Einstellungen - Vorselektierte Felder]]></de>
             <en><![CDATA[Search settings - Selected settings]]></en>
         </locale>
+        <locale name="quiqqer.search.listTemplate.advancedArticleList">
+            <de><![CDATA[Moderne Liste ohne Bilder]]></de>
+            <en><![CDATA[Modern list without picture]]></en>
+            <pl><![CDATA[Nowoczesna lista bez obrazków]]></pl>
+        </locale>
 
         <!-- result type settings -->
         <locale name="quiqqer.search.results.settings.title">

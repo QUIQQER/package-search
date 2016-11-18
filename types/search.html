@@ -2,7 +2,7 @@
 
 <div itemscope itemtype="http://schema.org/ItemList">
     {if $Template->getAttribute('content-header')}
-    <section class="content-header grid-100 mobile-grid-100">
+    <section class="content-header">
         <header>
             <h1>{$Site->getAttribute('title')}</h1>
         </header>
@@ -16,13 +16,13 @@
     {/if}
 
     {if $Template->getAttribute('content-body') && $Site->getAttribute('content')}
-    <section class="content-body grid-100 mobile-grid-100">
+    <section class="content-body">
         {$Site->getAttribute('content')}
     </section>
     {/if}
 
 
-    <section class="content-template grid-100 mobile-grid-100 qui-search-result">
+    <section class="content-template qui-search-result">
 
         <form action="{url site=$Site}" method="GET">
             <input type="text"
@@ -88,7 +88,10 @@
                 {$Pagination->create()}
             {/if}
 
-            {foreach from=$children item=Child}
+            {$ChildrenList->create()}
+
+
+            {*foreach from=$children item=Child}
                 <article class="qui-search-result-list-entry">
 
                     <h2>
@@ -145,7 +148,7 @@
                     </div>
 
                 </article>
-            {/foreach}
+            {/foreach*}
 
             {if $sheets > 1}
                 {*control control="\QUI\Controls\Sheets" Site=$Site sheets=$sheets search=$searchValue*}
