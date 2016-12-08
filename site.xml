@@ -38,6 +38,9 @@
                 <attribute>quiqqer.settings.search.list.hideSettings</attribute>
                 <attribute>quiqqer.settings.search.list.fields</attribute>
                 <attribute>quiqqer.settings.search.list.fields.selected</attribute>
+                <attribute default="1">quiqqer.settings.sitetypes.list.showCreator</attribute>
+                <attribute default="1">quiqqer.settings.sitetypes.list.showDate</attribute>
+                <attribute default="1">quiqqer.settings.sitetypes.list.showImages</attribute>
             </attributes>
 
             <!-- list settings -->
@@ -61,18 +64,39 @@
                             <option value="authorTop">
                                 <locale group="quiqqer/sitetypes" var="list.template.authorTop" />
                             </option>
-                            <option value="icons">
-                                <locale group="quiqqer/sitetypes" var="list.template.icons" />
+                            <option value="simpleArticleList">
+                                <locale group="quiqqer/sitetypes" var="list.template.simpleArticleList" />
                             </option>
                             <option value="advancedArticleList">
-                                <locale group="quiqqer/search"
-                                        var="quiqqer.search.listTemplate.advancedArticleList" />
+                                <locale group="quiqqer/sitetypes" var="list.template.advancedArticleList" />
                             </option>
                         </select>
 
                         <input conf="quiqqer.settings.search.list.max" type="number">
                             <text>
                                 <locale group="quiqqer/search" var="quiqqer.search.list.settings.max" />
+                            </text>
+                        </input>
+
+                        <input conf="quiqqer.settings.sitetypes.list.showCreator" type="checkbox">
+                            <text>
+                                <locale group="quiqqer/sitetypes"
+                                        var="quiqqer.sitetypes.list.settings.showCreator" />
+                            </text>
+                        </input>
+
+                        <input conf="quiqqer.settings.sitetypes.list.showDate" type="checkbox">
+                            <text>
+                                <locale group="quiqqer/sitetypes"
+                                        var="quiqqer.sitetypes.list.settings.showDate" />
+                            </text>
+                        </input>
+
+                        <input conf="quiqqer.settings.sitetypes.list.showImages" type="checkbox">
+                            <text>
+                                <locale group="quiqqer/sitetypes"
+                                        var="quiqqer.sitetypes.list.settings.showImages"
+                                />
                             </text>
                         </input>
 
