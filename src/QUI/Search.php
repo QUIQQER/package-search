@@ -231,7 +231,11 @@ class Search
      */
     public static function onTemplateGetHeader(QUI\Template $Template)
     {
-        $Project = QUI::getProjectManager()->get();
+        $Project = $Template->getAttribute('Project');
+
+        if (!is_object($Project)) {
+            $Project = QUI::getProjectManager()->get();
+        }
 
         $result = $Project->getSites(array(
             'where' => array(
