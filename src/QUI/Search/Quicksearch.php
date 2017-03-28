@@ -61,7 +61,7 @@ class Quicksearch
         }
 
         $query = "
-            SELECT *
+            SELECT id, siteId, urlParameter, data, rights, icon
             FROM
                 {$table}
             WHERE
