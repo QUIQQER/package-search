@@ -73,7 +73,9 @@ if (isset($_REQUEST['search'])) {
 }
 
 if (isset($_REQUEST['searchType']) && $_REQUEST['searchType'] == 'AND' ||
-    isset($settingsFields['searchTypeAnd'])) {
+    isset($settingsFields['searchTypeAnd']) ||
+    in_array('searchTypeAnd', $settingsFields)
+) {
     $searchType = 'AND';
 }
 
@@ -102,7 +104,6 @@ if (isset($_REQUEST['searchIn']) && is_array($_REQUEST['searchIn'])) {
             $fields[] = $field;
         }
     }
-
 } else {
     // nothing selected?
     // than select the settings ;-)
@@ -135,8 +136,7 @@ if (!empty($searchValue)) {
         try {
             // immer neues site objekt
             // falls die gleiche seite mit unterschiedlichen url params existiert
-            $_Site = new QUI\Projects\Site($Project, (int)$entry['siteId']);
-
+            $_Site     = new QUI\Projects\Site($Project, (int)$entry['siteId']);
             $urlParams = json_decode($entry['urlParameter'], true);
 
             if (!is_array($urlParams)) {
@@ -144,7 +144,7 @@ if (!empty($searchValue)) {
             }
 
             $url = $_Site->getUrlRewritten($urlParams);
-            $url = QUI\Utils\String::replaceDblSlashes($url);
+            $url = QUI\Utils\StringHelper::replaceDblSlashes($url);
 
             if (!isset($entry['relevance']) || $entry['relevance'] > 100) {
                 $entry['relevance'] = 100;
@@ -158,7 +158,6 @@ if (!empty($searchValue)) {
             $_Site->setAttribute('search-icon', $entry['icon']);
 
             $children[] = $_Site;
-
         } catch (QUI\Exception $Exception) {
             QUI\System\Log::addDebug($Exception->getMessage());
         }
@@ -166,7 +165,6 @@ if (!empty($searchValue)) {
 
     $sheets = ceil($result['count'] / $max);
     $count  = (int)$result['count'];
-
 
     $Pagination = new QUI\Bricks\Controls\Pagination(array(
         'Site'      => $Site,
@@ -184,6 +182,23 @@ if (!empty($searchValue)) {
     $Engine->assign('Pagination', $Pagination);
 }
 
+$ChildrenList = new QUI\Controls\ChildrenList(array(
+    'showTitle'      => false,
+    'Site'           => $Site,
+    'limit'          => $max,
+    'showDate'       => $Site->getAttribute('quiqqer.settings.sitetypes.list.showDate'),
+    'showCreator'    => $Site->getAttribute('quiqqer.settings.sitetypes.list.showCreator'),
+    'showTime'       => true,
+    'showSheets'     => false,
+    'showImages'     => $Site->getAttribute('quiqqer.settings.sitetypes.list.showImages'),
+    'showShort'      => true,
+    'showHeader'     => true,
+    'showContent'    => false,
+    'itemtype'       => 'http://schema.org/ItemList',
+    'child-itemtype' => 'http://schema.org/ListItem',
+    'display'        => $Site->getAttribute('quiqqer.settings.sitetypes.list.template'),
+    'children'       => $children
+));
 
 $Engine->assign(array(
     'fields'          => $fields,
@@ -193,4 +208,5 @@ $Engine->assign(array(
     'searchValue'     => $searchValue,
     'searchType'      => $searchType,
     'availableFields' => $availableFields,
+    'ChildrenList'    => $ChildrenList
 ));

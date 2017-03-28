@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiqqer>
+    <settings>
+
+        <config>
+            <section name="search">
+                <conf name="booleanSearchMaxLength">
+                    <type><![CDATA[integer]]></type>
+                    <defaultvalue>3</defaultvalue>
+                </conf>
+            </section>
+        </config>
+
+        <window name="quiqqer-search-settings">
+            <title>
+                <locale group="quiqqer/search" var="quiqqer.search.globale.settings.title"/>
+            </title>
+            <params>
+                <icon>fa fa-search</icon>
+            </params>
+
+            <categories>
+                <category name="quiqqer_search">
+                    <text>
+                        <locale group="quiqqer/search" var="quiqqer.search.globale.settings.title"/>
+                    </text>
+                    <icon>fa fa-search</icon>
+
+                    <settings title="quiqqer_search" name="quiqqer_search">
+                        <title>
+                            <locale group="quiqqer/search" var="quiqqer.search.globale.settings.title"/>
+                        </title>
+                        <input conf="search.booleanSearchMaxLength">
+                            <text>
+                                <locale group="quiqqer/search" var="quiqqer.search.globale.settings.booleanSearchMaxLength.text"/>
+                            </text>
+                            <description>
+                                <locale group="quiqqer/search" var="quiqqer.search.globale.settings.booleanSearchMaxLength.description"/>
+                            </description>
+                        </input>
+                    </settings>
+                </category>
+            </categories>
+        </window>
+
+    </settings>
+</quiqqer>

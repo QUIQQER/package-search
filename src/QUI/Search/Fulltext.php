@@ -11,7 +11,6 @@ namespace QUI\Search;
 use QUI;
 use QUI\Search;
 use QUI\Projects\Project;
-use QUI\Projects\Site;
 use QUI\Projects\Site\Edit as SiteEdit;
 use QUI\System\Log;
 use QUI\Utils\Security\Orthos;
@@ -50,7 +49,7 @@ class Fulltext extends QUI\QDOM
     /**
      * Search something in a project
      *
-     * @param String $str - search string
+     * @param string $str - search string
      *
      * @return array array(
      *        'list'   => array list of results
@@ -74,7 +73,7 @@ class Fulltext extends QUI\QDOM
         $strParts = explode(' ', $str);
 
         foreach ($strParts as $key => $part) {
-            $strParts[$key] = $part . '*';
+            $strParts[$key] = '*' . $part . '*';
         }
 
         switch ($this->getAttribute('searchtype')) {
@@ -107,7 +106,6 @@ class Fulltext extends QUI\QDOM
 
         if (!$attrFields || !is_array($attrFields)) {
             $fields = $availableFields;
-
         } else {
             $availableFields = array_flip($availableFields);
 
@@ -139,7 +137,7 @@ class Fulltext extends QUI\QDOM
         );
 
         $PDO   = QUI::getPDO();
-        $table = QUI::getDBProjectTableName(Search::tableSearchFull, $Project);
+        $table = QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project);
         $limit = QUI\Database\DB::createQueryLimit($attrLimit);
 
         // relevance match
@@ -184,9 +182,14 @@ class Fulltext extends QUI\QDOM
 
 
         // query
-        $query
-            = "
-            SELECT *
+        if (is_int(key($availableFields))) {
+            $selectedFields = implode(',', $availableFields);
+        } else {
+            $selectedFields = implode(',', array_keys($availableFields));
+        }
+
+        $query = "
+            SELECT e_date,urlParameter,siteId,{$selectedFields}
             FROM
                 {$table}
             WHERE
@@ -196,37 +199,45 @@ class Fulltext extends QUI\QDOM
                 data  LIKE :search)
                 {$datatypeQuery}
             GROUP BY
-                urlParameter,siteId
+                urlParameter,siteId,e_date,{$selectedFields}
             ORDER BY
                 e_date DESC
         ";
 
-        if (strlen($search) >= 2) {
-            $query
-                = "
+        $minWordLength = QUI::getPackage('quiqqer/search')
+            ->getConfig()
+            ->get('search', 'booleanSearchMaxLength');
+
+        if (!$minWordLength) {
+            $minWordLength = 3;
+        }
+
+        $match = str_replace(array('*', '+'), '', $search);
+
+        if (strlen($match) >= $minWordLength) {
+            $query = "
                 SELECT
-                    *,
-                    100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance
+                    siteId,
+                    urlParameter,
+                    100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance,
+                    {$selectedFields}
                 FROM
                     {$table}
                 WHERE
                     MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE)
                     {$datatypeQuery}
                 GROUP BY
-                    urlParameter,siteId
+                    urlParameter,siteId,{$selectedFields}
                 ORDER BY
                     relevance DESC
             ";
-
         } else {
-            $search = str_replace(array('*', '+'), '', $search);
-            $search = "%{$search}%";
+            $search = "%{$match}%";
         }
 
         $selectQuery = "{$query} {$limit['limit']}";
 
-        $countQuery
-            = "
+        $countQuery = "
             SELECT COUNT(*) as count
             FROM ({$query}) as T
         ";
@@ -297,7 +308,7 @@ class Fulltext extends QUI\QDOM
      * Add or set an entry to the fulltext search table
      *
      * @param Project $Project
-     * @param Integer $siteId
+     * @param integer $siteId
      * @param array $params
      * @param array $siteParams - optional; Parameter for the site link
      */
@@ -329,7 +340,7 @@ class Fulltext extends QUI\QDOM
         $siteId,
         $siteParams = array()
     ) {
-        $tbl = QUI::getDBProjectTableName(Search::tableSearchFull, $Project);
+        $tbl = QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project);
 
         QUI::getDataBase()->delete($tbl, array(
             'siteId'       => (int)$siteId,
@@ -351,7 +362,7 @@ class Fulltext extends QUI\QDOM
         $params = array(),
         $siteParams = array()
     ) {
-        $table  = QUI::getDBProjectTableName(Search::tableSearchFull, $Project);
+        $table  = QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project);
         $fields = self::getFieldList();
 
         $urlParameter = json_encode($siteParams);
@@ -362,7 +373,6 @@ class Fulltext extends QUI\QDOM
 
             unset($data['siteId']);
             unset($data['urlParameter']);
-
         } catch (QUI\Exception $Exception) {
             $siteUrlParams = array();
 
@@ -419,7 +429,7 @@ class Fulltext extends QUI\QDOM
         $siteParams = array()
     ) {
         $table = QUI::getDBProjectTableName(
-            Search::tableSearchFull,
+            Search::TABLE_SEARCH_FULL,
             $Project
         );
 
@@ -452,7 +462,7 @@ class Fulltext extends QUI\QDOM
         $siteParams = array()
     ) {
         $table = QUI::getDBProjectTableName(
-            Search::tableSearchFull,
+            Search::TABLE_SEARCH_FULL,
             $Project
         );
 
@@ -482,8 +492,8 @@ class Fulltext extends QUI\QDOM
      */
     public static function clearSearchTable(Project $Project)
     {
-        QUI::getDataBase()->Table()->truncate(
-            QUI::getDBProjectTableName(Search::tableSearchFull, $Project)
+        QUI::getDataBase()->table()->truncate(
+            QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project)
         );
     }
 
@@ -502,6 +512,8 @@ class Fulltext extends QUI\QDOM
         ));
 
         foreach ($list as $siteParams) {
+            set_time_limit(0);
+
             try {
                 $siteId = (int)$siteParams['id'];
                 $Site   = new SiteEdit($Project, (int)$siteId);
@@ -534,7 +546,6 @@ class Fulltext extends QUI\QDOM
                     'icon'     => $Site->getAttribute('image_site'),
                     'e_date'   => $e_date
                 ));
-
             } catch (QUI\Exception $Exception) {
                 Log::writeException($Exception);
             }
@@ -556,7 +567,6 @@ class Fulltext extends QUI\QDOM
 
         try {
             return QUI\Cache\Manager::get($cache);
-
         } catch (QUI\Exception $Exception) {
         }
 
@@ -564,7 +574,7 @@ class Fulltext extends QUI\QDOM
         $files  = self::getSearchXmlList();
 
         foreach ($files as $file) {
-            $Dom  = QUI\Utils\XML::getDomFromXml($file);
+            $Dom  = QUI\Utils\Text\XML::getDomFromXml($file);
             $Path = new \DOMXPath($Dom);
 
             $fields = $Path->query("//quiqqer/search/searchfields/field");
@@ -595,7 +605,6 @@ class Fulltext extends QUI\QDOM
 
         try {
             return QUI\Cache\Manager::get($cache);
-
         } catch (QUI\Exception $Exception) {
         }
 

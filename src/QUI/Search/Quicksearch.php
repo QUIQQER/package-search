@@ -39,7 +39,7 @@ class Quicksearch
     {
         $PDO   = QUI::getPDO();
         $table = QUI::getDBProjectTableName(
-            Search::tableSearchQuick,
+            Search::TABLE_SEARCH_QUICK,
             $Project
         );
 
@@ -60,9 +60,8 @@ class Quicksearch
             $groupedBy = '';
         }
 
-        $query
-            = "
-            SELECT *
+        $query = "
+            SELECT id, siteId, urlParameter, data, rights, icon
             FROM
                 {$table}
             WHERE
@@ -72,8 +71,7 @@ class Quicksearch
 
         $selectQuery = "{$query} {$limit['limit']}";
 
-        $countQuery
-            = "
+        $countQuery = "
             SELECT COUNT(*) as count
             FROM ({$query}) as T
         ";
@@ -125,7 +123,7 @@ class Quicksearch
      * Removes similar entries, with same siteId and siteParams
      *
      * @param Project $Project
-     * @param Integer $siteId
+     * @param integer $siteId
      * @param array $data - data array -> every array entry is a data entry
      * @param array $siteParams - optional; Parameter for the site link
      */
@@ -136,7 +134,7 @@ class Quicksearch
         $siteParams = array()
     ) {
         $table = QUI::getDBProjectTableName(
-            Search::tableSearchQuick,
+            Search::TABLE_SEARCH_QUICK,
             $Project
         );
 
@@ -188,8 +186,8 @@ class Quicksearch
      * Add an entry to the quicksearch search table
      *
      * @param Project $Project
-     * @param Integer $siteId
-     * @param String $data
+     * @param integer $siteId
+     * @param string $data
      * @param array $siteParams
      */
     public static function addEntry(
@@ -199,7 +197,7 @@ class Quicksearch
         $siteParams = array()
     ) {
         $table = QUI::getDBProjectTableName(
-            Search::tableSearchQuick,
+            Search::TABLE_SEARCH_QUICK,
             $Project
         );
 
@@ -227,7 +225,7 @@ class Quicksearch
      * Remove an search entry
      *
      * @param Project $Project
-     * @param Integer $siteId
+     * @param integer $siteId
      * @param array $siteParams
      */
     public static function removeEntries(
@@ -236,7 +234,7 @@ class Quicksearch
         $siteParams = array()
     ) {
         $table = QUI::getDBProjectTableName(
-            Search::tableSearchQuick,
+            Search::TABLE_SEARCH_QUICK,
             $Project
         );
 
@@ -269,7 +267,7 @@ class Quicksearch
         $siteParams = array()
     ) {
         $table = QUI::getDBProjectTableName(
-            Search::tableSearchQuick,
+            Search::TABLE_SEARCH_QUICK,
             $Project
         );
 
@@ -299,8 +297,8 @@ class Quicksearch
      */
     public static function clearSearchTable(Project $Project)
     {
-        QUI::getDataBase()->Table()->truncate(
-            QUI::getDBProjectTableName(Search::tableSearchQuick, $Project)
+        QUI::getDataBase()->table()->truncate(
+            QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project)
         );
     }
 }

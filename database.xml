@@ -8,10 +8,10 @@
         <table name="searchQuick" no-auto-update="1" no-site-reference="1">
             <field type="bigint(11)">id</field>
             <field type="bigint(11)">siteId</field>
-            <field type="text">urlParameter</field>
-            <field type="text">data</field>
-            <field type="text">rights</field>
-            <field type="varchar(255)">icon</field>
+            <field type="text NULL">urlParameter</field>
+            <field type="text NULL">data</field>
+            <field type="text NULL">rights</field>
+            <field type="varchar(255) NULL">icon</field>
 
             <auto_increment>id</auto_increment>
         </table>
@@ -19,10 +19,10 @@
         <table name="searchFull" no-auto-update="1" no-site-reference="1">
             <field type="bigint(11)">id</field>
             <field type="bigint(11)">siteId</field>
-            <field type="text">urlParameter</field>
-            <field type="text">rights</field>
-            <field type="varchar(255)">datatype</field>
-            <field type="varchar(255)">icon</field>
+            <field type="text NULL">urlParameter</field>
+            <field type="text NULL">rights</field>
+            <field type="varchar(255) NULL">datatype</field>
+            <field type="varchar(255) NULL">icon</field>
 
             <auto_increment>id</auto_increment>
             <index>siteId</index>

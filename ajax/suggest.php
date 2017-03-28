@@ -1,25 +1,52 @@
 <?php
 
 /**
- * Delete the permalink
+ * Return the suggest html search result
  *
  * @param string $project - project data
- * @param string $search  - search string
- * @param string $params  - search params
+ * @param string $search - search string
  *
- * @return array
+ * @return string
  */
-function package_quiqqer_search_ajax_suggest($project, $search, $params)
-{
-    $Project = \QUI::getProjectManager()->decode($project);
-    $Fulltext = new \QUI\Search\Quicksearch();
-
-    return $Fulltext->search($search, $Project, array(
-        'limit' => 10
-    ));
-}
-
-\QUI::$Ajax->register(
+QUI::$Ajax->registerFunction(
     'package_quiqqer_search_ajax_suggest',
-    array('project', 'search', 'params')
+    function ($project, $search) {
+        $Project  = QUI::getProjectManager()->decode($project);
+        $Fulltext = new QUI\Search\Quicksearch();
+
+        $result = $Fulltext->search($search, $Project, array(
+            'limit' => 10
+        ));
+
+        $list = '<ul>';
+
+        foreach ($result['list'] as $entry) {
+            try {
+                $Site = $Project->get($entry['siteId']);
+                $url  = $Site->getUrlRewritten();
+            } catch (QUI\Exception $exception) {
+                continue;
+            }
+
+            $list .= '<li data-id="' . $entry['id'] . '" data-url="' . $url . '">';
+            $list .= '<div class="quiqqer-search-suggest-icon">';
+
+            if (empty($entry['icon'])) {
+                $list .= '<span class="fa fa-file-o"></span>';
+            } else {
+                $list .= '<span class="fa ' . $entry['icon'] . '"></span>';
+            }
+
+            $list .= '</div>';
+            $list .= '<div class="quiqqer-search-suggest-text">';
+            $list .= $entry['data'];
+            $list .= '</div>';
+            $list .= '</li>';
+        }
+
+        $list .= '</ul>';
+
+        return $list;
+    },
+    array('project', 'search')
 );

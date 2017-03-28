@@ -1,28 +1,27 @@
 {
-    "name" : "quiqqer/search",
-    "type" : "quiqqer-module",
-    "description" : "Extra Search - provided extra Search functionality. Not the standard search. Search Package provieded an extra API and support MATCH searches.",
-
-    "version" : "dev-master",
-
-    "authors" : [{
-        "name": "Henning Leutz",
-        "email": "leutz@pcsg.de",
-        "homepage": "http://www.pcsg.de",
-        "role": "Developer"
-    }],
-
-    "support" : {
-        "email" : "support@pcsg.de"
-    },
-
-    "require": {
-        "quiqqer/quiqqer" : "*@dev"
-    },
-
-    "autoload": {
-        "psr-0" : {
-            "QUI" : "src/"
-        }
+  "name": "quiqqer/search",
+  "type": "quiqqer-module",
+  "description": "Extra Search - provided extra Search functionality. Not the standard search. Search Package provieded an extra API and support MATCH searches.",
+  "version": "dev-master",
+  "authors": [
+    {
+      "name": "Henning Leutz",
+      "email": "leutz@pcsg.de",
+      "homepage": "http://www.pcsg.de",
+      "role": "Developer"
     }
+  ],
+  "support": {
+    "email": "support@pcsg.de"
+  },
+  "require": {
+    "quiqqer/quiqqer": "*@dev",
+    "quiqqer/utils": ">=1.4|dev-master|dev-dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "QUI\\": "src/QUI",
+      "QUI\\Search\\": "src/QUI/Search"
+    }
+  }
 }

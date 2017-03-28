@@ -25,16 +25,16 @@ class Search
     /**
      * quick search table
      *
-     * @var String
+     * @var string
      */
-    const tableSearchQuick = 'searchQuick';
+    const TABLE_SEARCH_QUICK = 'searchQuick';
 
     /**
      * fulltext search table
      *
-     * @var String
+     * @var string
      */
-    const tableSearchFull = 'searchFull';
+    const TABLE_SEARCH_FULL = 'searchFull';
 
     /**
      * Create the fulltext search table for the Project
@@ -70,6 +70,8 @@ class Search
 
         foreach ($list as $siteParams) {
             try {
+                set_time_limit(0);
+
                 $siteId = (int)$siteParams['id'];
                 $Site   = new SiteEdit($Project, (int)$siteId);
 
@@ -89,7 +91,6 @@ class Search
                     $Site->getAttribute('name'),
                     $Site->getAttribute('title')
                 ));
-
             } catch (QUI\Exception $Exception) {
                 Log::writeException($Exception);
             }
@@ -106,7 +107,7 @@ class Search
      */
     public static function setup()
     {
-        $Table    = QUI::getDataBase()->Table();
+        $Table    = QUI::getDataBase()->table();
         $Manager  = QUI::getProjectManager();
         $projects = $Manager->getProjects(true);
 
@@ -128,17 +129,17 @@ class Search
         foreach ($projects as $_Project) {
             /* @var $_Project Project */
             $name  = $_Project->getName();
-            $langs = $_Project->getAttribute('langs');
+            $langs = $_Project->getLanguages();
 
             foreach ($langs as $lang) {
                 $Project = $Manager->getProject($name, $lang);
 
                 $table = QUI::getDBProjectTableName(
-                    self::tableSearchFull,
+                    self::TABLE_SEARCH_FULL,
                     $Project
                 );
 
-                $Table->appendFields($table, $fields);
+                $Table->addColumn($table, $fields);
 
                 foreach ($fulltext as $field) {
                     $Table->setFulltext($table, $field);
@@ -166,12 +167,12 @@ class Search
         $Project = $Site->getProject();
 
         $tableSearchFull = QUI::getDBProjectTableName(
-            self::tableSearchFull,
+            self::TABLE_SEARCH_FULL,
             $Project
         );
 
         $tableQuicksearch = QUI::getDBProjectTableName(
-            self::tableSearchQuick,
+            self::TABLE_SEARCH_QUICK,
             $Project
         );
 
@@ -230,7 +231,11 @@ class Search
      */
     public static function onTemplateGetHeader(QUI\Template $Template)
     {
-        $Project = QUI::getProjectManager()->get();
+        $Project = $Template->getAttribute('Project');
+
+        if (!is_object($Project)) {
+            $Project = QUI::getProjectManager()->get();
+        }
 
         $result = $Project->getSites(array(
             'where' => array(
@@ -271,6 +276,5 @@ class Search
             </script>
             '
         );
-
     }
 }

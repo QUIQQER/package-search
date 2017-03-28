@@ -13,10 +13,15 @@ define('package/quiqqer/search/bin/controls/Suggest', [
 
     'qui/QUI',
     'qui/controls/Control',
-    'Ajax'
+    'Ajax',
+    'Locale',
 
-], function (QUI, QUIControl, Ajax) {
+    'css!package/quiqqer/search/bin/controls/Suggest.css'
+
+], function (QUI, QUIControl, QUIAjax, QUILocale) {
     "use strict";
+
+    var lg = 'quiqqer/search';
 
     return new Class({
 
@@ -26,7 +31,10 @@ define('package/quiqqer/search/bin/controls/Suggest', [
         Binds: [
             '$onImport',
             '$onInsert',
-            '$keyUp'
+            '$keyUp',
+            '$blur',
+            '$renderSearch',
+            '$hideResults'
         ],
 
         options: {
@@ -39,8 +47,11 @@ define('package/quiqqer/search/bin/controls/Suggest', [
             this.$binds      = [];
             this.$timer      = null;
             this.$lastSearch = '';
+            this.$showed     = false;
 
-            this.$Datalist = null;
+            this.$CurrentInput = null;
+            this.$FX           = null;
+            this.$Datalist     = null;
 
             this.parent(options);
 
@@ -57,13 +68,14 @@ define('package/quiqqer/search/bin/controls/Suggest', [
          */
         create: function () {
             this.$Elm = new Element('input', {
-                type       : 'text',
-                required   : 'required',
+                type       : 'search',
                 placeholder: this.getAttribute('placeholder'),
                 name       : this.getAttribute('name')
             });
 
             this.bindElement(this.$Elm);
+
+            this.$FX = moofx(this.getDataList());
 
             return this.$Elm;
         },
@@ -76,8 +88,8 @@ define('package/quiqqer/search/bin/controls/Suggest', [
                 return this.$Datalist;
             }
 
-            this.$Datalist = new Element('datalist', {
-                id: 'datalist' + this.getId()
+            this.$Datalist = new Element('div', {
+                'class': 'quiqqer-search-suggest'
             }).inject(document.body);
 
             return this.$Datalist;
@@ -87,6 +99,11 @@ define('package/quiqqer/search/bin/controls/Suggest', [
          * event : on import
          */
         $onImport: function (self, Elm) {
+            if (!Elm.get('placeholder') || Elm.get('placeholder') === '') {
+                Elm.set('placeholder', this.getAttribute('placeholder'));
+            }
+
+            this.$FX = moofx(this.getDataList());
             this.bindElement(Elm);
         },
 
@@ -99,12 +116,12 @@ define('package/quiqqer/search/bin/controls/Suggest', [
             this.$binds.push(Node);
 
             Node.set({
-                list        : this.getDataList().get('id'),
                 autocomplete: "off"
             });
 
             Node.addEvents({
-                keyup: this.$keyUp
+                keyup: this.$keyUp,
+                blur : this.$blur
             });
         },
 
@@ -154,33 +171,51 @@ define('package/quiqqer/search/bin/controls/Suggest', [
                 clearTimeout(this.$timer);
             }
 
-            var self = this,
-                Elm  = event.target;
+            var self     = this,
+                Elm      = event.target,
+                DataList = this.getDataList();
 
-            if (this.$lastSearch == Elm.value) {
-                return;
+
+            this.$CurrentInput = Elm;
+
+            switch (event.key) {
+                case 'esc':
+                    Elm.value = '';
+                    this.$hideResults();
+                    event.stop();
+                    break;
+
+                case 'enter':
+                    var Active = DataList.getElement('li.active');
+
+                    if (Active) {
+                        Active.fireEvent('click', {
+                            target: Active
+                        });
+                        event.stop();
+                        return;
+                    }
+                    break;
+
+                case 'up':
+                    this.$up();
+                    event.stop();
+                    return;
+
+                case 'down':
+                    this.$down();
+                    event.stop();
+                    return;
             }
 
-            this.getDataList().set('html', '');
+            this.$resetResults();
+            this.$showResults();
 
             this.$timer = (function () {
-                self.$lastSearch = Elm.value;
-
-                self.search(Elm.value, function (result) {
-                    var list = result.list;
-
-                    var DataList = self.getDataList();
-
-                    DataList.set('html', '');
-
-                    for (var i = 0, len = list.length; i < len; i++) {
-                        new Element('option', {
-                            value: list[i].data
-                            // label : ""
-                        }).inject(DataList);
-                    }
-                });
-
+                if (Elm.value === '') {
+                    return self.$hideResults();
+                }
+                self.search(Elm.value).then(self.$renderSearch);
             }).delay(this.getAttribute('delay'));
         },
 
@@ -188,16 +223,175 @@ define('package/quiqqer/search/bin/controls/Suggest', [
          * Execute the suggest search
          *
          * @param {String} search - search string
-         * @param {Function} callback - callback function function( result ){}
+         * @return {Promise}
          */
-        search: function (search, callback) {
-            Ajax.get('package_quiqqer_search_ajax_suggest', function (result) {
-                callback(result);
-            }, {
-                'package': 'quiqqer/search',
-                project  : JSON.encode(QUIQQER_PROJECT),
-                search   : search
+        search: function (search) {
+            return new Promise(function (resolve) {
+                QUIAjax.get('package_quiqqer_search_ajax_suggest', resolve, {
+                    'package': 'quiqqer/search',
+                    project  : JSON.encode(QUIQQER_PROJECT),
+                    search   : search
+                });
+            }.bind(this));
+        },
+
+        /**
+         * set the results to the dropdown
+         *
+         * @param {string} data
+         * @return {Promise}
+         */
+        $renderSearch: function (data) {
+            var DropDown = this.getDataList();
+
+            if (data === '') {
+                DropDown.set(
+                    'html',
+
+                    '<span class="quiqqer-search-suggest-noresult">' +
+                    QUILocale.get(lg, 'message.product.search.empty') +
+                    '</span>'
+                );
+                return this.$showResults();
+            }
+
+            DropDown.set('html', data);
+
+            DropDown.getElements('li').addEvents({
+                mousedown: function (event) {
+                    event.stop();
+                },
+                click    : function (event) {
+                    var Target = event.target;
+
+                    if (Target.nodeName !== 'LI') {
+                        Target = Target.getParent('li');
+                    }
+
+                    window.location = Target.get('data-url');
+                }
             });
+
+            return this.$showResults();
+        },
+
+        /**
+         * Hide the results dropdown
+         *
+         * @returns {Promise}
+         */
+        $hideResults: function () {
+            return new Promise(function (resolve) {
+                this.$FX.animate({
+                    opacity: 0
+                }, {
+                    duration: 200,
+                    callback: function () {
+                        this.$showed = false;
+                        this.getDataList().setStyle('display', 'none');
+                        resolve();
+                    }.bind(this)
+                });
+            }.bind(this));
+        },
+
+        /**
+         * Show the results dropdown
+         *
+         * @returns {Promise}
+         */
+        $showResults: function () {
+            if (this.$showed) {
+                return Promise.resolve();
+            }
+
+            return new Promise(function (resolve) {
+                var pos  = this.$CurrentInput.getPosition(),
+                    size = this.$CurrentInput.getSize(),
+                    List = this.getDataList();
+
+                List.setStyles({
+                    left   : pos.x,
+                    opacity: 0,
+                    top    : pos.y + size.y,
+                    width  : size.x
+                });
+
+                List.setStyle('display', null);
+                this.$showed = true;
+
+                this.$FX.animate({
+                    opacity: 1
+                }, {
+                    duration: 200,
+                    callback: resolve
+                });
+            }.bind(this));
+        },
+
+        /**
+         * Reset the results, set a loader to the dropdown
+         */
+        $resetResults: function () {
+            this.getDataList().set(
+                'html',
+                '<span class="quiqqer-search-suggest-loader fa fa-spinner fa-spin"></span>'
+            );
+        },
+
+        /**
+         * blur effect
+         */
+        $blur: function () {
+            this.$hideResults();
+        },
+
+        /**
+         * Move up to next result
+         */
+        $up: function () {
+            var Active = this.getDataList().getElement('li.active');
+
+            if (!Active) {
+                Active = this.getDataList().getFirst('ul li');
+            }
+
+            if (!Active) {
+                return;
+            }
+
+            var Previous = Active.getPrevious();
+
+            if (!Previous) {
+                Previous = this.getDataList().getLast('ul li');
+            }
+
+            Active.removeClass('active');
+            Previous.addClass('active');
+        },
+
+        /**
+         * Move down to next result
+         */
+        $down: function () {
+            var Active = this.getDataList().getElement('li.active');
+
+            if (!Active) {
+                Active = this.getDataList().getLast('ul li');
+            }
+
+            if (!Active) {
+                return;
+            }
+
+            var Next = Active.getNext();
+
+            if (!Next) {
+                Next = this.getDataList().getFirst('ul li');
+            }
+
+            Active.removeClass('active');
+            Next.addClass('active');
         }
     });
 });

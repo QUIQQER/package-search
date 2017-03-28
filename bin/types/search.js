@@ -17,8 +17,8 @@ window.addEvent('domready', function () {
         });
 
         new QUIButton({
-            icon  : 'icon-gears fa fa-gears',
-            title : 'Erweiterte Einstellungen für die Suche',
+            icon  : 'fa fa-gears',
+            title : 'Erweiterte Einstellungen für die Suche', // #locale
             styles: {
                 marginLeft: 5
             },

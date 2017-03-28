@@ -1,0 +1,54 @@
+.quiqqer-search-suggest {
+    box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.35);
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    position: absolute;
+    z-index: 10000;
+}
+
+.quiqqer-search-suggest ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.quiqqer-search-suggest li {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    clear: both;
+    cursor: pointer;
+    float: left;
+    padding: 10px;
+    width: 100%;
+}
+
+.quiqqer-search-suggest li.active,
+.quiqqer-search-suggest li:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.quiqqer-search-suggest-icon {
+    float: left;
+    font-size: 18px;
+    text-align: center;
+    width: 30px;
+}
+
+.quiqqer-search-suggest-text {
+    float: left;
+    overflow: hidden;
+    padding: 0 10px;
+    text-align: left;
+    width: calc(100% - 30px);
+}
+
+.quiqqer-search-suggest-loader {
+    float: left;
+    font-size: 16px;
+    padding: 20px;
+}
+
+.quiqqer-search-suggest-noproducts {
+    float: left;
+    padding: 0 10px;
+}
