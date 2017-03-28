@@ -12,6 +12,48 @@
             <de><![CDATA[QUIQQER - Suche]]></de>
             <en><![CDATA[QUIQQER - Search]]></en>
         </locale>
+        <locale name="package.description">
+            <de><![CDATA[
+            Die Erweiterte Suche bringt eine umfangreiche Volltexte-Suche mit.
+            Sie ist durch andere Module flexibel erweiterbar und dient so als Ausgangspunkt für alle Suchfunktionen im QUIQQER Frontend.
+            Neben der Volltextsuche liefert sie auch Bausteine zur Einbindung einer Schnellsuche (Sugguest-Search).
+            ]]></de>
+            <en><![CDATA[
+            The Advanced Search includes a comprehensive full-text search.
+            It is flexibly expandable by other modules and thus serves as the starting point for all search functions in the QUIQQER front end.
+            In addition to full-text search, it also provides building blocks for the integration of a quick search (Sugguest-Search).
+            ]]></en>
+        </locale>
+        <locale name="quiqqer/search:types/search.title">
+            <de><![CDATA[Erweiterte Suche]]></de>
+            <en><![CDATA[]]></en>
+        </locale>
+        <locale name="quiqqer/search:types/search.description" html="true">
+            <de><![CDATA[
+            Der Seitentyp bietet umfangreiche Konfigurations-Möglichkeiten zur Suchfunktion von unterschiedlichen Informationen innerhalb von QUIQQER.
+            Es kann eingestellt werden welche Informationen genau durchsucht werden sollen und was der Nutzer im Frontend dazu einstellen kann.
+            ]]></de>
+            <en><![CDATA[
+            The page type offers extensive configuration possibilities for the search function of different information within QUIQQER.
+            It can be set which information should be searched exactly and what the user can adjust in the frontend.
+            ]]></en>
+        </locale>
+        <locale name="quiqqer/search:types/results.title">
+            <de><![CDATA[Vordefinierte Suchergebnisse]]></de>
+            <en><![CDATA[Predefined search results]]></en>
+        </locale>
+        <locale name="quiqqer/search:types/results.description" html="true">
+            <de><![CDATA[
+            In den Einstellungen des Seitentyps lassen sich Suchparameter voreinstellen.
+            Dadurch ist es möglich Besuchern der Seite bestimmte Ergebnisse (z.B. bestimmte Seitentypen) darzustellen ohne manuell eine Liste  mit den Informationen anlegen zu müssen.
+            Der Nutzer kann selbst keine Suche ausführen. Mit Hilfe dieses Seitentyps lassen sich schnell individuelle Suchergebnis-Listen vordefinieren.
+            ]]></de>
+            <en><![CDATA[
+            In the settings of the page type, search parameters can be preset.
+            This makes it possible for visitors of the page to display certain results (for example, certain page types) without having to create a list of the information manually.
+            The user can not perform a search by himself. This page type allows you to quickly define individual search results lists.
+            ]]></en>
+        </locale>
     </groups>
 
     <!-- php locale -->
