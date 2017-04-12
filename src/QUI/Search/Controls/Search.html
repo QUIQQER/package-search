@@ -1,0 +1,46 @@
+<section class="content-template quiqqer-search">
+
+    {if $count == 0 && isset($smarty.request.search)}
+    <div class="content-message-attention qui-search-no-result">
+        {locale group="quiqqer/search" value="tpl.search.no.results"}
+    </div>
+    {else}
+    <p class="quiqqer-search-result-count">
+        {if $count == 1}
+        {locale group="quiqqer/search" value="tpl.search.one.result"}
+        {else}
+        {locale group="quiqqer/search" value="tpl.search.more.result"
+        count=$count}
+        {/if}
+    </p>
+
+    <noscript>
+        {if $sheets > 1}
+        {$Pagination->create()}
+        {/if}
+    </noscript>
+
+    <div class="quiqqer-search-pagination quiqqer-search-pagination-top" style="display: none;">
+        {if $sheets > 1}
+        {$PaginationAsync->create()}
+        {/if}
+    </div>
+
+    <div class="quiqqer-search-results">
+    {$ChildrenList->create()}
+    </div>
+
+    <div class="quiqqer-search-pagination quiqqer-search-pagination-bottom" style="display: none;">
+        {if $sheets > 1}
+        {$PaginationAsync->create()}
+        {/if}
+    </div>
+
+    <noscript>
+        {if $sheets > 1}
+        {$Pagination->create()}
+        {/if}
+    </noscript>
+    {/if}
+
+</section>

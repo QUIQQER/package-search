@@ -1,0 +1,46 @@
+<form action="{url site=$Site}" method="GET">
+    <input type="search"
+           name="search"
+           value="{$search}"
+           class="quiqqer-search-searchinput-input"
+           placeholder="{t}quiqqer/search tpl.search.placeholder{/t}"
+    />
+
+    <input type="submit"
+           value="{t}quiqqer/search tpl.search.button{/t}"
+           class="quiqqer-search-searchinput-submit qui-button button"
+    />
+
+    {if count( $availableFields ) &&
+    $Site->getAttribute('quiqqer.settings.search.list.hideSettings') != true}
+    <div class="qui-search-searchinput-settings" style="display: none">
+        <label>
+            <input class="qui-search-searchinput-settings-setting"
+                   type="checkbox"
+                   name="searchType"
+                   value="AND"
+                   {if $searchType == 'AND'}checked="checked"{/if}
+            />
+
+            {locale group="quiqqer/search" value="tpl.search.and.type"}
+        </label>
+
+        <fieldset>
+            {foreach from=$availableFields item=field}
+            <label>
+                <input class="qui-search-searchinput-settings-setting"
+                       type="checkbox"
+                       name="searchIn[]"
+                       value="{$field}"
+                       {if in_array($field, $fields)}checked="checked" {/if}
+                />
+
+                {locale group="quiqqer/search"
+                value="tpl.search.field.`$field`"}
+            </label>
+            {/foreach}
+        </fieldset>
+    </div>
+    {/if}
+
+</form>

@@ -54,6 +54,19 @@
             The user can not perform a search by himself. This page type allows you to quickly define individual search results lists.
             ]]></en>
         </locale>
+
+        <locale name="tpl.search.no.results">
+            <de><![CDATA[Keine Ergebnisse gefunden. Bitte nutzen Sie einen anderen Suchbegriff.]]></de>
+            <en><![CDATA[No results found. Please use a different search.]]></en>
+        </locale>
+        <locale name="tpl.search.one.result">
+            <de><![CDATA[Es wurde ein Ergebnis gefunden.]]></de>
+            <en><![CDATA[One result has been found.]]></en>
+        </locale>
+        <locale name="tpl.search.more.result">
+            <de><![CDATA[Es wurden [count] Ergebnisse gefunden.]]></de>
+            <en><![CDATA[[count] results has been found.]]></en>
+        </locale>
     </groups>
 
     <!-- php locale -->
@@ -153,20 +166,6 @@
             <de><![CDATA[Relevanz:]]></de>
             <en><![CDATA[Relevance:]]></en>
         </locale>
-
-        <locale name="tpl.search.no.results">
-            <de><![CDATA[Keine Ergebnisse gefunden. Bitte nutzen Sie einen anderen Suchbegriff.]]></de>
-            <en><![CDATA[No results found. Please use a different search.]]></en>
-        </locale>
-        <locale name="tpl.search.one.result">
-            <de><![CDATA[Es wurde ein Ergebnis gefunden.]]></de>
-            <en><![CDATA[One result has been found.]]></en>
-        </locale>
-        <locale name="tpl.search.more.result">
-            <de><![CDATA[Es wurden [count] Ergebnisse gefunden.]]></de>
-            <en><![CDATA[[count] results has been found.]]></en>
-        </locale>
-
 
         <locale name="tpl.search.and.type">
             <de><![CDATA[Alle Begriffe müssen im Ergebnis enthalten sein.]]></de>
