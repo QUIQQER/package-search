@@ -57,11 +57,13 @@ class Search extends QUI\Control
         }
 
         $this->setAttributes(array(
-            'search'       => '', // search term
-            'searchType'   => $this::SEARCH_TYPE_OR,
-            'max'          => $this->Site->getAttribute('quiqqer.settings.search.list.max') ?: 10,
-            'searchFields' => $this->getDefaultSearchFields(),
-            'sheet'        => 1
+            'search'               => '', // search term
+            'searchType'           => $this::SEARCH_TYPE_OR,
+            'max'                  => $this->Site->getAttribute('quiqqer.settings.search.list.max') ?: 10,
+            'searchFields'         => $this->getDefaultSearchFields(),
+            'sheet'                => 1,
+            'childrenListTemplate' => false,
+            'childrenListCss'      => false
         ));
 
         $this->setJavaScriptControl('package/quiqqer/search/bin/controls/Search');
@@ -93,11 +95,6 @@ class Search extends QUI\Control
         $max      = $this->getAttribute('max');
         $sheet    = $this->getAttribute('sheet');
         $fields   = $this->getAttribute('searchFields');
-
-//        if (empty($fields)) {
-//            $fields = $this->getDefaultSearchFields();
-//        }
-
         $children = array();
 
         $FulltextSearch = new Fulltext(array(
@@ -163,7 +160,7 @@ class Search extends QUI\Control
     {
         $searchResult = $this->search();
 
-        return new ChildrenList(array(
+        $params = array(
             'showTitle'      => false,
             'Site'           => $this->Site,
             'limit'          => $searchResult['max'],
@@ -179,7 +176,17 @@ class Search extends QUI\Control
             'child-itemtype' => 'http://schema.org/ListItem',
             'display'        => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.template'),
             'children'       => $searchResult['children']
-        ));
+        );
+
+        if ($this->getAttribute('childrenListTemplate')) {
+            $params['displayTemplate'] = $this->getAttribute('childrenListTemplate');
+        }
+
+        if ($this->getAttribute('childrenListCss')) {
+            $params['displayCss'] = $this->getAttribute('childrenListCss');
+        }
+
+        return new ChildrenList($params);
     }
 
     /**

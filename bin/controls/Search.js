@@ -345,11 +345,9 @@ define('package/quiqqer/search/bin/controls/Search', [
             this.search().then(function (SearchResult) {
                 // handle pagination controls
                 if (!SearchResult.count) {
-                    self.$PaginationTopElm.setStyle('display', 'none');
-                    self.$PaginationBottomElm.setStyle('display', 'none');
+                    self.$hidePagination();
                 } else {
-                    self.$PaginationTopElm.setStyle('display', '');
-                    self.$PaginationBottomElm.setStyle('display', '');
+                    self.$showPagination();
 
                     self.$lockPagination = true;
                     self.$PaginationTop.setPageCount(SearchResult.sheets);
@@ -388,7 +386,7 @@ define('package/quiqqer/search/bin/controls/Search', [
                     function (SearchResult) {
                         self.fireEvent('search', [SearchResult, self]);
                         self.$renderResult(SearchResult);
-                        resolve();
+                        resolve(SearchResult);
                     }, {
                         'package'   : 'quiqqer/search',
                         searchParams: JSON.encode(self.$SearchParams),
@@ -398,6 +396,22 @@ define('package/quiqqer/search/bin/controls/Search', [
                     }
                 )
             });
+        },
+
+        /**
+         * Hide Pagination controls
+         */
+        $hidePagination: function() {
+            this.$PaginationTopElm.setStyle('display', 'none');
+            this.$PaginationBottomElm.setStyle('display', 'none');
+        },
+
+        /**
+         * Show Pagination controls
+         */
+        $showPagination: function() {
+            this.$PaginationTopElm.setStyle('display', '');
+            this.$PaginationBottomElm.setStyle('display', '');
         },
 
         /**
@@ -415,7 +429,6 @@ define('package/quiqqer/search/bin/controls/Search', [
                     });
 
                     var ChildrenContainer = this.$Elm.getElement('article').getParent('section');
-
                     Ghost.getElements('article').inject(ChildrenContainer);
                 } else {
                     this.$Results.set('html', SearchResult.childrenListHtml);
@@ -428,6 +441,17 @@ define('package/quiqqer/search/bin/controls/Search', [
                 }
             } else {
                 this.$Results.set('html', SearchResult.childrenListHtml);
+
+                if (!SearchResult.count) {
+                    this.$hidePagination();
+                } else {
+                    this.$showPagination();
+
+                    this.$lockPagination = true;
+                    this.$PaginationTop.setPageCount(SearchResult.sheets);
+                    this.$PaginationBottom.setPageCount(SearchResult.sheets);
+                    this.$lockPagination = false;
+                }
             }
 
             this.Loader.hide();
