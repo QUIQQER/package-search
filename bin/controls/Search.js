@@ -21,6 +21,7 @@ define('package/quiqqer/search/bin/controls/Search', [
     'qui/controls/Control',
     'qui/controls/buttons/Button',
     'qui/controls/loader/Loader',
+    'qui/utils/Elements',
     'utils/Controls',
 
     'Ajax',
@@ -28,7 +29,8 @@ define('package/quiqqer/search/bin/controls/Search', [
 
     //'css!package/quiqqer/search/bin/controls/Search.css'
 
-], function (QUI, QUIControl, QUIButton, QUILoader, ControlUtils, QUIAjax, QUILocale) {
+], function (QUI, QUIControl, QUIButton, QUILoader, QUIElementUtils, ControlUtils,
+             QUIAjax, QUILocale) {
     "use strict";
 
     var lg = 'quiqqer/search';
@@ -47,9 +49,12 @@ define('package/quiqqer/search/bin/controls/Search', [
         ],
 
         options: {
-            name       : 'search',
-            placeholder: 'Search...',
-            delay      : 300
+            name          : 'search',
+            placeholder   : 'Search...',
+            delay         : 300,
+            paginationtype: 'pagination',
+            max           : false,
+            sheet         : 1
         },
 
         initialize: function (options) {
@@ -65,10 +70,13 @@ define('package/quiqqer/search/bin/controls/Search', [
             this.$SearchParams        = {};
             this.Loader               = new QUILoader();
             this.$lockPagination      = false;
+            this.$MoreBtn             = null;
+            this.$moreBtnClicked      = 0;
+            this.$loadingMore         = false;
+            this.$moreBtnVisible      = false;
 
             this.addEvents({
-                onImport: this.$onImport,
-                onSearch: this.$onSearch
+                onImport: this.$onImport
             });
         },
 
@@ -88,6 +96,13 @@ define('package/quiqqer/search/bin/controls/Search', [
             this.$ResultCountElm = this.$Elm.getElement(
                 '.quiqqer-search-result-count'
             );
+
+            this.$paginationType = this.getAttribute('paginationtype');
+
+            if (this.$paginationType !== 'pagination') {
+                this.$initializeInfiniteScrolling();
+                return;
+            }
 
             this.Loader.show();
 
@@ -137,6 +152,141 @@ define('package/quiqqer/search/bin/controls/Search', [
         },
 
         /**
+         * Initialize infinite scrolling
+         */
+        $initializeInfiniteScrolling: function () {
+            var self = this;
+
+            this.$sheet = parseInt(this.getAttribute('sheet'));
+
+            this.$MoreBtn = this.$Elm.getElement(
+                '.quiqqer-search-pagination-inifinitescroll-more-btn'
+            );
+
+            if (!this.$MoreBtn.getProperty('data-hidden')) {
+                this.$moreBtnVisible = true;
+            }
+
+            this.$FXMore = moofx(this.$MoreBtn.getParent());
+
+            var FuncExecuteNextSearch = function () {
+                self.setSearchParams({
+                    sheet: ++self.$sheet
+                });
+
+                self.$loadingMore = true;
+
+                var oldButtonText = self.$MoreBtn.get('text');
+
+                self.$MoreBtn.set(
+                    'html',
+                    '<span class="fa fa-spinner fa-spin"></span>' +
+                    '<span class="loading-btn-text">' +
+                    QUILocale.get(lg, 'tpl.search.pagination.inifinitescroll.btn.loading') +
+                    '</span>'
+                );
+
+                self.$MoreBtn.setStyle('color', null);
+                self.$MoreBtn.addClass('loading');
+
+                self.search().then(function () {
+                    self.$loadingMore = false;
+
+                    self.$MoreBtn.set({
+                        html  : oldButtonText,
+                        styles: {
+                            width: null
+                        }
+                    });
+
+                    self.$MoreBtn.removeClass('loading');
+                });
+            };
+
+            this.$MoreBtn.addEvent('click', function (event) {
+                event.stop();
+
+                self.$moreBtnClicked++;
+                FuncExecuteNextSearch();
+            });
+
+            QUI.addEvent('scroll', function () {
+                if (!self.$MoreBtn) {
+                    return;
+                }
+
+                if (self.$moreBtnClicked < 3) {
+                    return;
+                }
+
+                if (self.$loadingMore) {
+                    return;
+                }
+
+                if (!self.$moreBtnVisible) {
+                    return;
+                }
+
+                var isInView = QUIElementUtils.isInViewport(self.$MoreBtn);
+
+                if (!isInView) {
+                    return;
+                }
+
+                FuncExecuteNextSearch();
+            });
+        },
+
+        /**
+         * hide the more button
+         *
+         * @return {Promise}
+         */
+        $hideMoreButton: function () {
+            if (!this.$MoreBtn) {
+                return Promise.resolve();
+            }
+
+            this.$MoreBtn.addClass('disabled');
+            this.$MoreBtn.setStyle('cursor', 'default');
+            this.$moreBtnVisible = false;
+
+            return new Promise(function (resolve) {
+                this.$FXMore.animate({
+                    opacity: 0
+                }, {
+                    duration: 200,
+                    callback: resolve
+                });
+            }.bind(this));
+        },
+
+        /**
+         * shows the more button
+         *
+         * @return {Promise}
+         */
+        $showMoreButton: function () {
+            if (!this.$MoreBtn) {
+                return Promise.resolve();
+            }
+
+            return new Promise(function (resolve) {
+                this.$FXMore.animate({
+                    opacity: 1
+                }, {
+                    duration: 200,
+                    callback: function () {
+                        this.$MoreBtn.removeClass('disabled');
+                        this.$MoreBtn.setStyle('cursor', null);
+                        this.$moreBtnVisible = true;
+                        resolve();
+                    }.bind(this)
+                });
+            }.bind(this));
+        },
+
+        /**
          * Submit search
          */
         $submit: function () {
@@ -177,11 +327,36 @@ define('package/quiqqer/search/bin/controls/Search', [
                 return;
             }
 
+            var self = this;
+
+            this.$lockPagination = true;
+            this.$PaginationTop.setPage(Query.sheet - 1);
+            this.$PaginationBottom.setPage(Query.sheet - 1);
+            this.$lockPagination = false;
+
             this.setSearchParams({
                 max: Query.limit
             });
 
-            this.search(Query.sheet);
+            this.setSearchParams({
+                sheet: Query.sheet
+            });
+
+            this.search().then(function (SearchResult) {
+                // handle pagination controls
+                if (!SearchResult.count) {
+                    self.$PaginationTopElm.setStyle('display', 'none');
+                    self.$PaginationBottomElm.setStyle('display', 'none');
+                } else {
+                    self.$PaginationTopElm.setStyle('display', '');
+                    self.$PaginationBottomElm.setStyle('display', '');
+
+                    self.$lockPagination = true;
+                    self.$PaginationTop.setPageCount(SearchResult.sheets);
+                    self.$PaginationBottom.setPageCount(SearchResult.sheets);
+                    self.$lockPagination = false;
+                }
+            });
         },
 
         /**
@@ -191,24 +366,19 @@ define('package/quiqqer/search/bin/controls/Search', [
          */
         setSearchParams: function (SearchParams) {
             this.$SearchParams = Object.merge(this.$SearchParams, SearchParams);
+
+            if ("sheet" in this.$SearchParams) {
+                this.$sheet = this.$SearchParams.sheet;
+            }
         },
 
         /**
          * Execute search
          *
-         * @param {number} [sheet] - The sheet (page) to start search with (if omitted, use 1)
          * @return {Promise}
          */
-        search: function (sheet) {
+        search: function () {
             var self = this;
-
-            sheet = parseInt(sheet);
-
-            if (sheet < 1) {
-                this.$SearchParams.sheet = 1;
-            } else {
-                this.$SearchParams.sheet = sheet;
-            }
 
             this.Loader.show();
 
@@ -217,6 +387,7 @@ define('package/quiqqer/search/bin/controls/Search', [
                     'package_quiqqer_search_ajax_search',
                     function (SearchResult) {
                         self.fireEvent('search', [SearchResult, self]);
+                        self.$renderResult(SearchResult);
                         resolve();
                     }, {
                         'package'   : 'quiqqer/search',
@@ -236,23 +407,30 @@ define('package/quiqqer/search/bin/controls/Search', [
          *
          * @param {Object} SearchResult
          */
-        $onSearch: function (SearchResult) {
-            this.$Results.set('html', SearchResult.childrenListHtml);
-            this.Loader.hide();
+        $renderResult: function (SearchResult) {
+            if (this.$paginationType === 'infinitescroll') {
+                if (this.$loadingMore) {
+                    var Ghost = new Element('div', {
+                        html: SearchResult.childrenListHtml
+                    });
 
-            // handle pagination controls
-            if (!SearchResult.count) {
-                this.$PaginationTopElm.setStyle('display', 'none');
-                this.$PaginationBottomElm.setStyle('display', 'none');
+                    var ChildrenContainer = this.$Elm.getElement('article').getParent('section');
+
+                    Ghost.getElements('article').inject(ChildrenContainer);
+                } else {
+                    this.$Results.set('html', SearchResult.childrenListHtml);
+                }
+
+                if (("more" in SearchResult) && !SearchResult.more) {
+                    this.$hideMoreButton();
+                } else {
+                    this.$showMoreButton();
+                }
             } else {
-                this.$PaginationTopElm.setStyle('display', '');
-                this.$PaginationBottomElm.setStyle('display', '');
-
-                this.$lockPagination = true;
-                this.$PaginationTop.setPageCount(SearchResult.sheets);
-                this.$PaginationBottom.setPageCount(SearchResult.sheets);
-                this.$lockPagination = false;
+                this.$Results.set('html', SearchResult.childrenListHtml);
             }
+
+            this.Loader.hide();
 
             // set result count
             if (!SearchResult.count) {

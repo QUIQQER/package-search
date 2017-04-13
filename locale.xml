@@ -67,6 +67,24 @@
             <de><![CDATA[Es wurden [count] Ergebnisse gefunden.]]></de>
             <en><![CDATA[[count] results has been found.]]></en>
         </locale>
+        <locale name="tpl.search.pagination.inifinitescroll.btn.loading">
+            <de><![CDATA[Lade...]]></de>
+            <en><![CDATA[Loading...]]></en>
+        </locale>
+
+        <!-- Settings -->
+        <locale name="search.pagination.type">
+            <de><![CDATA[Blätter-Funktion Typ]]></de>
+            <en><![CDATA[Pagination type]]></en>
+        </locale>
+        <locale name="search.pagination.type.pagination">
+            <de><![CDATA[Standard Blätter-Funktion]]></de>
+            <en><![CDATA[Standard pagination]]></en>
+        </locale>
+        <locale name="search.pagination.type.infinitescroll">
+            <de><![CDATA[Automatisches Nachladen beim Scrollen ("Infinite Scrolling")]]></de>
+            <en><![CDATA[Infinite Scrolling]]></en>
+        </locale>
     </groups>
 
     <!-- php locale -->
@@ -203,7 +221,10 @@
             <de><![CDATA[In Editierungsdatum suchen.]]></de>
             <en><![CDATA[Search in edit date.]]></en>
         </locale>
-
+        <locale name="tpl.search.pagination.inifinitescroll.btn">
+            <de><![CDATA[Mehr Ergebnisse laden]]></de>
+            <en><![CDATA[Load more results]]></en>
+        </locale>
     </groups>
 
 </locales>

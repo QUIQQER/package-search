@@ -20,27 +20,42 @@
         {/if}
     </noscript>
 
-    <div class="quiqqer-search-pagination quiqqer-search-pagination-top" style="display: none;">
+    {if $paginationType === 'pagination'}
+    <div class="quiqqer-search-pagination quiqqer-search-pagination-top"
+         style="display: none;">
         {if $sheets > 1}
         {$PaginationAsync->create()}
         {/if}
     </div>
+    {/if}
 
     <div class="quiqqer-search-results">
-    {$ChildrenList->create()}
+        {$ChildrenList->create()}
     </div>
 
-    <div class="quiqqer-search-pagination quiqqer-search-pagination-bottom" style="display: none;">
+    {if $paginationType === 'pagination'}
+    <div class="quiqqer-search-pagination quiqqer-search-pagination-bottom"
+         style="display: none;">
         {if $sheets > 1}
         {$PaginationAsync->create()}
         {/if}
     </div>
+    {/if}
 
     <noscript>
         {if $sheets > 1}
         {$Pagination->create()}
         {/if}
     </noscript>
+
+    {if $paginationType === 'infinitescroll'}
+    <div class="quiqqer-search-pagination-inifinitescroll-more" {if !$more}style="opacity: 0" data-hidden="1"{/if}>
+        <div class="quiqqer-search-pagination-inifinitescroll-more-btn button">
+            {locale group="quiqqer/search" var="tpl.search.pagination.inifinitescroll.btn"}
+        </div>
+    </div>
+    {/if}
+
     {/if}
 
 </section>

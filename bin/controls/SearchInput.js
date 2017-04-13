@@ -117,7 +117,8 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
             var SearchParams = {
                 search      : this.$SearchInput.value.trim(),
                 searchType  : 'OR',
-                searchFields: []
+                searchFields: [],
+                sheet       : 1 // start search from beginning
             };
 
             var settingInputs = this.$SettingsElm.getElements(

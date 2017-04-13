@@ -243,10 +243,6 @@ class Fulltext extends QUI\QDOM
         ";
 
         // search
-
-        \QUI\System\Log::writeRecursive($whereMatch);
-        \QUI\System\Log::writeRecursive($selectQuery);
-
         $Statement = $PDO->prepare($selectQuery);
         $Statement->bindValue(
             ':limit1',

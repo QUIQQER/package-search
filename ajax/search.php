@@ -24,7 +24,8 @@ QUI::$Ajax->registerFunction(
         return array(
             'childrenListHtml' => $Search->getChildrenList()->create(),
             'sheets'           => $searchResult['sheets'],
-            'count'            => $searchResult['count']
+            'count'            => $searchResult['count'],
+            'more'             => $searchResult['more']
         );
     },
     array('project', 'siteId', 'searchParams')

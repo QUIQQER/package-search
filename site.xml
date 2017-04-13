@@ -34,6 +34,7 @@
             <!-- list attributes -->
             <attributes>
                 <attribute default="childrenlist">quiqqer.settings.sitetypes.list.template</attribute>
+                <attribute default="pagination">quiqqer.search.sitetypes.search.pagination.type</attribute>
                 <attribute>quiqqer.settings.search.list.max</attribute>
                 <attribute>quiqqer.settings.search.list.hideSettings</attribute>
                 <attribute>quiqqer.settings.search.list.fields</attribute>
@@ -77,6 +78,18 @@
                                 <locale group="quiqqer/search" var="quiqqer.search.list.settings.max" />
                             </text>
                         </input>
+
+                        <select conf="quiqqer.search.sitetypes.search.pagination.type">
+                            <text>
+                                <locale group="quiqqer/search" var="search.pagination.type" />
+                            </text>
+                            <option value="pagination">
+                                <locale group="quiqqer/search" var="search.pagination.type.pagination" />
+                            </option>
+                            <option value="infinitescroll">
+                                <locale group="quiqqer/search" var="search.pagination.type.infinitescroll" />
+                            </option>
+                        </select>
 
                         <input conf="quiqqer.settings.sitetypes.list.showCreator" type="checkbox">
                             <text>

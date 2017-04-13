@@ -65,12 +65,14 @@ class Search extends QUI\Control
         ));
 
         $this->setJavaScriptControl('package/quiqqer/search/bin/controls/Search');
-//        $this->setJavaScriptControlOption('');
+        $this->setJavaScriptControlOption('paginationType', $this->getPaginationType());
 
         $this->addCSSClass('quiqqer-search');
         $this->addCSSFile(dirname(__FILE__) . '/Search.css');
 
         parent::__construct($attributes);
+
+        $this->setJavaScriptControlOption('sheet', (int)$this->getAttribute('sheet'));
     }
 
     /**
@@ -91,6 +93,11 @@ class Search extends QUI\Control
         $max      = $this->getAttribute('max');
         $sheet    = $this->getAttribute('sheet');
         $fields   = $this->getAttribute('searchFields');
+
+//        if (empty($fields)) {
+//            $fields = $this->getDefaultSearchFields();
+//        }
+
         $children = array();
 
         $FulltextSearch = new Fulltext(array(
@@ -133,14 +140,15 @@ class Search extends QUI\Control
             }
         }
 
-        $sheets = ceil($result['count'] / $max);
+        $sheets = (int)ceil($result['count'] / $max);
         $count  = (int)$result['count'];
 
         $this->searchResults = array(
             'count'    => $count,
             'max'      => $max,
             'sheets'   => $sheets,
-            'children' => $children
+            'children' => $children,
+            'more'     => $sheet < $sheets
         );
 
         return $this->searchResults;
@@ -221,10 +229,12 @@ class Search extends QUI\Control
         $Engine->assign(array(
             'count'           => $searchResult['count'],
             'sheets'          => $searchResult['sheets'],
+            'more'            => $searchResult['more'],
             'searchValue'     => $search,
             'searchType'      => $this->getAttribute('searchType'),
             'availableFields' => $this->Site->getAttribute('quiqqer.settings.search.list.fields'),
-            'ChildrenList'    => $this->getChildrenList()
+            'ChildrenList'    => $this->getChildrenList(),
+            'paginationType'  => $this->getPaginationType()
         ));
 
         return $Engine->fetch(dirname(__FILE__) . '/Search.html');
@@ -370,5 +380,21 @@ class Search extends QUI\Control
         }
 
         return $settingsFieldsSelected;
+    }
+
+    /**
+     * Get search list pagination type
+     *
+     * @return string
+     */
+    protected function getPaginationType()
+    {
+        $paginationType = $this->Site->getAttribute('quiqqer.search.sitetypes.search.pagination.type');
+
+        if (empty($paginationType)) {
+            $paginationType = 'pagination';
+        }
+
+        return $paginationType;
     }
 }
