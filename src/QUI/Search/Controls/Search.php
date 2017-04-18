@@ -26,6 +26,9 @@ class Search extends QUI\Control
     const SEARCH_TYPE_OR  = 'OR';
     const SEARCH_TYPE_AND = 'AND';
 
+    const PAGINATION_TYPE_PAGINATION      = 'pagination';
+    const PAGINATION_TYPE_INIFINITESCROLL = 'infinitescroll';
+
     /**
      * Site the control is on
      *
@@ -62,19 +65,19 @@ class Search extends QUI\Control
             'max'                  => $this->Site->getAttribute('quiqqer.settings.search.list.max') ?: 10,
             'searchFields'         => $this->getDefaultSearchFields(),
             'sheet'                => 1,
+            'paginationType'       => 'pagination',  // "pagination" or "infinitescroll"
+            'relevanceSearch'      => true,          // use Fulltext relevance search
             'childrenListTemplate' => false,
             'childrenListCss'      => false
         ));
-
-        $this->setJavaScriptControl('package/quiqqer/search/bin/controls/Search');
-        $this->setJavaScriptControlOption('paginationType', $this->getPaginationType());
 
         $this->addCSSClass('quiqqer-search');
         $this->addCSSFile(dirname(__FILE__) . '/Search.css');
 
         parent::__construct($attributes);
 
-        $this->setJavaScriptControlOption('sheet', (int)$this->getAttribute('sheet'));
+        $this->setJavaScriptControl('package/quiqqer/search/bin/controls/Search');
+        $this->setJavaScriptControlOption('searchparams', json_encode($this->getAttributes()));
     }
 
     /**
@@ -98,10 +101,11 @@ class Search extends QUI\Control
         $children = array();
 
         $FulltextSearch = new Fulltext(array(
-            'limit'      => (($sheet - 1) * $max) . ',' . $max,
-            'fields'     => $fields,
-            'searchtype' => $this->getAttribute('searchType'),
-            'Project'    => $this->Site->getProject()
+            'limit'           => (($sheet - 1) * $max) . ',' . $max,
+            'fields'          => $fields,
+            'searchtype'      => $this->getAttribute('searchType'),
+            'Project'         => $this->Site->getProject(),
+            'relevanceSearch' => $this->getAttribute('relevanceSearch')
         ));
 
         $result = $FulltextSearch->search($search);
@@ -312,7 +316,7 @@ class Search extends QUI\Control
                         break;
                     }
 
-                    $v = preg_replace("/[^a-zA-Z0-9äöüß]/", " ", $v);
+                    $v = preg_replace("/[^\p{L}\p{N}\-]/iu", " ", $v);
                     $v = Orthos::clear($v);
                     $v = preg_replace('#([ ]){2,}#', "$1", $v);
                     $v = trim($v);
@@ -322,10 +326,14 @@ class Search extends QUI\Control
                     if ($v !== $this::SEARCH_TYPE_OR) {
                         $settingsFields = $this->Site->getAttribute('quiqqer.settings.search.list.fields');
 
-                        if (in_array('searchTypeAnd', $settingsFields)) {
-                            $v = $this::SEARCH_TYPE_AND;
+                        if (is_array($settingsFields)) {
+                            if (in_array('searchTypeAnd', $settingsFields)) {
+                                $v = $this::SEARCH_TYPE_AND;
+                            } else {
+                                $v = $this::SEARCH_TYPE_OR;
+                            }
                         } else {
-                            $v = $this::SEARCH_TYPE_OR;
+                            $v = $this::SEARCH_TYPE_AND;
                         }
                     }
                     break;
@@ -339,9 +347,9 @@ class Search extends QUI\Control
                     $v = $this->clearSearchFields($v);
                     break;
 
-                default:
-                    unset($attributes[$k]);
-                    continue 2;
+                case 'relevanceSearch':
+                    $v = $v ? true : false;
+                    break;
             }
 
             $attributes[$k] = $v;
@@ -396,10 +404,14 @@ class Search extends QUI\Control
      */
     protected function getPaginationType()
     {
-        $paginationType = $this->Site->getAttribute('quiqqer.search.sitetypes.search.pagination.type');
+        $paginationType = $this->getAttribute('paginationType');
 
         if (empty($paginationType)) {
-            $paginationType = 'pagination';
+            $paginationType = $this->Site->getAttribute('quiqqer.search.sitetypes.search.pagination.type');
+        }
+
+        if (empty($paginationType)) {
+            $paginationType = $this::PAGINATION_TYPE_PAGINATION;
         }
 
         return $paginationType;

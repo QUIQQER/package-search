@@ -32,11 +32,12 @@ class Fulltext extends QUI\QDOM
     {
         // defaults
         $this->setAttributes(array(
-            'Project'    => false,    // Project
-            'limit'      => 10,        // limit of results
-            'fields'     => false,    // array list of fields
-            'searchtype' => 'OR',    // search type: OR / AND
-            'datatypes'  => false   // only for some site types, can be an array
+            'Project'         => false,   // Project
+            'limit'           => 10,      // limit of results
+            'fields'          => false,   // array list of fields
+            'searchtype'      => 'OR',    // search type: OR / AND
+            'datatypes'       => false,   // only for some site types, can be an array,
+            'relevanceSearch' => true     // use relevance search (if search string has minimum length)
         ));
 
         $this->setAttributes($params);
@@ -127,7 +128,6 @@ class Fulltext extends QUI\QDOM
             );
         }
 
-
         // sql
         $count = array(
             'name'    => 8,
@@ -139,6 +139,7 @@ class Fulltext extends QUI\QDOM
         $PDO   = QUI::getPDO();
         $table = QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project);
         $limit = QUI\Database\DB::createQueryLimit($attrLimit);
+        $binds = array();
 
         // relevance match
         $relevanceMatch = array();
@@ -175,11 +176,15 @@ class Fulltext extends QUI\QDOM
                 if ($len - 1 > $i) {
                     $datatypeQuery .= ' OR ';
                 }
+
+                $binds['type' . $i] = array(
+                    'value' => $datatypes[$i],
+                    'type'  => \PDO::PARAM_STR
+                );
             }
 
             $datatypeQuery .= ' )';
         }
-
 
         // query
         if (is_int(key($availableFields))) {
@@ -187,22 +192,6 @@ class Fulltext extends QUI\QDOM
         } else {
             $selectedFields = implode(',', array_keys($availableFields));
         }
-
-        $query = "
-            SELECT e_date,urlParameter,siteId,{$selectedFields}
-            FROM
-                {$table}
-            WHERE
-                (name LIKE :search OR
-                title LIKE :search OR
-                short LIKE :search OR
-                data  LIKE :search)
-                {$datatypeQuery}
-            GROUP BY
-                urlParameter,siteId,e_date,{$selectedFields}
-            ORDER BY
-                e_date DESC
-        ";
 
         $minWordLength = QUI::getPackage('quiqqer/search')
             ->getConfig()
@@ -214,7 +203,10 @@ class Fulltext extends QUI\QDOM
 
         $match = str_replace(array('*', '+'), '', $search);
 
-        if (strlen($match) >= $minWordLength) {
+        // Relevance search (MATCH.. AGAINST)
+        if ($this->getAttribute('relevanceSearch')
+            && strlen($match) >= $minWordLength
+        ) {
             $query = "
                 SELECT
                     siteId,
@@ -231,8 +223,53 @@ class Fulltext extends QUI\QDOM
                 ORDER BY
                     relevance DESC
             ";
+
+//            if (strlen($search) > 2 || $search == '%%') {
+                $binds['search'] = array(
+                    'value' => $search,
+                    'type'  => \PDO::PARAM_STR
+                );
+//            }
         } else {
-            $search = "%{$match}%";
+            $whereOr = array();
+
+            $searchFields = array(
+                'name',
+                'title',
+                'short',
+                'data'
+            );
+
+            if ($datatypes) {
+                $searchFields = array_merge($searchFields, $fields);
+            }
+
+            $searchTerms = explode(' ', $str);
+
+            foreach ($searchTerms as $k => $searchTerm) {
+                foreach ($searchFields as $field) {
+                    $whereOr[] = $field . ' LIKE :search' . $k;
+                }
+
+                $binds['search' . $k] = array(
+                    'value' => '%' . $searchTerm . '%',
+                    'type'  => \PDO::PARAM_STR
+                );
+            }
+
+            $where = implode(" OR ", $whereOr);
+
+            $query = "
+            SELECT e_date,urlParameter,siteId,{$selectedFields}
+            FROM
+                {$table}
+            WHERE
+                {$where}
+            GROUP BY
+                urlParameter,siteId,e_date,{$selectedFields}
+            ORDER BY
+                e_date DESC
+            ";
         }
 
         $selectQuery = "{$query} {$limit['limit']}";
@@ -256,18 +293,8 @@ class Fulltext extends QUI\QDOM
             \PDO::PARAM_INT
         );
 
-        if (strlen($search) > 2 || $search == '%%') {
-            $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
-        }
-
-        if ($datatypes) {
-            for ($i = 0, $len = count($datatypes); $i < $len; $i++) {
-                $Statement->bindValue(
-                    ':type' . $i,
-                    $datatypes[$i],
-                    \PDO::PARAM_STR
-                );
-            }
+        foreach ($binds as $placeholder => $bind) {
+            $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
         }
 
         $Statement->execute();
@@ -276,18 +303,8 @@ class Fulltext extends QUI\QDOM
         // count
         $Statement = $PDO->prepare($countQuery);
 
-        if (strlen($search) > 2 || $search == '%%') {
-            $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
-        }
-
-        if ($datatypes) {
-            for ($i = 0, $len = count($datatypes); $i < $len; $i++) {
-                $Statement->bindValue(
-                    ':type' . $i,
-                    $datatypes[$i],
-                    \PDO::PARAM_STR
-                );
-            }
+        foreach ($binds as $placeholder => $bind) {
+            $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
         }
 
         $Statement->execute();
@@ -298,7 +315,6 @@ class Fulltext extends QUI\QDOM
             'count' => $count[0]['count']
         );
     }
-
 
     /**
      * Creation

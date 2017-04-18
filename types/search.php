@@ -18,6 +18,9 @@ if (QUI::getRewrite()->getHeaderCode() === 404) {
         } else {
             $_REQUEST['search'] = $path['filename'];
         }
+
+        // replace all "-" with " " (space)
+        $_REQUEST['search'] = str_replace($_REQUEST['search'], '-', ' ');
     }
 }
 

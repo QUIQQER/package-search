@@ -11,25 +11,23 @@
  */
 define('package/quiqqer/search/bin/controls/SearchInput', [
 
-    'qui/QUI',
-    'qui/controls/Control',
     'qui/controls/loader/Loader',
     'qui/controls/buttons/Button',
 
-    'package/quiqqer/search/bin/SearchUtils',
+    'package/quiqqer/search/bin/controls/SearchExtension',
 
     'Locale',
 
     //'css!package/quiqqer/search/bin/controls/SearchInput.css'
 
-], function (QUI, QUIControl, QUILoader, QUIButton, SearchUtils, QUILocale) {
+], function (QUILoader, QUIButton, SearchExtension, QUILocale) {
     "use strict";
 
     var lg = 'quiqqer/search';
 
     return new Class({
 
-        Extends: QUIControl,
+        Extends: SearchExtension,
         Type   : 'package/quiqqer/search/bin/controls/SearchInput',
 
         Binds: [
@@ -48,7 +46,6 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
             this.parent(options);
 
             this.$SearchInput = null;
-            this.$Search      = null;
             this.$SettingsElm = null;
             this.$Elm         = null;
             this.Loader       = new QUILoader();
@@ -91,15 +88,6 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
                 'after'
             );
 
-            this.Loader.show();
-
-            SearchUtils.getSearchControl().then(function (SearchControl) {
-                self.Loader.hide();
-                self.$Search = SearchControl;
-            }, function () {
-                // @todo error handling
-            });
-
             // form
             this.$Elm.getElement('form').addEvents({
                 submit: function (event) {
@@ -113,9 +101,11 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
          * Submit search
          */
         $submit: function () {
-            var self         = this;
-            var SearchParams = {
-                search      : this.$SearchInput.value.trim(),
+            var self = this;
+
+            this.$searchTerms = this.$SearchInput.value.trim().split(' ');
+
+            this.SearchParams = {
                 searchType  : 'OR',
                 searchFields: [],
                 sheet       : 1 // start search from beginning
@@ -129,18 +119,16 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
                 switch (Input.getProperty('name')) {
                     case 'searchType':
                         if (Input.checked) {
-                            SearchParams.searchType = 'AND';
+                            self.SearchParams.searchType = 'AND';
                         }
                         break;
 
                     default:
                         if (Input.checked) {
-                            SearchParams.searchFields.push(Input.value);
+                            self.SearchParams.searchFields.push(Input.value);
                         }
                 }
             });
-
-            this.$Search.setSearchParams(SearchParams);
 
             this.Loader.show();
 

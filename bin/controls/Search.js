@@ -49,12 +49,8 @@ define('package/quiqqer/search/bin/controls/Search', [
         ],
 
         options: {
-            name          : 'search',
-            placeholder   : 'Search...',
-            delay         : 300,
-            paginationtype: 'pagination',
-            max           : false,
-            sheet         : 1
+            delay       : 300,
+            searchparams: {}
         },
 
         initialize: function (options) {
@@ -74,6 +70,7 @@ define('package/quiqqer/search/bin/controls/Search', [
             this.$moreBtnClicked      = 0;
             this.$loadingMore         = false;
             this.$moreBtnVisible      = false;
+            this.$extensions          = []; // search extension controls
 
             this.addEvents({
                 onImport: this.$onImport
@@ -97,7 +94,8 @@ define('package/quiqqer/search/bin/controls/Search', [
                 '.quiqqer-search-result-count'
             );
 
-            this.$paginationType = this.getAttribute('paginationtype');
+            this.$SearchParams   = JSON.decode(this.getAttribute('searchparams'));
+            this.$paginationType = this.$SearchParams.paginationType;
 
             if (this.$paginationType !== 'pagination') {
                 this.$initializeInfiniteScrolling();
@@ -329,18 +327,22 @@ define('package/quiqqer/search/bin/controls/Search', [
 
             var self = this;
 
-            this.$lockPagination = true;
-            this.$PaginationTop.setPage(Query.sheet - 1);
-            this.$PaginationBottom.setPage(Query.sheet - 1);
-            this.$lockPagination = false;
+            if ("limit" in Query) {
+                this.setSearchParams({
+                    max: Query.limit
+                });
+            }
 
-            this.setSearchParams({
-                max: Query.limit
-            });
+            if ("sheet" in Query) {
+                this.$lockPagination = true;
+                this.$PaginationTop.setPage(Query.sheet - 1);
+                this.$PaginationBottom.setPage(Query.sheet - 1);
+                this.$lockPagination = false;
 
-            this.setSearchParams({
-                sheet: Query.sheet
-            });
+                this.setSearchParams({
+                    sheet: Query.sheet
+                });
+            }
 
             this.search().then(function (SearchResult) {
                 // handle pagination controls
@@ -380,6 +382,26 @@ define('package/quiqqer/search/bin/controls/Search', [
 
             this.Loader.show();
 
+            var searchTerms = [];
+
+            this.$extensions.each(function (Extension) {
+                if ("getSearchTerms" in Extension &&
+                    typeOf(Extension.getSearchTerms) === 'function') {
+                    var extSearchTerms = Extension.getSearchTerms();
+
+                    extSearchTerms.each(function(searchTerm) {
+                        searchTerms.push(searchTerm);
+                    });
+                }
+
+                if ("getSearchParams" in Extension &&
+                    typeOf(Extension.getSearchParams) === 'function') {
+                    self.setSearchParams(Extension.getSearchParams());
+                }
+            });
+
+            this.$SearchParams.search = searchTerms.join(' ');
+
             return new Promise(function (resolve, reject) {
                 QUIAjax.get(
                     'package_quiqqer_search_ajax_search',
@@ -399,9 +421,18 @@ define('package/quiqqer/search/bin/controls/Search', [
         },
 
         /**
+         * Register a search extension control that extends this basic search
+         *
+         * @param {Object} Control
+         */
+        registerSearchExtension: function (Control) {
+            this.$extensions.push(Control);
+        },
+
+        /**
          * Hide Pagination controls
          */
-        $hidePagination: function() {
+        $hidePagination: function () {
             this.$PaginationTopElm.setStyle('display', 'none');
             this.$PaginationBottomElm.setStyle('display', 'none');
         },
@@ -409,7 +440,7 @@ define('package/quiqqer/search/bin/controls/Search', [
         /**
          * Show Pagination controls
          */
-        $showPagination: function() {
+        $showPagination: function () {
             this.$PaginationTopElm.setStyle('display', '');
             this.$PaginationBottomElm.setStyle('display', '');
         },
