@@ -15,8 +15,8 @@ QUI::$Ajax->registerFunction(
         $Project = QUI::getProjectManager()->decode($project);
         $Site    = $Project->get($siteId);
 
-//        $searchParams         = Orthos::clearArray();
-        $searchParams = json_decode($searchParams, true);
+    //        $searchParams         = Orthos::clearArray();
+        $searchParams         = json_decode($searchParams, true);
         $searchParams['Site'] = $Site;
 
         $Search       = new Search($searchParams);
