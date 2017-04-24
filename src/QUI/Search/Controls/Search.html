@@ -1,14 +1,11 @@
 <section class="content-template quiqqer-search">
 
-    {if $count == 0 && isset($smarty.request.search)}
-    <div class="content-message-attention qui-search-no-result">
-        {locale group="quiqqer/search" value="tpl.search.no.results"}
-    </div>
-    {else}
     <p class="quiqqer-search-result-count">
-        {if $count == 1}
+        {if $count == 0}
+        {locale group="quiqqer/search" value="tpl.search.no.results"}
+        {elseif $count == 1}
         {locale group="quiqqer/search" value="tpl.search.one.result"}
-        {else}
+        {elseif $count > 1}
         {locale group="quiqqer/search" value="tpl.search.more.result"
         count=$count}
         {/if}
@@ -20,12 +17,10 @@
         {/if}
     </noscript>
 
-    {if $paginationType === 'pagination'}
+    {if $paginationType == 'pagination'}
     <div class="quiqqer-search-pagination quiqqer-search-pagination-top"
          style="display: none;">
-        {if $sheets > 1}
         {$PaginationAsync->create()}
-        {/if}
     </div>
     {/if}
 
@@ -33,12 +28,10 @@
         {$ChildrenList->create()}
     </div>
 
-    {if $paginationType === 'pagination'}
+    {if $paginationType == 'pagination'}
     <div class="quiqqer-search-pagination quiqqer-search-pagination-bottom"
          style="display: none;">
-        {if $sheets > 1}
         {$PaginationAsync->create()}
-        {/if}
     </div>
     {/if}
 
@@ -54,8 +47,6 @@
             {locale group="quiqqer/search" var="tpl.search.pagination.inifinitescroll.btn"}
         </div>
     </div>
-    {/if}
-
     {/if}
 
 </section>

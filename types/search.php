@@ -28,7 +28,9 @@ if (QUI::getRewrite()->getHeaderCode() === 404) {
  * Settings
  */
 
-$SearchInput = new SearchInput();
+$SearchInput = new SearchInput(array(
+    'suggestSearch' => $Site->getAttribute('quiqqer.search.sitetypes.search.suggestSearch')
+));
 $Search  = new Search();
 
 // requests

@@ -54,19 +54,12 @@ class Quicksearch
         $search = '%' . $str . '%';
         $limit  = QUI\Database\DB::createQueryLimit($params['limit']);
 
-        $groupedBy = 'GROUP BY data';
-
-        if (isset($params['group']) && $params['group'] === false) {
-            $groupedBy = '';
-        }
-
         $query = "
             SELECT id, siteId, urlParameter, data, rights, icon
             FROM
                 {$table}
             WHERE
                 data LIKE :search
-            {$groupedBy}
         ";
 
         $selectQuery = "{$query} {$limit['limit']}";
@@ -100,13 +93,25 @@ class Quicksearch
 
         $result = $Statement->fetchAll(\PDO::FETCH_ASSOC);
 
+        if (!isset($params['group']) || $params['group'] !== false) {
+            $groups = array();
+
+            foreach ($result as $k => $row) {
+                if (isset($groups[$row['data']])) {
+                    unset($result[$k]);
+                    continue;
+                }
+
+                $groups[$row['data']] = true;
+            }
+        }
+
         // count
         $Statement = $PDO->prepare($countQuery);
         $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
         $Statement->execute();
 
         $count = $Statement->fetchAll(\PDO::FETCH_ASSOC);
-
 
         return array(
             'list'  => $result,

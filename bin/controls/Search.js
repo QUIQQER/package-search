@@ -23,6 +23,7 @@ define('package/quiqqer/search/bin/controls/Search', [
     'qui/controls/loader/Loader',
     'qui/utils/Elements',
     'utils/Controls',
+    'URI',
 
     'Ajax',
     'Locale'
@@ -30,7 +31,7 @@ define('package/quiqqer/search/bin/controls/Search', [
     //'css!package/quiqqer/search/bin/controls/Search.css'
 
 ], function (QUI, QUIControl, QUIButton, QUILoader, QUIElementUtils, ControlUtils,
-             QUIAjax, QUILocale) {
+             URI, QUIAjax, QUILocale) {
     "use strict";
 
     var lg = 'quiqqer/search';
@@ -50,6 +51,7 @@ define('package/quiqqer/search/bin/controls/Search', [
 
         options: {
             delay       : 300,
+            resultcount : 0,
             searchparams: {}
         },
 
@@ -64,6 +66,7 @@ define('package/quiqqer/search/bin/controls/Search', [
             this.$PaginationBottomElm = null;
             this.$ResultCountElm      = null;
             this.$SearchParams        = {};
+            this.$searchTerms         = [];
             this.Loader               = new QUILoader();
             this.$lockPagination      = false;
             this.$MoreBtn             = null;
@@ -136,6 +139,7 @@ define('package/quiqqer/search/bin/controls/Search', [
                     self.$PaginationTop.addEvent('change', self.$onPaginationChange);
                     self.$PaginationBottom.addEvent('change', self.$onPaginationChange);
 
+
                     self.$Elm.getElement(
                         '.quiqqer-search-pagination-top'
                     ).setStyle('display', 'block');
@@ -143,6 +147,11 @@ define('package/quiqqer/search/bin/controls/Search', [
                     self.$Elm.getElement(
                         '.quiqqer-search-pagination-bottom'
                     ).setStyle('display', 'block');
+
+
+                    if (!self.getAttribute('resultcount')) {
+                        self.$hidePagination();
+                    }
 
                     resolve();
                 }, reject);
@@ -155,7 +164,7 @@ define('package/quiqqer/search/bin/controls/Search', [
         $initializeInfiniteScrolling: function () {
             var self = this;
 
-            this.$sheet = parseInt(this.getAttribute('sheet'));
+            this.$sheet = parseInt(this.$SearchParams.sheet);
 
             this.$MoreBtn = this.$Elm.getElement(
                 '.quiqqer-search-pagination-inifinitescroll-more-btn'
@@ -360,7 +369,16 @@ define('package/quiqqer/search/bin/controls/Search', [
         },
 
         /**
-         * Set search parameters
+         * Set (multiple) search terms
+         *
+         * @param {Array} searchTerms
+         */
+        setSearchTerms: function (searchTerms) {
+            this.$searchTerms = searchTerms;
+        },
+
+        /**
+         * Set search parameters (does not set search term!)
          *
          * @param {Object} [SearchParams] - Custom search params
          */
@@ -389,15 +407,14 @@ define('package/quiqqer/search/bin/controls/Search', [
                     typeOf(Extension.getSearchTerms) === 'function') {
                     var extSearchTerms = Extension.getSearchTerms();
 
-                    extSearchTerms.each(function(searchTerm) {
+                    extSearchTerms.each(function (searchTerm) {
                         searchTerms.push(searchTerm);
                     });
                 }
+            });
 
-                if ("getSearchParams" in Extension &&
-                    typeOf(Extension.getSearchParams) === 'function') {
-                    self.setSearchParams(Extension.getSearchParams());
-                }
+            this.$searchTerms.each(function (searchTerm) {
+                searchTerms.push(searchTerm);
             });
 
             this.$SearchParams.search = searchTerms.join(' ');
@@ -408,6 +425,8 @@ define('package/quiqqer/search/bin/controls/Search', [
                     function (SearchResult) {
                         self.fireEvent('search', [SearchResult, self]);
                         self.$renderResult(SearchResult);
+                        self.$setUri();
+
                         resolve(SearchResult);
                     }, {
                         'package'   : 'quiqqer/search',
@@ -418,6 +437,34 @@ define('package/quiqqer/search/bin/controls/Search', [
                     }
                 )
             });
+        },
+
+        /**
+         * Set URI based on current search parameters
+         */
+        $setUri: function () {
+            var Uri       = new URI();
+            var UriParams = {
+                max       : this.$SearchParams.max,
+                search    : this.$SearchParams.search,
+                searchIn  : this.$SearchParams.searchFields.join(','),
+                searchType: this.$SearchParams.searchType
+            };
+
+            if (this.$paginationType === 'pagination') {
+                UriParams.sheet = this.$sheet;
+            }
+
+            Uri.setSearch(UriParams);
+
+            var url = Uri.toString();
+
+            if ("history" in window) {
+                window.history.pushState({}, "", url);
+                window.fireEvent('popstate');
+            } else {
+                window.location = url;
+            }
         },
 
         /**

@@ -49,15 +49,6 @@ define('package/quiqqer/search/bin/controls/SearchExtension', [
          */
         getSearchTerms: function () {
             return this.$searchTerms;
-        },
-
-        /**
-         * Get search parameters
-         *
-         * @return {Object}
-         */
-        getSearchParams: function () {
-            return this.$SearchParams;
         }
     });
 });

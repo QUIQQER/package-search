@@ -42,6 +42,7 @@
                 <attribute default="1">quiqqer.settings.sitetypes.list.showCreator</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showDate</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showImages</attribute>
+                <attribute default="0">quiqqer.search.sitetypes.search.suggestSearch</attribute>
             </attributes>
 
             <!-- list settings -->
@@ -90,6 +91,13 @@
                                 <locale group="quiqqer/search" var="search.pagination.type.infinitescroll" />
                             </option>
                         </select>
+
+                        <input conf="quiqqer.search.sitetypes.search.suggestSearch" type="checkbox">
+                            <text>
+                                <locale group="quiqqer/sitetypes"
+                                        var="search.suggestSearch" />
+                            </text>
+                        </input>
 
                         <input conf="quiqqer.settings.sitetypes.list.showCreator" type="checkbox">
                             <text>

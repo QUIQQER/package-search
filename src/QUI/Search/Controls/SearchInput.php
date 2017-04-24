@@ -40,9 +40,10 @@ class SearchInput extends QUI\Control
         $this->Site = QUI::getRewrite()->getSite();
 
         $this->setAttributes(array(
-            'search'     => '', // search term,
-            'searchType' => Search::SEARCH_TYPE_OR,
-            'fields'     => array()     // selected fields
+            'search'        => '', // search term,
+            'searchType'    => Search::SEARCH_TYPE_OR,
+            'fields'        => array(),     // selected fields
+            'suggestSearch' => $this->Site->getAttribute('quiqqer.search.sitetypes.search.suggestSearch')
         ));
 
         $this->setJavaScriptControl('package/quiqqer/search/bin/controls/SearchInput');
@@ -68,7 +69,8 @@ class SearchInput extends QUI\Control
             'availableFields' => $this->getAvailableFields(),
             'searchType'      => $this->getAttribute('searchType'),
             'search'          => $this->getAttribute('search'),
-            'fields'          => $this->getAttribute('fields')
+            'fields'          => $this->getAttribute('fields'),
+            'suggestSearch'   => $this->getAttribute('suggestSearch')
         ));
 
         return $Engine->fetch(dirname(__FILE__) . '/SearchInput.html');

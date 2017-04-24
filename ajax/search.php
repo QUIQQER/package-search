@@ -15,10 +15,8 @@ QUI::$Ajax->registerFunction(
         $Project = QUI::getProjectManager()->decode($project);
         $Site    = $Project->get($siteId);
 
-        $searchParams         = Orthos::clearArray(json_decode($searchParams, true));
-
-        \QUI\System\Log::writeRecursive($searchParams);
-
+//        $searchParams         = Orthos::clearArray();
+        $searchParams = json_decode($searchParams, true);
         $searchParams['Site'] = $Site;
 
         $Search       = new Search($searchParams);

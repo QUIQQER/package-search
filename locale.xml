@@ -85,6 +85,10 @@
             <de><![CDATA[Automatisches Nachladen beim Scrollen ("Infinite Scrolling")]]></de>
             <en><![CDATA[Infinite Scrolling]]></en>
         </locale>
+        <locale name="search.suggestSearch">
+            <de><![CDATA[Suchvorschläge im Such-Input anzeigen]]></de>
+            <en><![CDATA[Show search suggestions in search input]]></en>
+        </locale>
     </groups>
 
     <!-- php locale -->

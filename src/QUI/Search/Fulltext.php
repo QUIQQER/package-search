@@ -97,21 +97,22 @@ class Fulltext extends QUI\QDOM
 
         // filter
         foreach ($fieldList as $entry) {
-            if (mb_strpos($entry['type'], 'varchar') !== false
-                || mb_strpos($entry['type'], 'text') !== false
+            $type = mb_strtolower($entry['type']);
+
+            if (mb_strpos($type, 'varchar') !== false
+                || mb_strpos($type, 'text') !== false
             ) {
                 $availableFields[] = $entry['field'];
             }
         }
 
-
         if (!$attrFields || !is_array($attrFields)) {
             $fields = $availableFields;
         } else {
-            $availableFields = array_flip($availableFields);
+            $availableFieldsTmp = array_flip($availableFields);
 
             foreach ($attrFields as $field) {
-                if (isset($availableFields[$field])) {
+                if (isset($availableFieldsTmp[$field])) {
                     $fields[] = Orthos::clearNoneCharacters($field);
                 }
             }
@@ -225,10 +226,10 @@ class Fulltext extends QUI\QDOM
             ";
 
 //            if (strlen($search) > 2 || $search == '%%') {
-                $binds['search'] = array(
-                    'value' => $search,
-                    'type'  => \PDO::PARAM_STR
-                );
+            $binds['search'] = array(
+                'value' => $search,
+                'type'  => \PDO::PARAM_STR
+            );
 //            }
         } else {
             $whereOr = array();

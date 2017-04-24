@@ -105,7 +105,7 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
 
             this.$searchTerms = this.$SearchInput.value.trim().split(' ');
 
-            this.SearchParams = {
+            var SearchParams = {
                 searchType  : 'OR',
                 searchFields: [],
                 sheet       : 1 // start search from beginning
@@ -119,18 +119,20 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
                 switch (Input.getProperty('name')) {
                     case 'searchType':
                         if (Input.checked) {
-                            self.SearchParams.searchType = 'AND';
+                            SearchParams.searchType = 'AND';
                         }
                         break;
 
                     default:
                         if (Input.checked) {
-                            self.SearchParams.searchFields.push(Input.value);
+                            SearchParams.searchFields.push(Input.value);
                         }
                 }
             });
 
             this.Loader.show();
+
+            this.$Search.setSearchParams(SearchParams);
 
             this.$Search.search().then(function () {
                 self.Loader.hide();

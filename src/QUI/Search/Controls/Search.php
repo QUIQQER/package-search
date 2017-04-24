@@ -65,19 +65,25 @@ class Search extends QUI\Control
             'max'                  => $this->Site->getAttribute('quiqqer.settings.search.list.max') ?: 10,
             'searchFields'         => $this->getDefaultSearchFields(),
             'sheet'                => 1,
-            'paginationType'       => 'pagination',  // "pagination" or "infinitescroll"
+            'paginationType'       => false,// "pagination" or "infinitescroll" (determined by getPaginationType())
             'relevanceSearch'      => true,          // use Fulltext relevance search
-            'childrenListTemplate' => false,
-            'childrenListCss'      => false
+            'childrenListTemplate' => dirname(__FILE__, 5) . '/templates/SearchResultList.html',
+            'childrenListCss'      => dirname(__FILE__, 5) . '/templates/SearchResultList.css'
         ));
 
-        $this->addCSSClass('quiqqer-search');
-        $this->addCSSFile(dirname(__FILE__) . '/Search.css');
-
+        // set attributes
         parent::__construct($attributes);
 
+        // sanitize attributes
+        $this->sanitizeAttribues();
+
+        // set javascript control data
         $this->setJavaScriptControl('package/quiqqer/search/bin/controls/Search');
         $this->setJavaScriptControlOption('searchparams', json_encode($this->getAttributes()));
+
+        // set template data
+        $this->addCSSClass('quiqqer-search');
+        $this->addCSSFile(dirname(__FILE__) . '/Search.css');
     }
 
     /**
@@ -90,8 +96,6 @@ class Search extends QUI\Control
         if (!is_null($this->searchResults)) {
             return $this->searchResults;
         }
-
-        $this->sanitizeAttribues();
 
         $search   = $this->getAttribute('search');
         $Project  = $this->Site->getProject();
@@ -190,6 +194,14 @@ class Search extends QUI\Control
             $params['displayCss'] = $this->getAttribute('childrenListCss');
         }
 
+        $childrenListAttributes = $this->getAttribute('childrenListAttributes');
+
+        if (!empty($childrenListAttributes)
+            && is_array($childrenListAttributes)
+        ) {
+            $params = array_merge($childrenListAttributes, $params);
+        }
+
         return new ChildrenList($params);
     }
 
@@ -247,6 +259,8 @@ class Search extends QUI\Control
             'ChildrenList'    => $this->getChildrenList(),
             'paginationType'  => $this->getPaginationType()
         ));
+
+        $this->setJavaScriptControlOption('resultcount', $searchResult['count']);
 
         return $Engine->fetch(dirname(__FILE__) . '/Search.html');
     }
@@ -347,9 +361,15 @@ class Search extends QUI\Control
                     $v = $this->clearSearchFields($v);
                     break;
 
+                case 'suggestSearch':
                 case 'relevanceSearch':
                     $v = $v ? true : false;
                     break;
+
+                case 'paginationType':
+                    if (empty($v)) {
+                        $v = $this->getPaginationType();
+                    }
             }
 
             $attributes[$k] = $v;
