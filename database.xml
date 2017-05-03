@@ -14,6 +14,7 @@
             <field type="varchar(255) NULL">icon</field>
 
             <auto_increment>id</auto_increment>
+            <primary>id</primary>
         </table>
 
         <table name="searchFull" no-auto-update="1" no-site-reference="1">
@@ -26,6 +27,7 @@
 
             <auto_increment>id</auto_increment>
             <index>siteId</index>
+            <primary>id</primary>
         </table>
 
     </projects>

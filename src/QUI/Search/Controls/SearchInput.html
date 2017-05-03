@@ -3,8 +3,8 @@
            name="search"
            value="{$search}"
            class="quiqqer-search-searchinput-input"
-           {if $suggestSearch}data-qui="package/quiqqer/search/bin/controls/Suggest"{/if}
-           placeholder="{t}quiqqer/search tpl.search.placeholder{/t}"
+           {if $suggestSearch != 'off'}data-qui="package/quiqqer/search/bin/controls/Suggest"{/if}
+           placeholder="{$placeholder}"
     />
 
     <input type="submit"
@@ -12,9 +12,15 @@
            class="quiqqer-search-searchinput-submit qui-button button"
     />
 
-    {if count( $availableFields ) &&
-    $Site->getAttribute('quiqqer.settings.search.list.hideSettings') != true}
-    <div class="qui-search-searchinput-settings" style="display: none">
+    <noscript>
+        <style>
+            .qui-search-searchinput-settings__hidden {
+                display: block;
+            }
+        </style>
+    </noscript>
+
+    <div class="qui-search-searchinput-settings qui-search-searchinput-settings__hidden">
         <label>
             <input class="qui-search-searchinput-settings-setting"
                    type="checkbox"
@@ -33,7 +39,7 @@
                        type="checkbox"
                        name="searchIn[]"
                        value="{$field}"
-                       {if in_array($field, $fields)}checked="checked" {/if}
+                       {if in_array($field, $fields)}checked="checked"{/if}
                 />
 
                 {locale group="quiqqer/search"
@@ -42,6 +48,5 @@
             {/foreach}
         </fieldset>
     </div>
-    {/if}
 
 </form>

@@ -46,7 +46,8 @@ define('package/quiqqer/search/bin/controls/Search', [
             '$submit',
             '$onPaginationChange',
             'setSearchParams',
-            'search'
+            'search',
+            'reset'
         ],
 
         options: {
@@ -378,6 +379,13 @@ define('package/quiqqer/search/bin/controls/Search', [
         },
 
         /**
+         * Clear all previously set search terms
+         */
+        clearSearchTerms: function () {
+            this.$searchTerms = [];
+        },
+
+        /**
          * Set search parameters (does not set search term!)
          *
          * @param {Object} [SearchParams] - Custom search params
@@ -427,6 +435,12 @@ define('package/quiqqer/search/bin/controls/Search', [
                         self.$renderResult(SearchResult);
                         self.$setUri();
 
+                        // reset "more" btn if a fresh search is started
+                        if (self.$paginationType === 'infinitescroll' &&
+                            !self.$loadingMore) {
+                            self.$moreBtnClicked = 0;
+                        }
+
                         resolve(SearchResult);
                     }, {
                         'package'   : 'quiqqer/search',
@@ -455,7 +469,9 @@ define('package/quiqqer/search/bin/controls/Search', [
                 UriParams.sheet = this.$sheet;
             }
 
-            Uri.setSearch(UriParams);
+            // keep url params that are not set by this class
+            var ExternalUrlParams = Uri.search(true);
+            Uri.search(Object.merge(ExternalUrlParams, UriParams));
 
             var url = Uri.toString();
 

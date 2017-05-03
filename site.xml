@@ -42,7 +42,7 @@
                 <attribute default="1">quiqqer.settings.sitetypes.list.showCreator</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showDate</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showImages</attribute>
-                <attribute default="0">quiqqer.search.sitetypes.search.suggestSearch</attribute>
+                <attribute default="off">quiqqer.search.sitetypes.search.suggestSearch</attribute>
             </attributes>
 
             <!-- list settings -->
@@ -92,12 +92,21 @@
                             </option>
                         </select>
 
-                        <input conf="quiqqer.search.sitetypes.search.suggestSearch" type="checkbox">
+                        <select conf="quiqqer.search.sitetypes.search.suggestSearch">
                             <text>
-                                <locale group="quiqqer/sitetypes"
+                                <locale group="quiqqer/search"
                                         var="search.suggestSearch" />
                             </text>
-                        </input>
+                            <option value="off">
+                                <locale group="quiqqer/search" var="search.suggestSearch.option.off" />
+                            </option>
+                            <option value="clicktosite">
+                                <locale group="quiqqer/search" var="search.suggestSearch.option.clicktosite" />
+                            </option>
+                            <option value="clicktosearch">
+                                <locale group="quiqqer/search" var="search.suggestSearch.option.clicktosearch" />
+                            </option>
+                        </select>
 
                         <input conf="quiqqer.settings.sitetypes.list.showCreator" type="checkbox">
                             <text>

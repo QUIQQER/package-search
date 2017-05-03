@@ -86,8 +86,20 @@
             <en><![CDATA[Infinite Scrolling]]></en>
         </locale>
         <locale name="search.suggestSearch">
-            <de><![CDATA[Suchvorschläge im Such-Input anzeigen]]></de>
-            <en><![CDATA[Show search suggestions in search input]]></en>
+            <de><![CDATA[Suchvorschläge anzeigen]]></de>
+            <en><![CDATA[Show search suggestions]]></en>
+        </locale>
+        <locale name="search.suggestSearch.option.off">
+            <de><![CDATA[Aus]]></de>
+            <en><![CDATA[Off]]></en>
+        </locale>
+        <locale name="search.suggestSearch.option.clicktosite">
+            <de><![CDATA[Suchvorschläge anzeigen - Klick auf Suchvorschlag wechselt auf Seite]]></de>
+            <en><![CDATA[Show search suggestions - Click on a suggestion switches to site]]></en>
+        </locale>
+        <locale name="search.suggestSearch.option.clicktosearch">
+            <de><![CDATA[Suchvorschläge anzeigen - Klick auf Suchvorschlag sucht nach Vorschlagstext]]></de>
+            <en><![CDATA[Show search suggestions - Click on a suggestion searches for suggestions text]]></en>
         </locale>
     </groups>
 

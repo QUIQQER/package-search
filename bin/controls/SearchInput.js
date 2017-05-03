@@ -13,14 +13,16 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
 
     'qui/controls/loader/Loader',
     'qui/controls/buttons/Button',
-
-    'package/quiqqer/search/bin/controls/SearchExtension',
+    'qui/controls/buttons/Select',
+    'utils/Controls',
 
     'Locale',
 
+    'package/quiqqer/search/bin/controls/SearchExtension'
+
     //'css!package/quiqqer/search/bin/controls/SearchInput.css'
 
-], function (QUILoader, QUIButton, SearchExtension, QUILocale) {
+], function (QUILoader, QUIButton, QUISelect, QUIControlUtils, QUILocale, SearchExtension) {
     "use strict";
 
     var lg = 'quiqqer/search';
@@ -37,18 +39,19 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
         ],
 
         options: {
-            name       : 'search',
-            placeholder: 'Search...',
-            delay      : 300
+            suggestsearch    : 'off',
+            showfieldsettings: true,
+            delay            : 300
         },
 
         initialize: function (options) {
             this.parent(options);
 
-            this.$SearchInput = null;
-            this.$SettingsElm = null;
-            this.$Elm         = null;
-            this.Loader       = new QUILoader();
+            this.$SearchInput       = null;
+            this.$SettingsElm       = null;
+            this.$SearchFieldSelect = null;
+            this.$Elm               = null;
+            this.Loader             = new QUILoader();
 
             this.addEvents({
                 onImport: this.$onImport
@@ -73,20 +76,30 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
                 '.qui-search-searchinput-settings'
             );
 
-            // config toggle btn
-            new QUIButton({
-                'class': 'quiqqer-search-searchinput-settings-btn',
-                icon   : 'fa fa-gears',
-                title  : 'Sucheinstellungen',
-                events : {
-                    onClick: this.$toggleSettings
-                }
-            }).inject(
-                this.$Elm.getElement(
-                    '.quiqqer-search-searchinput-submit'
-                ),
-                'after'
-            );
+            this.$searchTerms = this.$SearchInput.value.trim().split(' ');
+
+            // Initialize suggest input event (if option is set)
+            QUIControlUtils.getControlByElement(this.$SearchInput).then(function (SuggestControl) {
+                SuggestControl.addEvents({
+                    onSuggestionClick: function (suggestion, url, Control) {
+                        switch (self.getAttribute('suggestsearch')) {
+                            case 'clicktosite':
+                                window.location = url;
+                                break;
+
+                            default:
+                                Control.$hideResults();
+                                self.$searchTerms       = [suggestion];
+                                self.$SearchInput.value = suggestion;
+                                self.$Search.search();
+                        }
+                    }
+                });
+            }, function () {
+                // nothing
+            });
+
+            this.$initSearchFieldSettings();
 
             // form
             this.$Elm.getElement('form').addEvents({
@@ -98,6 +111,106 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
         },
 
         /**
+         * Initialize search field settings (user can select which fields to search)
+         */
+        $initSearchFieldSettings: function () {
+            if (!this.getAttribute('showfieldsettings')) {
+                return;
+            }
+
+            var self = this;
+
+            // config toggle btn
+            //new QUIButton({
+            //    'class': 'quiqqer-search-searchinput-settings-btn',
+            //    icon   : 'fa fa-gears',
+            //    title  : 'Sucheinstellungen',   // @todo translation
+            //    events : {
+            //        onClick: this.$toggleSettings
+            //    }
+            //}).inject(
+            //    this.$Elm.getElement(
+            //        '.quiqqer-search-searchinput-submit'
+            //    ),
+            //    'after'
+            //);
+
+            this.$SearchFieldSelect = new QUISelect({
+                multiple : true,
+                checkable: true
+            });
+
+            var settingInputs = this.$SettingsElm.getElements(
+                '.qui-search-searchinput-settings-setting'
+            );
+
+            var setValues = [];
+
+            settingInputs.each(function (Input) {
+                var field = Input.value;
+
+                self.$SearchFieldSelect.appendChild(
+                    QUILocale.get(lg, 'tpl.search.field.' + field),
+                    field,
+                    false
+                );
+
+                if (Input.checked) {
+                    setValues.push(field);
+                }
+            });
+
+            this.$SearchFieldSelect.inject(
+                this.$Elm.getElement(
+                    '.quiqqer-search-searchinput-submit'
+                ),
+                'after'
+            );
+
+            this.$SearchFieldSelect.setValues(setValues);
+        },
+
+        /**
+         * Parses search params from settings
+         *
+         * @return {Object} - Search params
+         */
+        $parseSearchParams: function () {
+            var SearchParams = {
+                searchType  : 'OR',
+                searchFields: [],
+                sheet       : 1 // start search from beginning
+            };
+
+            // search fields
+            if (this.$SearchFieldSelect) {
+                console.log(this.$SearchFieldSelect.getValue());
+                SearchParams.searchFields = this.$SearchFieldSelect.getValue();
+            } else {
+                var settingInputs = this.$SettingsElm.getElements(
+                    '.qui-search-searchinput-settings-setting'
+                );
+
+                settingInputs.each(function (Input) {
+                    switch (Input.getProperty('name')) {
+                        case 'searchType':
+                            if (Input.checked) {
+                                SearchParams.searchType = 'AND';
+                            }
+                            break;
+
+                        default:
+                            if (Input.checked) {
+                                SearchParams.searchFields.push(Input.value);
+                            }
+                    }
+                });
+            }
+
+            return SearchParams;
+        },
+
+        /**
          * Submit search
          */
         $submit: function () {
@@ -105,36 +218,15 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
 
             this.$searchTerms = this.$SearchInput.value.trim().split(' ');
 
-            var SearchParams = {
-                searchType  : 'OR',
-                searchFields: [],
-                sheet       : 1 // start search from beginning
-            };
-
-            var settingInputs = this.$SettingsElm.getElements(
-                '.qui-search-searchinput-settings-setting'
-            );
-
-            settingInputs.each(function (Input) {
-                switch (Input.getProperty('name')) {
-                    case 'searchType':
-                        if (Input.checked) {
-                            SearchParams.searchType = 'AND';
-                        }
-                        break;
-
-                    default:
-                        if (Input.checked) {
-                            SearchParams.searchFields.push(Input.value);
-                        }
-                }
-            });
-
             this.Loader.show();
 
-            this.$Search.setSearchParams(SearchParams);
+            this.$Search.setSearchParams(this.$parseSearchParams());
 
             this.$Search.search().then(function () {
+                self.$setUri({
+                    searchterms: self.$searchTerms.join(',')
+                });
+
                 self.Loader.hide();
             });
         },

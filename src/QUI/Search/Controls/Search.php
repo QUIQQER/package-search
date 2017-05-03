@@ -266,6 +266,50 @@ class Search extends QUI\Control
     }
 
     /**
+     * Set control attributes by reading $_REQUEST
+     *
+     * @return void
+     */
+    public function setAttributesFromRequest()
+    {
+        // requests
+        if (isset($_REQUEST['sheet'])) {
+            $this->setAttribute('sheet', $_REQUEST['sheet']);
+        }
+
+        if (isset($_REQUEST['search'])) {
+            $this->setAttribute('search', $_REQUEST['search']);
+        }
+
+        if (isset($_REQUEST['searchType'])
+            && $_REQUEST['searchType'] == self::SEARCH_TYPE_AND
+        ) {
+            $this->setAttribute('searchType', self::SEARCH_TYPE_AND);
+        }
+
+        $fields = array();
+
+        // search fields
+        if (isset($_REQUEST['searchIn'])) {
+            if (!is_array($_REQUEST['searchIn'])) {
+                $_REQUEST['searchIn'] = explode(',', urldecode($_REQUEST['searchIn']));
+            }
+
+            foreach ($_REQUEST['searchIn'] as $field) {
+                if (!is_string($field)) {
+                    continue;
+                }
+
+                $fields[] = Orthos::clear($field);
+            }
+
+            $this->setAttribute('searchFields', $fields);
+        }
+
+        $this->sanitizeAttribues();
+    }
+
+    /**
      * Clears the given search fields (remove invalid fields)
      *
      * @param array $fields
@@ -330,7 +374,8 @@ class Search extends QUI\Control
                         break;
                     }
 
-                    $v = preg_replace("/[^\p{L}\p{N}\-]/iu", " ", $v);
+                    /* http://www.regular-expressions.info/unicode.html#prop */
+                    $v = preg_replace("/[^\p{L}\p{N}\p{P}\-]/iu", " ", $v);
                     $v = Orthos::clear($v);
                     $v = preg_replace('#([ ]){2,}#', "$1", $v);
                     $v = trim($v);

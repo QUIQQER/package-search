@@ -40,19 +40,25 @@ class SearchInput extends QUI\Control
         $this->Site = QUI::getRewrite()->getSite();
 
         $this->setAttributes(array(
-            'search'        => '', // search term,
-            'searchType'    => Search::SEARCH_TYPE_OR,
-            'fields'        => array(),     // selected fields
-            'suggestSearch' => $this->Site->getAttribute('quiqqer.search.sitetypes.search.suggestSearch')
+            'search'            => '', // search term,
+            'searchType'        => Search::SEARCH_TYPE_OR,
+            'availableFields'   => $this->getAllAvaiableFields(),
+            'fields'            => array(),     // selected fields
+            'suggestSearch'     => 'off',
+            'placeholder'       => QUI::getLocale()->get('quiqqer/search', 'tpl.search.placeholder'),
+            'showFieldSettings' => true
         ));
-
-        $this->setJavaScriptControl('package/quiqqer/search/bin/controls/SearchInput');
-//        $this->setJavaScriptControlOption('');
 
         $this->addCSSClass('quiqqer-search-searchinput');
         $this->addCSSFile(dirname(__FILE__) . '/SearchInput.css');
 
         parent::__construct($attributes);
+
+        $this->setJavaScriptControl('package/quiqqer/search/bin/controls/SearchInput');
+        $this->setJavaScriptControlOption('suggestsearch', $this->getAttribute('suggestSearch'));
+        $this->setJavaScriptControlOption('showfieldsettings', $this->getAttribute('showFieldSettings'));
+
+        $this->sanitizeFields();
     }
 
     /**
@@ -65,23 +71,103 @@ class SearchInput extends QUI\Control
         $Engine = QUI::getTemplateManager()->getEngine();
 
         $Engine->assign(array(
-            'Site'            => $this->Site,
-            'availableFields' => $this->getAvailableFields(),
-            'searchType'      => $this->getAttribute('searchType'),
-            'search'          => $this->getAttribute('search'),
-            'fields'          => $this->getAttribute('fields'),
-            'suggestSearch'   => $this->getAttribute('suggestSearch')
+            'Site'              => $this->Site,
+            'searchType'        => $this->getAttribute('searchType'),
+            'search'            => $this->getAttribute('search'),
+            'availableFields'   => $this->getAttribute('availableFields'),
+            'fields'            => $this->getAttribute('fields'),
+            'suggestSearch'     => $this->getAttribute('suggestSearch'),
+            'placeholder'       => $this->getAttribute('placeholder'),
+            'showFieldSettings' => $this->getAttribute('showFieldSettings')
         ));
 
         return $Engine->fetch(dirname(__FILE__) . '/SearchInput.html');
     }
 
     /**
-     * Get available search fields
+     * Set control attributes by reading $_REQUEST
+     *
+     * @return void
+     */
+    public function setAttributesFromRequest()
+    {
+        // requests
+        if (isset($_REQUEST['searchterms'])) {
+            $this->setAttribute('search', $_REQUEST['searchterms']);
+        }
+
+        if (isset($_REQUEST['searchType'])
+            && $_REQUEST['searchType'] == Search::SEARCH_TYPE_AND
+        ) {
+            $this->setAttribute('searchType', Search::SEARCH_TYPE_AND);
+        }
+
+        // search fields
+        if (isset($_REQUEST['searchIn'])) {
+            $fields = array();
+
+            if (!is_array($_REQUEST['searchIn'])) {
+                $_REQUEST['searchIn'] = explode(',', urldecode($_REQUEST['searchIn']));
+            }
+
+            foreach ($_REQUEST['searchIn'] as $field) {
+                if (!is_string($field)) {
+                    continue;
+                }
+
+                $fields[] = Orthos::clear($field);
+            }
+
+            $this->setAttribute('fields', $fields);
+        }
+
+        $this->sanitizeFields();
+    }
+
+    /**
+     * Sanitizes fields
+     */
+    protected function sanitizeFields()
+    {
+        // available fields
+        $allFields       = $this->getAllAvaiableFields();
+        $availableFields = $this->getAttribute('availableFields');
+
+        if (!is_array($availableFields)
+            || empty($availableFields)
+        ) {
+            $availableFields = $allFields;
+        } else {
+            foreach ($availableFields as $k => $field) {
+                if (!in_array($field, $allFields)) {
+                    unset($availableFields[$k]);
+                }
+            }
+        }
+
+        // selected fields
+        $selectedFields = $this->getAttribute('fields');
+
+        if (!is_array($selectedFields)) {
+            $selectedFields = array();
+        }
+
+        foreach ($selectedFields as $k => $field) {
+            if (!in_array($field, $availableFields)) {
+                unset($selectedFields[$k]);
+            }
+        }
+
+        $this->setAttribute('availableFields', $availableFields);
+        $this->setAttribute('fields', $selectedFields);
+    }
+
+    /**
+     * Get all available search fields
      *
      * @return array
      */
-    protected function getAvailableFields()
+    protected function getAllAvaiableFields()
     {
         $allFields = array();
 
@@ -89,14 +175,6 @@ class SearchInput extends QUI\Control
             $allFields[] = $entry['field'];
         }
 
-        $settingsFields = $this->Site->getAttribute('quiqqer.settings.search.list.fields');
-
-        if (empty($settingsFields)
-            || !is_array($settingsFields)
-        ) {
-            return $allFields;
-        }
-
-        return $settingsFields;
+        return $allFields;
     }
 }

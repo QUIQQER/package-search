@@ -13,9 +13,10 @@
 define('package/quiqqer/search/bin/controls/SearchExtension', [
 
     'qui/controls/Control',
-    'package/quiqqer/search/bin/SearchUtils'
+    'package/quiqqer/search/bin/SearchUtils',
+    'URI'
 
-], function (QUIControl, SearchUtils) {
+], function (QUIControl, SearchUtils, URI) {
     "use strict";
 
     return new Class({
@@ -49,6 +50,28 @@ define('package/quiqqer/search/bin/controls/SearchExtension', [
          */
         getSearchTerms: function () {
             return this.$searchTerms;
+        },
+
+        /**
+         * Set URI based on given uri parameters
+         *
+         * @param {Object} UriParams - Uri parameters
+         */
+        $setUri: function (UriParams) {
+            var Uri = new URI();
+
+            // keep url params that are not set by this class
+            var ExternalUrlParams = Uri.search(true);
+            Uri.search(Object.merge(ExternalUrlParams, UriParams));
+
+            var url = Uri.toString();
+
+            if ("history" in window) {
+                window.history.pushState({}, "", url);
+                window.fireEvent('popstate');
+            } else {
+                window.location = url;
+            }
         }
     });
 });

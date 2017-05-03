@@ -8,6 +8,8 @@
  * @require qui/QUI
  * @require qui/controls/Control
  * @require Ajax
+ *
+ * @event onSuggestionClick [text, url, self] - fires if the user clicks a search suggestion
  */
 define('package/quiqqer/search/bin/controls/Suggest', [
 
@@ -52,6 +54,7 @@ define('package/quiqqer/search/bin/controls/Suggest', [
             this.$CurrentInput = null;
             this.$FX           = null;
             this.$Datalist     = null;
+            this.$Form         = null;
 
             this.parent(options);
 
@@ -102,6 +105,8 @@ define('package/quiqqer/search/bin/controls/Suggest', [
             if (!Elm.get('placeholder') || Elm.get('placeholder') === '') {
                 Elm.set('placeholder', this.getAttribute('placeholder'));
             }
+
+            this.$Form = Elm.getParent('form');
 
             this.$FX = moofx(this.getDataList());
             this.bindElement(Elm);
@@ -242,6 +247,7 @@ define('package/quiqqer/search/bin/controls/Suggest', [
          * @return {Promise}
          */
         $renderSearch: function (data) {
+            var self     = this;
             var DropDown = this.getDataList();
 
             if (data === '') {
@@ -268,7 +274,13 @@ define('package/quiqqer/search/bin/controls/Suggest', [
                         Target = Target.getParent('li');
                     }
 
-                    window.location = Target.get('data-url');
+                    self.fireEvent('suggestionClick', [
+                        Target.getElement('.quiqqer-search-suggest-text').innerHTML,
+                        Target.get('data-url'),
+                        self
+                    ]);
+
+                    //window.location = Target.get('data-url');
                 }
             });
 

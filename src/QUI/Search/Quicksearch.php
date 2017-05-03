@@ -162,8 +162,8 @@ class Quicksearch
         // site params
         if (is_array($siteParams) && !empty($siteParams)) {
             foreach ($siteParams as $key => $value) {
-                $key   = Orthos::clear($key);
-                $value = Orthos::clear($value);
+                $key   = Orthos::clearMySQL($key, false);
+                $value = Orthos::clearMySQL($value, false);
 
                 $siteUrlParams[$key] = $value;
             }
@@ -176,7 +176,7 @@ class Quicksearch
             QUI::getDataBase()->insert($table, array(
                 'siteId'       => $siteId,
                 'urlParameter' => $urlParameter,
-                'data'         => Orthos::clear($dataEntry)
+                'data'         => Orthos::clearMySQL($dataEntry, false)
             ));
         }
 
@@ -217,12 +217,30 @@ class Quicksearch
         }
 
         $urlParameter = json_encode($siteParams);
+//        $data         = QUI::getPDO()->quote($data);
 
+        // check if entry exists
+        if (self::existsEntry($Project, $siteId, $data, $siteParams)) {
+            QUI::getDataBase()->update(
+                $table,
+                array(
+                    'rights' => null, // @todo auf was richtiges setzen, wenn der parameter implementiert wird
+                    'icon'   => null  // @todo auf was richtiges setzen, wenn der parameter implementiert wird
+                ),
+                array(
+                    'siteId'       => $siteId,
+                    'urlParameter' => $urlParameter,
+                    'data'         => $data
+                )
+            );
+
+            return;
+        }
 
         QUI::getDataBase()->insert($table, array(
             'siteId'       => $siteId,
             'urlParameter' => $urlParameter,
-            'data'         => Orthos::clear($data)
+            'data'         => $data
         ));
     }
 
@@ -293,6 +311,41 @@ class Quicksearch
         }
 
         return $result[0];
+    }
+
+    /**
+     * Check if a quicksearch entry already exists
+     *
+     * @param Project $Project
+     * @param int $siteId
+     * @param string $data
+     * @param array $siteParams
+     * @return bool
+     */
+    public static function existsEntry(
+        Project $Project,
+        $siteId,
+        $data,
+        $siteParams = array()
+    ) {
+        $table = QUI::getDBProjectTableName(
+            Search::TABLE_SEARCH_QUICK,
+            $Project
+        );
+
+        $urlParameter = json_encode($siteParams);
+
+        $result = QUI::getDataBase()->fetch(array(
+            'count' => 1,
+            'from'  => $table,
+            'where' => array(
+                'siteId'       => (int)$siteId,
+                'data'         => $data,
+                'urlParameter' => $urlParameter
+            )
+        ));
+
+        return boolval(current(current($result)));
     }
 
     /**

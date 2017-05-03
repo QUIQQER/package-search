@@ -29,48 +29,18 @@ if (QUI::getRewrite()->getHeaderCode() === 404) {
  */
 
 $SearchInput = new SearchInput(array(
-    'suggestSearch' => $Site->getAttribute('quiqqer.search.sitetypes.search.suggestSearch')
+    'suggestSearch'     => $Site->getAttribute('quiqqer.search.sitetypes.search.suggestSearch'),
+    'availableFields'   => $Site->getAttribute('quiqqer.settings.search.list.fields'),
+    'fields'            => $Site->getAttribute('quiqqer.settings.search.list.fields.selected'),
+    'showFieldSettings' => !boolval($Site->getAttribute('quiqqer.settings.search.list.hideSettings'))
 ));
-$Search  = new Search();
 
-// requests
-if (isset($_REQUEST['sheet'])) {
-    $Search->setAttribute('sheet', $_REQUEST['sheet']);
-}
+$Search = new Search();
 
-if (isset($_REQUEST['search'])) {
-    $SearchInput->setAttribute('search', $_REQUEST['search']);
-    $Search->setAttribute('search', $_REQUEST['search']);
-}
-
-if (isset($_REQUEST['searchType'])
-    && $_REQUEST['searchType'] == $Search::SEARCH_TYPE_AND
-) {
-    $SearchInput->setAttribute('searchType', $Search::SEARCH_TYPE_AND);
-    $Search->setAttribute('searchType', $Search::SEARCH_TYPE_AND);
-}
-
-$fields = array();
-
-// search fields
-if (isset($_REQUEST['searchIn'])) {
-    if (!is_array($_REQUEST['searchIn'])) {
-        $_REQUEST['searchIn'] = explode(',', urldecode($_REQUEST['searchIn']));
-    }
-
-    foreach ($_REQUEST['searchIn'] as $field) {
-        if (!is_string($field)) {
-            continue;
-        }
-
-        $fields[] = Orthos::clear($field);
-    }
-
-    $SearchInput->setAttribute('fields', $fields);
-    $Search->setAttribute('searchFields', $fields);
-}
+$Search->setAttributesFromRequest();
+$SearchInput->setAttributesFromRequest();
 
 $Engine->assign(array(
     'SearchInput' => $SearchInput,
-    'Search'  => $Search
+    'Search'      => $Search
 ));

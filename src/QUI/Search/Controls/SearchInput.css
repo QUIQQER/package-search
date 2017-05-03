@@ -16,3 +16,7 @@
 .qui-search-searchinput-settings {
     float: left;
 }
+
+.qui-search-searchinput-settings__hidden {
+    display: none;
+}
