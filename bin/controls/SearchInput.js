@@ -136,8 +136,14 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
             //);
 
             this.$SearchFieldSelect = new QUISelect({
-                multiple : true,
-                checkable: true
+                'class'              : 'quiqqer-search-searchinput-searchfieldselect',
+                placeholderText      : QUILocale.get(
+                    lg,
+                    'controls.searchinput.searchfieldselect.placeholder'
+                ),
+                placeholderSelectable: false,
+                multiple             : true,
+                checkable            : true
             });
 
             var settingInputs = this.$SettingsElm.getElements(
@@ -147,10 +153,20 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
             var setValues = [];
 
             settingInputs.each(function (Input) {
+                var fieldLabel;
                 var field = Input.value;
 
+                switch (field) {
+                    case 'AND':
+                        fieldLabel = QUILocale.get(lg, 'tpl.search.' + field.toLowerCase() + '.type');
+                        break;
+
+                    default:
+                        fieldLabel = QUILocale.get(lg, 'tpl.search.field.' + field);
+                }
+
                 self.$SearchFieldSelect.appendChild(
-                    QUILocale.get(lg, 'tpl.search.field.' + field),
+                    fieldLabel,
                     field,
                     false
                 );

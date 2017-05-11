@@ -32,10 +32,11 @@ define('package/quiqqer/search/bin/controls/SearchExtension', [
         initialize: function (options) {
             this.parent(options);
 
-            var self           = this;
-            this.$Search       = null;
-            this.$searchTerms  = [];
-            this.$SearchParams = {};
+            var self               = this;
+            this.$Search           = null;
+            this.$searchTerms      = [];
+            this.$SearchParams     = {};
+            this.$FieldConstraints = {};
 
             SearchUtils.getSearchControl().then(function (SearchControl) {
                 self.$Search = SearchControl;
@@ -50,6 +51,15 @@ define('package/quiqqer/search/bin/controls/SearchExtension', [
          */
         getSearchTerms: function () {
             return this.$searchTerms;
+        },
+
+        /**
+         * Get field constraints
+         *
+         * @return {Array}
+         */
+        getFieldConstraints: function () {
+            return this.$FieldConstraints;
         },
 
         /**

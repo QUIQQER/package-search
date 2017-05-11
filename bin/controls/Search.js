@@ -408,16 +408,27 @@ define('package/quiqqer/search/bin/controls/Search', [
 
             this.Loader.show();
 
-            var searchTerms = [];
+            var searchTerms      = [];
+            var FieldConstraints = {};
 
             this.$extensions.each(function (Extension) {
-                if ("getSearchTerms" in Extension &&
-                    typeOf(Extension.getSearchTerms) === 'function') {
-                    var extSearchTerms = Extension.getSearchTerms();
+                if ("getSearchTerms" in Extension) {
+                    if (typeOf(Extension.getSearchTerms) === 'function') {
+                        var extSearchTerms = Extension.getSearchTerms();
 
-                    extSearchTerms.each(function (searchTerm) {
-                        searchTerms.push(searchTerm);
-                    });
+                        extSearchTerms.each(function (searchTerm) {
+                            searchTerms.push(searchTerm);
+                        });
+                    }
+                }
+
+                if ("getFieldConstraints" in Extension) {
+                    if (typeOf(Extension.getFieldConstraints) === 'function') {
+                        FieldConstraints = Object.merge(
+                            FieldConstraints,
+                            Extension.getFieldConstraints()
+                        );
+                    }
                 }
             });
 
@@ -425,7 +436,8 @@ define('package/quiqqer/search/bin/controls/Search', [
                 searchTerms.push(searchTerm);
             });
 
-            this.$SearchParams.search = searchTerms.join(' ');
+            this.$SearchParams.search           = searchTerms.join(' ');
+            this.$SearchParams.fieldConstraints = FieldConstraints;
 
             return new Promise(function (resolve, reject) {
                 QUIAjax.get(
@@ -443,11 +455,11 @@ define('package/quiqqer/search/bin/controls/Search', [
 
                         resolve(SearchResult);
                     }, {
-                        'package'   : 'quiqqer/search',
-                        searchParams: JSON.encode(self.$SearchParams),
-                        project     : JSON.encode(QUIQQER_PROJECT),
-                        siteId      : QUIQQER_SITE.id,
-                        onError     : reject
+                        'package'       : 'quiqqer/search',
+                        searchParams    : JSON.encode(self.$SearchParams),
+                        project         : JSON.encode(QUIQQER_PROJECT),
+                        siteId          : QUIQQER_SITE.id,
+                        onError         : reject
                     }
                 )
             });

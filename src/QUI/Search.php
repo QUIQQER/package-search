@@ -146,7 +146,14 @@ class Search
                 }
 
                 foreach ($index as $field) {
-                    $Table->setIndex($table, $field);
+                    try {
+                        $Table->setIndex($table, $field);
+                    } catch (\Exception $Exception) {
+                        QUI\System\Log::addWarning(
+                            self::class . ' :: setup() -> Could not create Index for Fulltext'
+                            . ' search column "' . $field . '": ' . $Exception->getMessage()
+                        );
+                    }
                 }
             }
         }
@@ -219,7 +226,7 @@ class Search
 
         // Quicksearch
         $Quicksearch->setEntries($Project, $Site->getId(), array(
-            $Site->getAttribute('name'),
+//            $Site->getAttribute('name'),
             $Site->getAttribute('title')
         ));
     }

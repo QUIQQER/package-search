@@ -13,6 +13,7 @@ use QUI\Projects\Site;
 use QUI\Utils\StringHelper;
 use QUI\Bricks\Controls\Pagination;
 use QUI\Controls\ChildrenList;
+use QUI\Rating\Handler as RatingHandler;
 
 /**
  * Class Search
@@ -64,6 +65,7 @@ class Search extends QUI\Control
             'searchType'           => $this::SEARCH_TYPE_OR,
             'max'                  => $this->Site->getAttribute('quiqqer.settings.search.list.max') ?: 10,
             'searchFields'         => $this->getDefaultSearchFields(),
+            'fieldConstraints'     => array(),
             'sheet'                => 1,
             'paginationType'       => false,// "pagination" or "infinitescroll" (determined by getPaginationType())
             'relevanceSearch'      => true,          // use Fulltext relevance search
@@ -101,15 +103,15 @@ class Search extends QUI\Control
         $Project  = $this->Site->getProject();
         $max      = $this->getAttribute('max');
         $sheet    = $this->getAttribute('sheet');
-        $fields   = $this->getAttribute('searchFields');
         $children = array();
 
         $FulltextSearch = new Fulltext(array(
-            'limit'           => (($sheet - 1) * $max) . ',' . $max,
-            'fields'          => $fields,
-            'searchtype'      => $this->getAttribute('searchType'),
-            'Project'         => $this->Site->getProject(),
-            'relevanceSearch' => $this->getAttribute('relevanceSearch')
+            'limit'            => (($sheet - 1) * $max) . ',' . $max,
+            'fields'           => $this->getAttribute('searchFields'),
+            'fieldConstraints' => $this->getAttribute('fieldConstraints'),
+            'searchtype'       => $this->getAttribute('searchType'),
+            'Project'          => $this->Site->getProject(),
+            'relevanceSearch'  => $this->getAttribute('relevanceSearch')
         ));
 
         $result = $FulltextSearch->search($search);
@@ -374,11 +376,7 @@ class Search extends QUI\Control
                         break;
                     }
 
-                    /* http://www.regular-expressions.info/unicode.html#prop */
-                    $v = preg_replace("/[^\p{L}\p{N}\p{P}\-]/iu", " ", $v);
-                    $v = Orthos::clear($v);
-                    $v = preg_replace('#([ ]){2,}#', "$1", $v);
-                    $v = trim($v);
+                    $v = self::sanitizeSearchString($v);
                     break;
 
                 case 'searchType':
@@ -403,6 +401,11 @@ class Search extends QUI\Control
                     break;
 
                 case 'searchFields':
+                    if (!is_array($v)) {
+                        $v = $this->getDefaultSearchFields();
+                        break;
+                    }
+
                     $v = $this->clearSearchFields($v);
                     break;
 
@@ -411,16 +414,73 @@ class Search extends QUI\Control
                     $v = $v ? true : false;
                     break;
 
+                case 'fieldConstraints':
+                    if (!is_array($v)) {
+                        $v = array();
+                        break;
+                    }
+
+                    $fields      = $this->clearSearchFields(array_keys($v));
+                    $constraints = array();
+
+                    foreach ($v as $field => $constraint) {
+                        if (!in_array($field, $fields)) {
+                            continue;
+                        }
+
+                        if (!is_array($constraint)
+                            && !is_string($constraint)) {
+                            continue;
+                        }
+
+                        $constraints[$field] = array();
+
+                        if (is_array($constraint)) {
+                            foreach ($constraint as $value) {
+                                if (!is_string($value)) {
+                                    continue;
+                                }
+
+                                $constraints[$field][] = self::sanitizeSearchString($value);
+                            }
+
+                            continue;
+                        }
+
+                        $constraints[$field][] = self::sanitizeSearchString($constraint);
+                    }
+
+                    $v = $constraints;
+                    break;
+
                 case 'paginationType':
                     if (empty($v)) {
                         $v = $this->getPaginationType();
                     }
+                    break;
             }
 
             $attributes[$k] = $v;
         }
 
         $this->setAttributes($attributes);
+    }
+
+    /**
+     * Sanitizes a search string
+     *
+     * @param string $str
+     * @return string - sanitized string
+     */
+    protected function sanitizeSearchString($str)
+    {
+        /* http://www.regular-expressions.info/unicode.html#prop */
+        $str = preg_replace("/[^\p{L}\p{N}\p{P}\-]/iu", " ", $str);
+        $str = Orthos::clear($str);
+        $str = preg_replace('#([ ]){2,}#', "$1", $str);
+        $str = trim($str);
+
+        return $str;
     }
 
     /**

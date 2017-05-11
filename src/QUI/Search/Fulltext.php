@@ -32,12 +32,13 @@ class Fulltext extends QUI\QDOM
     {
         // defaults
         $this->setAttributes(array(
-            'Project'         => false,   // Project
-            'limit'           => 10,      // limit of results
-            'fields'          => false,   // array list of fields
-            'searchtype'      => 'OR',    // search type: OR / AND
-            'datatypes'       => false,   // only for some site types, can be an array,
-            'relevanceSearch' => true     // use relevance search (if search string has minimum length)
+            'Project'          => false,   // Project
+            'limit'            => 10,      // limit of results
+            'fields'           => false,   // array list of fields
+            'fieldConstraints' => array(), // restrict certain search fields to specific values
+            'searchtype'       => 'OR',    // search type: OR / AND
+            'datatypes'        => false,   // only for some site types, can be an array,
+            'relevanceSearch'  => true     // use relevance search (if search string has minimum length)
         ));
 
         $this->setAttributes($params);
@@ -187,6 +188,49 @@ class Fulltext extends QUI\QDOM
             $datatypeQuery .= ' )';
         }
 
+        // field constraints
+        $fieldConstraints      = $this->getAttribute('fieldConstraints');
+        $whereFieldConstraints = '';
+
+        if (!empty($fieldConstraints)) {
+            $fieldConstraintsEntries = array();
+            $i                       = 0;
+
+            foreach ($fieldConstraints as $field => $constraintValues) {
+                if (!in_array($field, $availableFields)) {
+                    continue;
+                }
+
+                if (is_string($constraintValues)) {
+                    $constraintValues = array($constraintValues);
+                }
+
+                $constraintEntriesOr = array();
+
+                foreach ($constraintValues as $value) {
+                    if (empty($value)) {
+                        continue;
+                    }
+
+                    $constraintEntriesOr[]    = $field . ' = :constraint' . $i;
+                    $binds['constraint' . $i] = array(
+                        'value' => $value,
+                        'type'  => \PDO::PARAM_STR
+                    );
+
+                    $i++;
+                }
+
+                if (!empty($constraintEntriesOr)) {
+                    $fieldConstraintsEntries[] = "(" . implode(" OR ", $constraintEntriesOr) . ")";
+                }
+            }
+
+            if (!empty($fieldConstraintsEntries)) {
+                $whereFieldConstraints = ' AND (' . implode(" AND ", $fieldConstraintsEntries) . ')';
+            }
+        }
+
         // query
         if (is_int(key($availableFields))) {
             $selectedFields = implode(',', $availableFields);
@@ -217,8 +261,9 @@ class Fulltext extends QUI\QDOM
                 FROM
                     {$table}
                 WHERE
-                    MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE)
+                    (MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE))
                     {$datatypeQuery}
+                    {$whereFieldConstraints}
                 GROUP BY
                     urlParameter,siteId,{$selectedFields}
                 ORDER BY
@@ -241,11 +286,8 @@ class Fulltext extends QUI\QDOM
                 'data'
             );
 
-            if ($datatypes) {
-                $searchFields = array_merge($searchFields, $fields);
-            }
-
-            $searchTerms = explode(' ', $str);
+            $searchFields = array_merge($searchFields, $fields);
+            $searchTerms  = explode(' ', $str);
 
             foreach ($searchTerms as $k => $searchTerm) {
                 foreach ($searchFields as $field) {
@@ -265,7 +307,8 @@ class Fulltext extends QUI\QDOM
             FROM
                 {$table}
             WHERE
-                {$where}
+                ({$where})
+                {$whereFieldConstraints}
             GROUP BY
                 urlParameter,siteId,e_date,{$selectedFields}
             ORDER BY

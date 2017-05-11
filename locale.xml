@@ -4,6 +4,12 @@
     <!-- javascript locale -->
     <groups name="quiqqer/search" datatype="js">
 
+        <!-- Control: SearchInput -->
+        <locale name="controls.searchinput.searchfieldselect.placeholder">
+            <de><![CDATA[Suchbereiche]]></de>
+            <en><![CDATA[Search areas]]></en>
+        </locale>
+
     </groups>
 
     <!-- php + javascript locale -->
@@ -210,32 +216,32 @@
             <en><![CDATA[and Search]]></en>
         </locale>
         <locale name="tpl.search.field.name">
-            <de><![CDATA[In Namen suchen.]]></de>
-            <en><![CDATA[Search in names.]]></en>
+            <de><![CDATA[In Namen suchen]]></de>
+            <en><![CDATA[Search in names]]></en>
         </locale>
         <locale name="tpl.search.field.title">
-            <de><![CDATA[In Titeln suchen.]]></de>
-            <en><![CDATA[Search in titles.]]></en>
+            <de><![CDATA[In Titeln suchen]]></de>
+            <en><![CDATA[Search in titles]]></en>
         </locale>
         <locale name="tpl.search.field.short">
-            <de><![CDATA[In der Kurzbeschreibung suchen.]]></de>
-            <en><![CDATA[Search in short description.]]></en>
+            <de><![CDATA[In der Kurzbeschreibung suchen]]></de>
+            <en><![CDATA[Search in short description]]></en>
         </locale>
         <locale name="tpl.search.field.data">
-            <de><![CDATA[Im Inhalt suchen.]]></de>
+            <de><![CDATA[Im Inhalt suchen]]></de>
             <en><![CDATA[Search in the content]]></en>
         </locale>
-        <locale name="tpl.search.field.icon ">
-            <de><![CDATA[In Schwerpunkte suchen.]]></de>
+        <locale name="tpl.search.field.icon">
+            <de><![CDATA[In Schwerpunkte suchen]]></de>
             <en><![CDATA[]]></en>
         </locale>
         <locale name="tpl.search.field.datatype">
-            <de><![CDATA[Nach Seitentyp suchen.]]></de>
-            <en><![CDATA[Search as sitetypes.]]></en>
+            <de><![CDATA[Nach Seitentyp suchen]]></de>
+            <en><![CDATA[Search as sitetypes]]></en>
         </locale>
         <locale name="tpl.search.field.e_date">
-            <de><![CDATA[In Editierungsdatum suchen.]]></de>
-            <en><![CDATA[Search in edit date.]]></en>
+            <de><![CDATA[In Editierungsdatum suchen]]></de>
+            <en><![CDATA[Search in edit date]]></en>
         </locale>
         <locale name="tpl.search.pagination.inifinitescroll.btn">
             <de><![CDATA[Mehr Ergebnisse laden]]></de>
