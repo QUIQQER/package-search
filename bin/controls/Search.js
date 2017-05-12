@@ -108,7 +108,7 @@ define('package/quiqqer/search/bin/controls/Search', [
 
             this.Loader.show();
 
-            this.$parsePaginationControls().then(function () {
+            this.$initializePaginationControls().then(function () {
                 self.Loader.hide();
             });
         },
@@ -118,7 +118,7 @@ define('package/quiqqer/search/bin/controls/Search', [
          *
          * @return {Promise}
          */
-        $parsePaginationControls: function () {
+        $initializePaginationControls: function () {
             var self = this;
 
             this.$PaginationTopElm = this.$Elm.getElement(
@@ -139,7 +139,6 @@ define('package/quiqqer/search/bin/controls/Search', [
 
                     self.$PaginationTop.addEvent('change', self.$onPaginationChange);
                     self.$PaginationBottom.addEvent('change', self.$onPaginationChange);
-
 
                     self.$Elm.getElement(
                         '.quiqqer-search-pagination-top'
