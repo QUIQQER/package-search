@@ -62,7 +62,9 @@ class Search
     public function createQuicksearch(Project $Project)
     {
         $list = $Project->getSitesIds(array(
-            'active' => 1
+            'where' => array(
+                'active' => 1
+            )
         ));
 
         $Quicksearch = new Quicksearch();

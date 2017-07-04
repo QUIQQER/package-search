@@ -60,6 +60,7 @@ class Quicksearch
                 {$table}
             WHERE
                 data LIKE :search
+            GROUP BY siteId, urlParameter
         ";
 
         $selectQuery = "{$query} {$limit['limit']}";
