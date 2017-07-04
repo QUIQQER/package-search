@@ -40,9 +40,10 @@ define('package/quiqqer/search/bin/controls/Suggest', [
         ],
 
         options: {
-            name       : 'search',
-            placeholder: 'Search...',
-            delay      : 300
+            name          : 'search',
+            placeholder   : 'Search...',
+            delay         : 300,
+            fireClickEvent: false
         },
 
         initialize: function (options) {
@@ -274,13 +275,16 @@ define('package/quiqqer/search/bin/controls/Suggest', [
                         Target = Target.getParent('li');
                     }
 
-                    self.fireEvent('suggestionClick', [
-                        Target.getElement('.quiqqer-search-suggest-text').innerHTML,
-                        Target.get('data-url'),
-                        self
-                    ]);
+                    if (self.getAttribute('fireClickEvent')) {
+                        self.fireEvent('suggestionClick', [
+                            Target.getElement('.quiqqer-search-suggest-text').innerHTML,
+                            Target.get('data-url'),
+                            self
+                        ]);
+                        return;
+                    }
 
-                    //window.location = Target.get('data-url');
+                    window.location = Target.get('data-url');
                 }
             });
 
