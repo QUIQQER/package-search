@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiqqer>
+    <bricks>
+
+        <!-- search brick -->
+        <brick control="\QUI\Search\Bricks\Search">
+            <title>
+                <locale group="quiqqer/search"
+                        var="bricks.search.title"/>
+            </title>
+            <description>
+                <locale group="quiqqer/search"
+                        var="bricks.search.description"/>
+            </description>
+            <settings>
+
+                <setting name="resultSite" data-qui="controls/projects/project/site/Input">
+                    <locale group="quiqqer/search" var="bricks.search.resultSite"/>
+                </setting>
+                <setting name="suggestSearch" type="checkbox">
+                    <locale group="quiqqer/search" var="bricks.search.suggestSearch"/>
+                </setting>
+
+            </settings>
+        </brick>
+
+    </bricks>
+</quiqqer>

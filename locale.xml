@@ -107,6 +107,28 @@
             <de><![CDATA[Suchvorschläge anzeigen - Klick auf Suchvorschlag sucht nach Vorschlagstext]]></de>
             <en><![CDATA[Show search suggestions - Click on a suggestion searches for suggestions text]]></en>
         </locale>
+
+        <!-- search brick -->
+        <locale name="bricks.search.title">
+            <de><![CDATA[Suche: Suchfeld]]></de>
+            <en><![CDATA[Search: Input search]]></en>
+            <pl><![CDATA[Search: Pole wyszukiwania]]></pl>
+        </locale>
+        <locale name="bricks.search.description">
+            <de><![CDATA[Erstellt einen Suchbaustein.]]></de>
+            <en><![CDATA[Create a search brick]]></en>
+            <pl><![CDATA[Umożliwia umieszczenie wyszukiwarki w dowolnym miejscu.]]></pl>
+        </locale>
+        <locale name="bricks.search.resultsSite">
+            <de><![CDATA[Ergebnisse]]></de>
+            <en><![CDATA[Results site]]></en>
+            <pl><![CDATA[Strona z wynikami]]></pl>
+        </locale>
+        <locale name="bricks.search.suggestSearch" html="true">
+            <de><![CDATA[Vorschläge beim Eintippen anzeigen? <br/>(Suggest search)]]></de>
+            <en><![CDATA[Use suggest search?]]></en>
+            <pl><![CDATA[Podpowiedzi podczas wpisywania? <br/>(Suggest search)]]></pl>
+        </locale>
     </groups>
 
     <!-- php locale -->

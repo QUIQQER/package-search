@@ -62,6 +62,7 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
          * Event: onImport
          */
         $onImport: function () {
+            console.log(1)
             var self = this;
 
             this.$Elm = this.getElm();

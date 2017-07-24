@@ -1,0 +1,22 @@
+{if $this->getAttribute('showTitle') && $this->getAttribute('frontendTitle')}
+<header class="control-header">
+    <h1>{$this->getAttribute('frontendTitle')}</h1>
+</header>
+{/if}
+
+{if $this->getAttribute('content') != ""}
+<div class="control-content">
+    {$this->getAttribute('content')}
+</div>
+{/if}
+
+
+<div class="quiqqer-suggestSearch control-color">
+    <div class="quiqqer-suggestSearch-wrapper">
+        <form action="{$resultSite}">
+            <input type="search" data-qui="{$suggestSearch}"
+                   placeholder="Suchbegriff eintippen"/>
+            <span class="fa fa-search control-color"></span>
+        </form>
+    </div>
+</div>
