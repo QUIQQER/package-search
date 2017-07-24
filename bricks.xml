@@ -14,7 +14,7 @@
             </description>
             <settings>
 
-                <setting name="resultSite" data-qui="controls/projects/project/site/Input">
+                <setting name="resultSite" class="project-site">
                     <locale group="quiqqer/search" var="bricks.search.resultSite"/>
                 </setting>
                 <setting name="suggestSearch" type="checkbox">

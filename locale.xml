@@ -119,7 +119,7 @@
             <en><![CDATA[Create a search brick]]></en>
             <pl><![CDATA[Umożliwia umieszczenie wyszukiwarki w dowolnym miejscu.]]></pl>
         </locale>
-        <locale name="bricks.search.resultsSite">
+        <locale name="bricks.search.resultSite">
             <de><![CDATA[Ergebnisse]]></de>
             <en><![CDATA[Results site]]></en>
             <pl><![CDATA[Strona z wynikami]]></pl>
@@ -128,6 +128,16 @@
             <de><![CDATA[Vorschläge beim Eintippen anzeigen? <br/>(Suggest search)]]></de>
             <en><![CDATA[Use suggest search?]]></en>
             <pl><![CDATA[Podpowiedzi podczas wpisywania? <br/>(Suggest search)]]></pl>
+        </locale>
+        <locale name="bricks.search.placeholder">
+            <de><![CDATA[Suchbegriff eingeben]]></de>
+            <en><![CDATA[Enter your search term]]></en>
+            <pl><![CDATA[Wpisz zapytanie]]></pl>
+        </locale>
+        <locale name="bricks.search.button.value">
+            <de><![CDATA[Suchen]]></de>
+            <en><![CDATA[Search]]></en>
+            <pl><![CDATA[Szukaj]]></pl>
         </locale>
     </groups>
 

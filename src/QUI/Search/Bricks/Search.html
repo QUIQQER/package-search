@@ -12,11 +12,12 @@
 
 
 <div class="quiqqer-suggestSearch control-color">
-    <div class="quiqqer-suggestSearch-wrapper">
-        <form action="{$resultSite}">
+    <form action="{$resultSite}" method="get">
+        <div class="quiqqer-suggestSearch-wrapper">
             <input type="search" data-qui="{$suggestSearch}"
-                   placeholder="Suchbegriff eintippen"/>
+                   placeholder="{locale group='quiqqer/search' var='bricks.search.placeholder'}" name="search"/>
             <span class="fa fa-search control-color"></span>
-        </form>
-    </div>
+            <input type="submit" value="{locale group='quiqqer/search' var='bricks.search.button.value'}" class="quiqqer-suggestSearch-submit" />
+        </div>
+    </form>
 </div>
