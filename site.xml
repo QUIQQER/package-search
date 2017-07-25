@@ -57,6 +57,13 @@
                             <text>
                                 <locale group="quiqqer/sitetypes" var="list.template" />
                             </text>
+
+                            <option value="standardSearch">
+                                <locale group="quiqqer/search" var="search.listTemplate.standardSearch"/>
+                            </option>
+                            <option value="cardRows">
+                                <locale group="quiqqer/sitetypes" var="list.template.cardRows"/>
+                            </option>
                             <option value="childrenList">
                                 <locale group="quiqqer/sitetypes" var="list.template.childrenList" />
                             </option>

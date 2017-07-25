@@ -1,5 +1,10 @@
 @CHARSET "UTF-8";
 
+.qui-control-childrenlist-default {
+    clear: both;
+    float: none;
+}
+
 .qui-control-childrenlist-default-entry {
     clear: both;
     float: left;
@@ -16,6 +21,31 @@
     padding: 0;
     text-align: center;
 }
+
+.qui-control-childrenlist-default-entry-image a {
+    height: 100%;
+    display: block;
+    color: inherit;
+}
+
+.qui-control-childrenlist-default-entry-image img {
+    max-height: 100%;
+}
+
+/* vertical align fontawesome icon */
+.qui-control-childrenlist-default-entry-image .fa:after {
+    content: '';
+    vertical-align: middle;
+    height: 100%;
+    display: inline-block;
+    width: 0;
+}
+
+.qui-control-childrenlist-default-entry-image .fa {
+    font-size: 120px;
+    height: 100%;
+}
+
 
 .qui-control-childrenlist-default-entry-content-headerLink,
 .qui-control-childrenlist-default-entry-content-headerLink:hover {
@@ -126,8 +156,12 @@
         /*padding: 40px 0;*/
     }
 
+    .qui-control-childrenlist-longFooter-entry:first-of-type {
+        margin-top: 60px;
+    }
+
     .qui-control-childrenlist-default-entry-image {
-        max-height: 300px;
+        max-height: initial;
         margin-bottom: 20px;
     }
 

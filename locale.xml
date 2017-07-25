@@ -205,6 +205,12 @@
             <en><![CDATA[Modern list without picture]]></en>
             <pl><![CDATA[Nowoczesna lista bez obrazków]]></pl>
         </locale>
+        <locale name="search.listTemplate.standardSearch">
+            <de><![CDATA[Standard Liste (von search)]]></de>
+            <en><![CDATA[Standard list (from search)]]></en>
+            <pl><![CDATA[Standardowa lista (z pakietu search)]]></pl>
+        </locale>
+
 
         <!-- result type settings -->
         <locale name="quiqqer.search.results.settings.title">
