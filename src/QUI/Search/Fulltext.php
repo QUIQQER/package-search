@@ -428,6 +428,17 @@ class Fulltext extends QUI\QDOM
         $urlParameter = json_encode($siteParams);
         $siteId       = (int)$siteId;
 
+        // cannot set entry for inactive sites!
+        try {
+            $Site = $Project->get($siteId);
+
+            if (!$Site->getAttribute('active')) {
+                return;
+            }
+        } catch (\Exception $Exception) {
+            return;
+        }
+
         try {
             $data = self::getEntry($Project, $siteId, $siteParams);
 

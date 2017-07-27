@@ -216,6 +216,17 @@ class Quicksearch
             return;
         }
 
+        // cannot set entry for inactive sites!
+        try {
+            $Site = $Project->get($siteId);
+
+            if (!$Site->getAttribute('active')) {
+                return;
+            }
+        } catch (\Exception $Exception) {
+            return;
+        }
+
         $urlParameter = json_encode($siteParams);
 //        $data         = QUI::getPDO()->quote($data);
 
