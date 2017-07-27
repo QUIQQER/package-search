@@ -17,9 +17,8 @@
         {/if}
     </noscript>
 
-    {if $paginationType == 'pagination'}
-    <div class="quiqqer-search-pagination quiqqer-search-pagination-top"
-         style="display: none;">
+    {if $paginationType == 'pagination' && $sheets > 1}
+    <div class="quiqqer-search-pagination quiqqer-search-pagination-top">
         {$PaginationAsync->create()}
     </div>
     {/if}
@@ -28,9 +27,8 @@
         {$ChildrenList->create()}
     </div>
 
-    {if $paginationType == 'pagination'}
-    <div class="quiqqer-search-pagination quiqqer-search-pagination-bottom"
-         style="display: none;">
+    {if $paginationType == 'pagination' && $sheets > 1}
+    <div class="quiqqer-search-pagination quiqqer-search-pagination-bottom">
         {$PaginationAsync->create()}
     </div>
     {/if}
