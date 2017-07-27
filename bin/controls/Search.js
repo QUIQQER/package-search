@@ -59,22 +59,23 @@ define('package/quiqqer/search/bin/controls/Search', [
         initialize: function (options) {
             this.parent(options);
 
-            this.$Elm                 = null;
-            this.$Results             = null;
-            this.$PaginationTop       = null;
-            this.$PaginationTopElm    = null;
-            this.$PaginationBottom    = null;
-            this.$PaginationBottomElm = null;
-            this.$ResultCountElm      = null;
-            this.$SearchParams        = {};
-            this.$searchTerms         = [];
-            this.Loader               = new QUILoader();
-            this.$lockPagination      = false;
-            this.$MoreBtn             = null;
-            this.$moreBtnClicked      = 0;
-            this.$loadingMore         = false;
-            this.$moreBtnVisible      = false;
-            this.$extensions          = []; // search extension controls
+            this.$Elm                   = null;
+            this.$Results               = null;
+            this.$PaginationTop         = null;
+            this.$PaginationTopElm      = null;
+            this.$PaginationBottom      = null;
+            this.$PaginationBottomElm   = null;
+            this.$paginationInitialized = false;
+            this.$ResultCountElm        = null;
+            this.$SearchParams          = {};
+            this.$searchTerms           = [];
+            this.Loader                 = new QUILoader();
+            this.$lockPagination        = false;
+            this.$MoreBtn               = null;
+            this.$moreBtnClicked        = 0;
+            this.$loadingMore           = false;
+            this.$moreBtnVisible        = false;
+            this.$extensions            = []; // search extension controls
 
             this.addEvents({
                 onImport: this.$onImport
@@ -109,6 +110,8 @@ define('package/quiqqer/search/bin/controls/Search', [
             this.Loader.show();
 
             this.$initializePaginationControls().then(function () {
+                self.Loader.hide();
+            }, function () {
                 self.Loader.hide();
             });
         },
@@ -152,6 +155,8 @@ define('package/quiqqer/search/bin/controls/Search', [
                     if (!self.getAttribute('resultcount')) {
                         self.$hidePagination();
                     }
+
+                    self.$paginationInitialized = true;
 
                     resolve();
                 }, reject);
@@ -454,11 +459,11 @@ define('package/quiqqer/search/bin/controls/Search', [
 
                         resolve(SearchResult);
                     }, {
-                        'package'       : 'quiqqer/search',
-                        searchParams    : JSON.encode(self.$SearchParams),
-                        project         : JSON.encode(QUIQQER_PROJECT),
-                        siteId          : QUIQQER_SITE.id,
-                        onError         : reject
+                        'package'   : 'quiqqer/search',
+                        searchParams: JSON.encode(self.$SearchParams),
+                        project     : JSON.encode(QUIQQER_PROJECT),
+                        siteId      : QUIQQER_SITE.id,
+                        onError     : reject
                     }
                 )
             });
@@ -507,16 +512,20 @@ define('package/quiqqer/search/bin/controls/Search', [
          * Hide Pagination controls
          */
         $hidePagination: function () {
-            this.$PaginationTopElm.setStyle('display', 'none');
-            this.$PaginationBottomElm.setStyle('display', 'none');
+            if (this.$paginationInitialized) {
+                this.$PaginationTopElm.setStyle('display', 'none');
+                this.$PaginationBottomElm.setStyle('display', 'none');
+            }
         },
 
         /**
          * Show Pagination controls
          */
         $showPagination: function () {
-            this.$PaginationTopElm.setStyle('display', '');
-            this.$PaginationBottomElm.setStyle('display', '');
+            if (this.$paginationInitialized) {
+                this.$PaginationTopElm.setStyle('display', '');
+                this.$PaginationBottomElm.setStyle('display', '');
+            }
         },
 
         /**
@@ -547,15 +556,17 @@ define('package/quiqqer/search/bin/controls/Search', [
             } else {
                 this.$Results.set('html', SearchResult.childrenListHtml);
 
-                if (!SearchResult.count) {
-                    this.$hidePagination();
-                } else {
-                    this.$showPagination();
+                if (this.$paginationInitialized) {
+                    if (!SearchResult.count) {
+                        this.$hidePagination();
+                    } else {
+                        this.$showPagination();
 
-                    this.$lockPagination = true;
-                    this.$PaginationTop.setPageCount(SearchResult.sheets);
-                    this.$PaginationBottom.setPageCount(SearchResult.sheets);
-                    this.$lockPagination = false;
+                        this.$lockPagination = true;
+                        this.$PaginationTop.setPageCount(SearchResult.sheets);
+                        this.$PaginationBottom.setPageCount(SearchResult.sheets);
+                        this.$lockPagination = false;
+                    }
                 }
             }
 

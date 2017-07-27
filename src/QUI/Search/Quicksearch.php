@@ -16,11 +16,26 @@ use QUI\Utils\Security\Orthos;
  *
  * @author www.pcsg.de (Henning Leutz)
  */
-class Quicksearch
+class Quicksearch extends QUI\QDOM
 {
     /**
      * Search
      */
+
+    /**
+     * Constructor
+     *
+     * @param array $params - Attributes
+     */
+    public function __construct($params = array())
+    {
+        // defaults
+        $this->setAttributes(array(
+            'siteTypes' => false   // restrict search to certain site types
+        ));
+
+        $this->setAttributes($params);
+    }
 
     /**
      * Search something in a project
@@ -53,6 +68,34 @@ class Quicksearch
 
         $search = '%' . $str . '%';
         $limit  = QUI\Database\DB::createQueryLimit($params['limit']);
+        $binds  = array();
+
+        // restrict search to certain site types
+        $siteTypes      = $this->getAttribute('siteTypes');
+        $siteTypesQuery = '';
+
+        if ($siteTypes) {
+            if (!is_array($siteTypes)) {
+                $siteTypes = array($siteTypes);
+            }
+
+            $siteTypesQuery = ' AND (';
+
+            for ($i = 0, $len = count($siteTypes); $i < $len; $i++) {
+                $siteTypesQuery .= ' siteType LIKE :type' . $i;
+
+                if ($len - 1 > $i) {
+                    $siteTypesQuery .= ' OR ';
+                }
+
+                $binds['type' . $i] = array(
+                    'value' => $siteTypes[$i],
+                    'type'  => \PDO::PARAM_STR
+                );
+            }
+
+            $siteTypesQuery .= ' )';
+        }
 
         $query = "
             SELECT id, siteId, urlParameter, data, rights, icon
@@ -60,7 +103,8 @@ class Quicksearch
                 {$table}
             WHERE
                 data LIKE :search
-            GROUP BY siteId, urlParameter
+                {$siteTypesQuery}
+            GROUP BY siteId, urlParameter, id
         ";
 
         $selectQuery = "{$query} {$limit['limit']}";
@@ -73,6 +117,10 @@ class Quicksearch
         // search
         $Statement = $PDO->prepare($selectQuery);
         $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
+
+        foreach ($binds as $placeholder => $bind) {
+            $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
+        }
 
         if (isset($limit['prepare'][':limit1'])) {
             $Statement->bindValue(
@@ -110,6 +158,11 @@ class Quicksearch
         // count
         $Statement = $PDO->prepare($countQuery);
         $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
+
+        foreach ($binds as $placeholder => $bind) {
+            $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
+        }
+
         $Statement->execute();
 
         $count = $Statement->fetchAll(\PDO::FETCH_ASSOC);
@@ -154,6 +207,17 @@ class Quicksearch
             return;
         }
 
+        // cannot set entry for inactive sites!
+        try {
+            $Site = $Project->get($siteId);
+
+            if (!$Site->getAttribute('active')) {
+                return;
+            }
+        } catch (\Exception $Exception) {
+            return;
+        }
+
         // clear the entries
         self::removeEntries($Project, $siteId);
 
@@ -177,7 +241,8 @@ class Quicksearch
             QUI::getDataBase()->insert($table, array(
                 'siteId'       => $siteId,
                 'urlParameter' => $urlParameter,
-                'data'         => Orthos::clearMySQL($dataEntry, false)
+                'data'         => Orthos::clearMySQL($dataEntry, false),
+                'siteType'     => $Site->getAttribute('type')
             ));
         }
 
@@ -236,8 +301,9 @@ class Quicksearch
             QUI::getDataBase()->update(
                 $table,
                 array(
-                    'rights' => null, // @todo auf was richtiges setzen, wenn der parameter implementiert wird
-                    'icon'   => null  // @todo auf was richtiges setzen, wenn der parameter implementiert wird
+                    'rights'   => null, // @todo auf was richtiges setzen, wenn der parameter implementiert wird
+                    'icon'     => null,  // @todo auf was richtiges setzen, wenn der parameter implementiert wird
+                    'siteType' => $Site->getAttribute('type')
                 ),
                 array(
                     'siteId'       => $siteId,
@@ -252,7 +318,8 @@ class Quicksearch
         QUI::getDataBase()->insert($table, array(
             'siteId'       => $siteId,
             'urlParameter' => $urlParameter,
-            'data'         => $data
+            'data'         => $data,
+            'siteType'     => $Site->getAttribute('type')
         ));
     }
 

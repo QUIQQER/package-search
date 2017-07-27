@@ -236,6 +236,7 @@ define('package/quiqqer/search/bin/controls/Suggest', [
                 QUIAjax.get('package_quiqqer_search_ajax_suggest', resolve, {
                     'package': 'quiqqer/search',
                     project  : JSON.encode(QUIQQER_PROJECT),
+                    siteId   : QUIQQER_SITE.id,
                     search   : search
                 });
             }.bind(this));

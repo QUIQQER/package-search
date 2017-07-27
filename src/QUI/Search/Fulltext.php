@@ -37,7 +37,7 @@ class Fulltext extends QUI\QDOM
             'fields'           => false,   // array list of fields
             'fieldConstraints' => array(), // restrict certain search fields to specific values
             'searchtype'       => 'OR',    // search type: OR / AND
-            'datatypes'        => false,   // only for some site types, can be an array,
+            'datatypes'        => false,   // restrict search to certain site types
             'relevanceSearch'  => true     // use relevance search (if search string has minimum length)
         ));
 
@@ -161,7 +161,7 @@ class Fulltext extends QUI\QDOM
 
         $relevanceMatch = implode(' + ', $relevanceMatch);
 
-        // site types
+        // restrict search to certain site types
         $datatypes     = $this->getAttribute('datatypes');
         $datatypeQuery = '';
 
@@ -309,6 +309,7 @@ class Fulltext extends QUI\QDOM
             WHERE
                 ({$where})
                 {$whereFieldConstraints}
+                {$datatypeQuery}
             GROUP BY
                 urlParameter,siteId,e_date,{$selectedFields}
             ORDER BY
@@ -479,6 +480,8 @@ class Fulltext extends QUI\QDOM
             $data[$field] = $params[$field];
         }
 
+        $data['datatype'] = $Site->getAttribute('type');
+
         QUI::getDataBase()->update($table, $data, array(
             'siteId'       => (int)$siteId,
             'urlParameter' => $urlParameter
@@ -499,6 +502,17 @@ class Fulltext extends QUI\QDOM
         $data = '',
         $siteParams = array()
     ) {
+        // cannot set entry for inactive sites!
+        try {
+            $Site = $Project->get($siteId);
+
+            if (!$Site->getAttribute('active')) {
+                return;
+            }
+        } catch (\Exception $Exception) {
+            return;
+        }
+
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_FULL,
             $Project
@@ -611,6 +625,7 @@ class Fulltext extends QUI\QDOM
                 $Fulltext->setEntry($Project, $siteId, array(
                     'name'     => $Site->getAttribute('name'),
                     'title'    => $Site->getAttribute('title'),
+                    'siteType' => $Site->getAttribute('type'),
                     'short'    => $Site->getAttribute('short'),
                     'data'     => $Site->getAttribute('content'),
                     'datatype' => $Site->getAttribute('type'),

@@ -90,8 +90,7 @@ class Search
                 }
 
                 $Quicksearch->setEntries($Project, $siteId, array(
-                    $Site->getAttribute('name'),
-                    $Site->getAttribute('title')
+                    $Site->getAttribute('name') . ' ' . $Site->getAttribute('title'),
                 ));
             } catch (QUI\Exception $Exception) {
                 Log::writeException($Exception);

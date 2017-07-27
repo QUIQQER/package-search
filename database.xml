@@ -12,6 +12,7 @@
             <field type="text NULL">data</field>
             <field type="text NULL">rights</field>
             <field type="varchar(255) NULL">icon</field>
+            <field type="varchar(255) NULL">siteType</field>
 
             <auto_increment>id</auto_increment>
             <primary>id</primary>

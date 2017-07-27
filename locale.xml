@@ -107,6 +107,10 @@
             <de><![CDATA[Suchvorschläge anzeigen - Klick auf Suchvorschlag sucht nach Vorschlagstext]]></de>
             <en><![CDATA[Show search suggestions - Click on a suggestion searches for suggestions text]]></en>
         </locale>
+        <locale name="quiqqer.search.sitetypes.search.filter">
+            <de><![CDATA[Suche auf bestimmte Seiten-Typen beschränken]]></de>
+            <en><![CDATA[Restrict search to certain site types]]></en>
+        </locale>
 
         <!-- search brick -->
         <locale name="bricks.search.title">

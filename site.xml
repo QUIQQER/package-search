@@ -43,6 +43,7 @@
                 <attribute default="1">quiqqer.settings.sitetypes.list.showDate</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showImages</attribute>
                 <attribute default="off">quiqqer.search.sitetypes.search.suggestSearch</attribute>
+                <attribute>quiqqer.settings.search.sitetypes.filter</attribute>
             </attributes>
 
             <!-- list settings -->
@@ -114,6 +115,13 @@
                                 <locale group="quiqqer/search" var="search.suggestSearch.option.clicktosearch" />
                             </option>
                         </select>
+
+                        <input conf="quiqqer.settings.search.sitetypes.filter" type="text" data-qui="package/quiqqer/search/bin/controls/settings/SiteTypeFilter">
+                            <text>
+                                <locale group="quiqqer/search"
+                                        var="quiqqer.search.sitetypes.search.filter" />
+                            </text>
+                        </input>
 
                         <input conf="quiqqer.settings.sitetypes.list.showCreator" type="checkbox">
                             <text>

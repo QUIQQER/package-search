@@ -200,7 +200,6 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
 
             // search fields
             if (this.$SearchFieldSelect) {
-                console.log(this.$SearchFieldSelect.getValue());
                 SearchParams.searchFields = this.$SearchFieldSelect.getValue();
             } else {
                 var settingInputs = this.$SettingsElm.getElements(

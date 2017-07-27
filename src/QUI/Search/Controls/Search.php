@@ -24,10 +24,10 @@ use QUI\Rating\Handler as RatingHandler;
  */
 class Search extends QUI\Control
 {
-    const SEARCH_TYPE_OR = 'OR';
+    const SEARCH_TYPE_OR  = 'OR';
     const SEARCH_TYPE_AND = 'AND';
 
-    const PAGINATION_TYPE_PAGINATION = 'pagination';
+    const PAGINATION_TYPE_PAGINATION      = 'pagination';
     const PAGINATION_TYPE_INIFINITESCROLL = 'infinitescroll';
 
     /**
@@ -61,14 +61,19 @@ class Search extends QUI\Control
         }
 
         $this->setAttributes(array(
-            'search'               => '', // search term
+            'search'               => '',
+            // search term
             'searchType'           => $this::SEARCH_TYPE_OR,
             'max'                  => $this->Site->getAttribute('quiqqer.settings.search.list.max') ?: 10,
             'searchFields'         => $this->getDefaultSearchFields(),
             'fieldConstraints'     => array(),
+            // restrict search to certain site types
+            'datatypes'            => array(),
             'sheet'                => 1,
-            'paginationType'       => false,// "pagination" or "infinitescroll" (determined by getPaginationType())
-            'relevanceSearch'      => true,          // use Fulltext relevance search
+            // "pagination" or "infinitescroll" (determined by getPaginationType())
+            'paginationType'       => false,
+            // use Fulltext relevance search
+            'relevanceSearch'      => true,
             'childrenListTemplate' => dirname(__FILE__, 5) . '/templates/SearchResultList.html',
             'childrenListCss'      => dirname(__FILE__, 5) . '/templates/SearchResultList.css'
         ));
@@ -105,13 +110,26 @@ class Search extends QUI\Control
         $sheet    = $this->getAttribute('sheet');
         $children = array();
 
+        $siteTypesFilter = $this->getAttribute('datatypes');
+
+        if (empty($siteTypesFilter)) {
+            $siteTypesFilter = $this->Site->getAttribute('quiqqer.settings.search.sitetypes.filter');
+
+            if (!empty($siteTypesFilter)) {
+                $siteTypesFilter = explode(';', $siteTypesFilter);
+            } else {
+                $siteTypesFilter = array();
+            }
+        }
+
         $FulltextSearch = new Fulltext(array(
             'limit'            => (($sheet - 1) * $max) . ',' . $max,
             'fields'           => $this->getAttribute('searchFields'),
             'fieldConstraints' => $this->getAttribute('fieldConstraints'),
             'searchtype'       => $this->getAttribute('searchType'),
             'Project'          => $this->Site->getProject(),
-            'relevanceSearch'  => $this->getAttribute('relevanceSearch')
+            'relevanceSearch'  => $this->getAttribute('relevanceSearch'),
+            'datatypes'        => $siteTypesFilter
         ));
 
         $result = $FulltextSearch->search($search);
@@ -171,23 +189,23 @@ class Search extends QUI\Control
         $searchResult = $this->search();
 
         $params = array(
-            'showTitle'      => false,
-            'Site'           => $this->Site,
-            'limit'          => $searchResult['max'],
-            'showDate'       => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showDate'),
-            'showCreator'    => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showCreator'),
-            'showTime'       => true,
-            'showSheets'     => false,
-            'showImages'     => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showImages'),
-            'showShort'      => true,
-            'showHeader'     => true,
-            'showContent'    => false,
-            'itemtype'       => 'http://schema.org/ItemList',
-            'child-itemtype' => 'http://schema.org/ListItem',
-            'display'        => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.template'),
-            'children'       => $searchResult['children']
+            'showTitle'                  => false,
+            'Site'                       => $this->Site,
+            'limit'                      => $searchResult['max'],
+            'showDate'                   => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showDate'),
+            'showCreator'                => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showCreator'),
+            'showTime'                   => true,
+            'showSheets'                 => false,
+            'showImages'                 => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showImages'),
+            'showShort'                  => true,
+            'showHeader'                 => true,
+            'showContent'                => false,
+            'itemtype'                   => 'http://schema.org/ItemList',
+            'child-itemtype'             => 'http://schema.org/ListItem',
+            'display'                    => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.template'),
+            'children'                   => $searchResult['children'],
+            'loadAllChildrenOnEmptyList' => false
         );
-
 
         if (!$this->Site->getAttribute('quiqqer.settings.sitetypes.list.template')) {
             if ($this->getAttribute('childrenListTemplate')) {
