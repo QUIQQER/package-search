@@ -39,7 +39,7 @@ QUI::$Ajax->registerFunction(
 
             $list .= '</div>';
             $list .= '<div class="quiqqer-search-suggest-text">';
-            $list .= $entry['data'];
+            $list .= $Site->getAttribute('title');
             $list .= '</div>';
             $list .= '</li>';
         }

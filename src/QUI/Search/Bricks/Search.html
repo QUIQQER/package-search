@@ -1,0 +1,23 @@
+{if $this->getAttribute('showTitle') && $this->getAttribute('frontendTitle')}
+<header class="control-header">
+    <h1>{$this->getAttribute('frontendTitle')}</h1>
+</header>
+{/if}
+
+{if $this->getAttribute('content') != ""}
+<div class="control-content">
+    {$this->getAttribute('content')}
+</div>
+{/if}
+
+
+<div class="quiqqer-suggestSearch control-color">
+    <form action="{$resultSite}" method="get">
+        <div class="quiqqer-suggestSearch-wrapper">
+            <input type="search" data-qui="{$suggestSearch}"
+                   placeholder="{locale group='quiqqer/search' var='bricks.search.placeholder'}" name="search"/>
+            <span class="fa fa-search control-color"></span>
+            <input type="submit" value="{locale group='quiqqer/search' var='bricks.search.button.value'}" class="quiqqer-suggestSearch-submit" />
+        </div>
+    </form>
+</div>

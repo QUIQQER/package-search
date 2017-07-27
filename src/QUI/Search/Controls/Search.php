@@ -24,10 +24,10 @@ use QUI\Rating\Handler as RatingHandler;
  */
 class Search extends QUI\Control
 {
-    const SEARCH_TYPE_OR  = 'OR';
+    const SEARCH_TYPE_OR = 'OR';
     const SEARCH_TYPE_AND = 'AND';
 
-    const PAGINATION_TYPE_PAGINATION      = 'pagination';
+    const PAGINATION_TYPE_PAGINATION = 'pagination';
     const PAGINATION_TYPE_INIFINITESCROLL = 'infinitescroll';
 
     /**
@@ -188,12 +188,20 @@ class Search extends QUI\Control
             'children'       => $searchResult['children']
         );
 
-        if ($this->getAttribute('childrenListTemplate')) {
-            $params['displayTemplate'] = $this->getAttribute('childrenListTemplate');
+
+        if (!$this->Site->getAttribute('quiqqer.settings.sitetypes.list.template')) {
+            if ($this->getAttribute('childrenListTemplate')) {
+                $params['displayTemplate'] = $this->getAttribute('childrenListTemplate');
+            }
+
+            if ($this->getAttribute('childrenListCss')) {
+                $params['displayCss'] = $this->getAttribute('childrenListCss');
+            }
         }
 
-        if ($this->getAttribute('childrenListCss')) {
-            $params['displayCss'] = $this->getAttribute('childrenListCss');
+        if ($this->Site->getAttribute('quiqqer.settings.sitetypes.list.template') == 'standardSearch') {
+            $params['displayTemplate'] = $this->getAttribute('childrenListTemplate');
+            $params['displayCss']      = $this->getAttribute('childrenListCss');
         }
 
         $childrenListAttributes = $this->getAttribute('childrenListAttributes');
@@ -429,7 +437,8 @@ class Search extends QUI\Control
                         }
 
                         if (!is_array($constraint)
-                            && !is_string($constraint)) {
+                            && !is_string($constraint)
+                        ) {
                             continue;
                         }
 
