@@ -39,7 +39,7 @@
                 <attribute>quiqqer.settings.search.list.hideSettings</attribute>
                 <attribute>quiqqer.settings.search.list.fields</attribute>
                 <attribute>quiqqer.settings.search.list.fields.selected</attribute>
-                <attribute default="1">quiqqer.settings.sitetypes.list.showCreator</attribute>
+                <attribute default="0">quiqqer.settings.sitetypes.list.showCreator</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showDate</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showImages</attribute>
                 <attribute default="off">quiqqer.search.sitetypes.search.suggestSearch</attribute>
