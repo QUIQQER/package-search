@@ -143,6 +143,24 @@
             <en><![CDATA[Search]]></en>
             <pl><![CDATA[Szukaj]]></pl>
         </locale>
+
+        <!-- cron.xml -->
+        <locale name="cron.title">
+            <de><![CDATA[Such-Datenbank aufbauen]]></de>
+            <en><![CDATA[Build search database]]></en>
+        </locale>
+        <locale name="cron.description">
+            <de><![CDATA[Parst alle aktiven Seiten und fügt die relevanten Information zur Volltext- und Schnellsuch-Datenbank hinzu]]></de>
+            <en><![CDATA[Parses active sites and adds relevant data to the fulltext and quicksearch database]]></en>
+        </locale>
+        <locale name="cron.param.project">
+            <de><![CDATA[Projekt-Titel]]></de>
+            <en><![CDATA[Project title]]></en>
+        </locale>
+        <locale name="cron.param.lang">
+            <de><![CDATA[Projekt-Sprache]]></de>
+            <en><![CDATA[Project language]]></en>
+        </locale>
     </groups>
 
     <!-- php locale -->

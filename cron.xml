@@ -2,16 +2,20 @@
 <crons>
 
     <cron exec="\QUI\Search\Cron::createSearchDatabase">
-        <title>Search Datenbank aufbauen</title>
-        <description></description>
+        <title>
+            <locale group="quiqqer/search" var="cron.title" />
+        </title>
+        <description>
+            <locale group="quiqqer/search" var="cron.description" />
+        </description>
 
         <!-- available params -->
         <params>
             <param name="project">
-                <locale group="" value="" />
+                <locale group="quiqqer/search" var="cron.param.project" />
             </param>
             <param name="lang">
-                <locale group="" value="" />
+                <locale group="quiqqer/search" var="cron.param.lang" />
             </param>
         </params>
     </cron>
