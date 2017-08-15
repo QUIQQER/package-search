@@ -66,7 +66,7 @@ class Quicksearch extends QUI\QDOM
             $params['limit'] = 10;
         }
 
-        $search = '%' . $str . '%';
+        $search = '%'.$str.'%';
         $limit  = QUI\Database\DB::createQueryLimit($params['limit']);
         $binds  = array();
 
@@ -82,13 +82,13 @@ class Quicksearch extends QUI\QDOM
             $siteTypesQuery = ' AND (';
 
             for ($i = 0, $len = count($siteTypes); $i < $len; $i++) {
-                $siteTypesQuery .= ' siteType LIKE :type' . $i;
+                $siteTypesQuery .= ' siteType LIKE :type'.$i;
 
                 if ($len - 1 > $i) {
                     $siteTypesQuery .= ' OR ';
                 }
 
-                $binds['type' . $i] = array(
+                $binds['type'.$i] = array(
                     'value' => $siteTypes[$i],
                     'type'  => \PDO::PARAM_STR
                 );
@@ -97,8 +97,21 @@ class Quicksearch extends QUI\QDOM
             $siteTypesQuery .= ' )';
         }
 
-        $query = "
-            SELECT id, siteId, urlParameter, data, rights, icon
+        if (version_compare(QUI::getDataBase()->getVersion(), '5.7.0')) {
+            $query = "
+                SELECT ANY_VALUE(id) AS id, 
+                    siteId, 
+                    urlParameter, 
+                    ANY_VALUE(data) AS data, 
+                    ANY_VALUE(rights) AS rights, 
+                    ANY_VALUE(icon) AS icon
+            ";
+        } else {
+            $query = "SELECT id, siteId, urlParameter, data, rights, icon";
+        }
+
+
+        $query .= "
             FROM
                 {$table}
             WHERE
@@ -119,7 +132,7 @@ class Quicksearch extends QUI\QDOM
         $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
 
         foreach ($binds as $placeholder => $bind) {
-            $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
+            $Statement->bindValue(':'.$placeholder, $bind['value'], $bind['type']);
         }
 
         if (isset($limit['prepare'][':limit1'])) {
@@ -160,7 +173,7 @@ class Quicksearch extends QUI\QDOM
         $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
 
         foreach ($binds as $placeholder => $bind) {
-            $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
+            $Statement->bindValue(':'.$placeholder, $bind['value'], $bind['type']);
         }
 
         $Statement->execute();
