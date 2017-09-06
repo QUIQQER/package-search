@@ -1,7 +1,7 @@
 {
   "name": "quiqqer/search",
   "type": "quiqqer-module",
-  "description": "Extra Search - provided extra Search functionality. Not the standard search. Search Package provieded an extra API and support MATCH searches.",
+  "description": "The package provides an advanced search for QUIQQER. Search your projects through a relevancy search.",
   "version": "dev-dev",
   "authors": [
     {

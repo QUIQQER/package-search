@@ -20,14 +20,10 @@
         </locale>
         <locale name="package.description">
             <de><![CDATA[
-            Die Erweiterte Suche bringt eine umfangreiche Volltexte-Suche mit.
-            Sie ist durch andere Module flexibel erweiterbar und dient so als Ausgangspunkt für alle Suchfunktionen im QUIQQER Frontend.
-            Neben der Volltextsuche liefert sie auch Bausteine zur Einbindung einer Schnellsuche (Sugguest-Search).
+            Das Paket stellt eine erweiterte Suche für QUIQQER zur Verfügung. Durchsuchen Sie Ihre Projekte über eine Relevanzssuche.
             ]]></de>
             <en><![CDATA[
-            The Advanced Search includes a comprehensive full-text search.
-            It is flexibly expandable by other modules and thus serves as the starting point for all search functions in the QUIQQER front end.
-            In addition to full-text search, it also provides building blocks for the integration of a quick search (Sugguest-Search).
+            The package provides an advanced search for QUIQQER. Search your projects through a relevancy search.
             ]]></en>
         </locale>
         <locale name="quiqqer/search:types/search.title">
