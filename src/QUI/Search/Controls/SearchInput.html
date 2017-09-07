@@ -7,10 +7,16 @@
            placeholder="{$placeholder}"
     />
 
-    <input type="submit"
-           value="{t}quiqqer/search tpl.search.button{/t}"
-           class="quiqqer-search-searchinput-submit qui-button button"
-    />
+    {if !$submitIcon}
+        <input type="submit"
+               value="{t}quiqqer/search tpl.search.button{/t}"
+               class="quiqqer-search-searchinput-submit qui-button button"
+        />
+    {else}
+        <button class="quiqqer-search-searchinput-submitIcon" type="submit">
+            <span class="fa fa-search"></span>
+        </button>
+    {/if}
 
     <noscript>
         <style>

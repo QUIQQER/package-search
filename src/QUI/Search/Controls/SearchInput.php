@@ -46,7 +46,8 @@ class SearchInput extends QUI\Control
             'fields'            => array(),     // selected fields
             'suggestSearch'     => 'off',
             'placeholder'       => QUI::getLocale()->get('quiqqer/search', 'tpl.search.placeholder'),
-            'showFieldSettings' => true
+            'showFieldSettings' => true,
+            'submitIcon'        => false
         ));
 
         $this->addCSSClass('quiqqer-search-searchinput');
@@ -78,7 +79,8 @@ class SearchInput extends QUI\Control
             'fields'            => $this->getAttribute('fields'),
             'suggestSearch'     => $this->getAttribute('suggestSearch'),
             'placeholder'       => $this->getAttribute('placeholder'),
-            'showFieldSettings' => $this->getAttribute('showFieldSettings')
+            'showFieldSettings' => $this->getAttribute('showFieldSettings'),
+            'submitIcon'        => $this->getAttribute('submitIcon')
         ));
 
         return $Engine->fetch(dirname(__FILE__) . '/SearchInput.html');
