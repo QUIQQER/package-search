@@ -22,8 +22,11 @@ QUI::$Ajax->registerFunction(
         $Search       = new Search($searchParams);
         $searchResult = $Search->search();
 
+        $Output           = new \QUI\Output();
+        $childrenListHtml = $Output->parse($Search->getChildrenList()->create());
+
         return array(
-            'childrenListHtml' => $Search->getChildrenList()->create(),
+            'childrenListHtml' => $childrenListHtml,
             'sheets'           => $searchResult['sheets'],
             'count'            => $searchResult['count'],
             'more'             => $searchResult['more']
