@@ -3,6 +3,7 @@
   "type": "quiqqer-module",
   "description": "The package provides an advanced search for QUIQQER. Search your projects through a relevancy search.",
   "version": "dev-dev",
+  "license": ["PCSG QL-1.0","CC BY-NC-SA 4.0"],
   "authors": [
     {
       "name": "Henning Leutz",
