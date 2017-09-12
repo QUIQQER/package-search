@@ -24,10 +24,10 @@ use QUI\Rating\Handler as RatingHandler;
  */
 class Search extends QUI\Control
 {
-    const SEARCH_TYPE_OR  = 'OR';
+    const SEARCH_TYPE_OR = 'OR';
     const SEARCH_TYPE_AND = 'AND';
 
-    const PAGINATION_TYPE_PAGINATION      = 'pagination';
+    const PAGINATION_TYPE_PAGINATION = 'pagination';
     const PAGINATION_TYPE_INIFINITESCROLL = 'infinitescroll';
 
     /**
@@ -60,6 +60,8 @@ class Search extends QUI\Control
             $this->Site = QUI::getRewrite()->getSite();
         }
 
+        $directory = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+
         $this->setAttributes(array(
             'search'               => '',
             // search term
@@ -74,8 +76,8 @@ class Search extends QUI\Control
             'paginationType'       => false,
             // use Fulltext relevance search
             'relevanceSearch'      => true,
-            'childrenListTemplate' => dirname(__FILE__, 5) . '/templates/SearchResultList.html',
-            'childrenListCss'      => dirname(__FILE__, 5) . '/templates/SearchResultList.css'
+            'childrenListTemplate' => $directory . '/templates/SearchResultList.html',
+            'childrenListCss'      => $directory . '/templates/SearchResultList.css'
         ));
 
         // set attributes
