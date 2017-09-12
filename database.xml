@@ -12,8 +12,10 @@
             <field type="text NULL">data</field>
             <field type="text NULL">rights</field>
             <field type="varchar(255) NULL">icon</field>
+            <field type="varchar(255) NULL">siteType</field>
 
             <auto_increment>id</auto_increment>
+            <primary>id</primary>
         </table>
 
         <table name="searchFull" no-auto-update="1" no-site-reference="1">
@@ -26,6 +28,7 @@
 
             <auto_increment>id</auto_increment>
             <index>siteId</index>
+            <primary>id</primary>
         </table>
 
     </projects>

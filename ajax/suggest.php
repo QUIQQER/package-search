@@ -10,11 +10,22 @@
  */
 QUI::$Ajax->registerFunction(
     'package_quiqqer_search_ajax_suggest',
-    function ($project, $search) {
-        $Project  = QUI::getProjectManager()->decode($project);
-        $Fulltext = new QUI\Search\Quicksearch();
+    function ($project, $siteId, $search) {
+        $Project         = QUI::getProjectManager()->decode($project);
+        $Site            = $Project->get($siteId);
+        $siteTypesFilter = $Site->getAttribute('quiqqer.settings.search.sitetypes.filter');
 
-        $result = $Fulltext->search($search, $Project, array(
+        if (!empty($siteTypesFilter)) {
+            $siteTypesFilter = explode(';', $siteTypesFilter);
+        } else {
+            $siteTypesFilter = array();
+        }
+
+        $QuickSearch = new QUI\Search\Quicksearch(array(
+            'siteTypes' => $siteTypesFilter
+        ));
+
+        $result = $QuickSearch->search($search, $Project, array(
             'limit' => 10
         ));
 
@@ -39,7 +50,7 @@ QUI::$Ajax->registerFunction(
 
             $list .= '</div>';
             $list .= '<div class="quiqqer-search-suggest-text">';
-            $list .= $entry['data'];
+            $list .= $Site->getAttribute('title');
             $list .= '</div>';
             $list .= '</li>';
         }
@@ -48,5 +59,5 @@ QUI::$Ajax->registerFunction(
 
         return $list;
     },
-    array('project', 'search')
+    array('project', 'siteId', 'search')
 );

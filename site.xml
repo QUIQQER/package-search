@@ -34,13 +34,16 @@
             <!-- list attributes -->
             <attributes>
                 <attribute default="childrenlist">quiqqer.settings.sitetypes.list.template</attribute>
+                <attribute default="pagination">quiqqer.search.sitetypes.search.pagination.type</attribute>
                 <attribute>quiqqer.settings.search.list.max</attribute>
                 <attribute>quiqqer.settings.search.list.hideSettings</attribute>
                 <attribute>quiqqer.settings.search.list.fields</attribute>
                 <attribute>quiqqer.settings.search.list.fields.selected</attribute>
-                <attribute default="1">quiqqer.settings.sitetypes.list.showCreator</attribute>
+                <attribute default="0">quiqqer.settings.sitetypes.list.showCreator</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showDate</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showImages</attribute>
+                <attribute default="off">quiqqer.search.sitetypes.search.suggestSearch</attribute>
+                <attribute>quiqqer.settings.search.sitetypes.filter</attribute>
             </attributes>
 
             <!-- list settings -->
@@ -55,6 +58,13 @@
                             <text>
                                 <locale group="quiqqer/sitetypes" var="list.template" />
                             </text>
+
+                            <option value="standardSearch">
+                                <locale group="quiqqer/search" var="search.listTemplate.standardSearch"/>
+                            </option>
+                            <option value="cardRows">
+                                <locale group="quiqqer/sitetypes" var="list.template.cardRows"/>
+                            </option>
                             <option value="childrenList">
                                 <locale group="quiqqer/sitetypes" var="list.template.childrenList" />
                             </option>
@@ -75,6 +85,41 @@
                         <input conf="quiqqer.settings.search.list.max" type="number">
                             <text>
                                 <locale group="quiqqer/search" var="quiqqer.search.list.settings.max" />
+                            </text>
+                        </input>
+
+                        <select conf="quiqqer.search.sitetypes.search.pagination.type">
+                            <text>
+                                <locale group="quiqqer/search" var="search.pagination.type" />
+                            </text>
+                            <option value="pagination">
+                                <locale group="quiqqer/search" var="search.pagination.type.pagination" />
+                            </option>
+                            <option value="infinitescroll">
+                                <locale group="quiqqer/search" var="search.pagination.type.infinitescroll" />
+                            </option>
+                        </select>
+
+                        <select conf="quiqqer.search.sitetypes.search.suggestSearch">
+                            <text>
+                                <locale group="quiqqer/search"
+                                        var="search.suggestSearch" />
+                            </text>
+                            <option value="off">
+                                <locale group="quiqqer/search" var="search.suggestSearch.option.off" />
+                            </option>
+                            <option value="clicktosite">
+                                <locale group="quiqqer/search" var="search.suggestSearch.option.clicktosite" />
+                            </option>
+                            <option value="clicktosearch">
+                                <locale group="quiqqer/search" var="search.suggestSearch.option.clicktosearch" />
+                            </option>
+                        </select>
+
+                        <input conf="quiqqer.settings.search.sitetypes.filter" type="text" data-qui="package/quiqqer/search/bin/controls/settings/SiteTypeFilter">
+                            <text>
+                                <locale group="quiqqer/search"
+                                        var="quiqqer.search.sitetypes.search.filter" />
                             </text>
                         </input>
 

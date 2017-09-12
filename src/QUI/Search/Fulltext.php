@@ -32,11 +32,13 @@ class Fulltext extends QUI\QDOM
     {
         // defaults
         $this->setAttributes(array(
-            'Project'    => false,    // Project
-            'limit'      => 10,        // limit of results
-            'fields'     => false,    // array list of fields
-            'searchtype' => 'OR',    // search type: OR / AND
-            'datatypes'  => false   // only for some site types, can be an array
+            'Project'          => false,   // Project
+            'limit'            => 10,      // limit of results
+            'fields'           => false,   // array list of fields
+            'fieldConstraints' => array(), // restrict certain search fields to specific values
+            'searchtype'       => 'OR',    // search type: OR / AND
+            'datatypes'        => false,   // restrict search to certain site types
+            'relevanceSearch'  => true     // use relevance search (if search string has minimum length)
         ));
 
         $this->setAttributes($params);
@@ -96,21 +98,22 @@ class Fulltext extends QUI\QDOM
 
         // filter
         foreach ($fieldList as $entry) {
-            if (mb_strpos($entry['type'], 'varchar') !== false
-                || mb_strpos($entry['type'], 'text') !== false
+            $type = mb_strtolower($entry['type']);
+
+            if (mb_strpos($type, 'varchar') !== false
+                || mb_strpos($type, 'text') !== false
             ) {
                 $availableFields[] = $entry['field'];
             }
         }
 
-
         if (!$attrFields || !is_array($attrFields)) {
             $fields = $availableFields;
         } else {
-            $availableFields = array_flip($availableFields);
+            $availableFieldsTmp = array_flip($availableFields);
 
             foreach ($attrFields as $field) {
-                if (isset($availableFields[$field])) {
+                if (isset($availableFieldsTmp[$field])) {
                     $fields[] = Orthos::clearNoneCharacters($field);
                 }
             }
@@ -127,7 +130,6 @@ class Fulltext extends QUI\QDOM
             );
         }
 
-
         // sql
         $count = array(
             'name'    => 8,
@@ -139,6 +141,7 @@ class Fulltext extends QUI\QDOM
         $PDO   = QUI::getPDO();
         $table = QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project);
         $limit = QUI\Database\DB::createQueryLimit($attrLimit);
+        $binds = array();
 
         // relevance match
         $relevanceMatch = array();
@@ -158,7 +161,7 @@ class Fulltext extends QUI\QDOM
 
         $relevanceMatch = implode(' + ', $relevanceMatch);
 
-        // site types
+        // restrict search to certain site types
         $datatypes     = $this->getAttribute('datatypes');
         $datatypeQuery = '';
 
@@ -175,11 +178,58 @@ class Fulltext extends QUI\QDOM
                 if ($len - 1 > $i) {
                     $datatypeQuery .= ' OR ';
                 }
+
+                $binds['type' . $i] = array(
+                    'value' => $datatypes[$i],
+                    'type'  => \PDO::PARAM_STR
+                );
             }
 
             $datatypeQuery .= ' )';
         }
 
+        // field constraints
+        $fieldConstraints      = $this->getAttribute('fieldConstraints');
+        $whereFieldConstraints = '';
+
+        if (!empty($fieldConstraints)) {
+            $fieldConstraintsEntries = array();
+            $i                       = 0;
+
+            foreach ($fieldConstraints as $field => $constraintValues) {
+                if (!in_array($field, $availableFields)) {
+                    continue;
+                }
+
+                if (is_string($constraintValues)) {
+                    $constraintValues = array($constraintValues);
+                }
+
+                $constraintEntriesOr = array();
+
+                foreach ($constraintValues as $value) {
+                    if (empty($value)) {
+                        continue;
+                    }
+
+                    $constraintEntriesOr[]    = $field . ' = :constraint' . $i;
+                    $binds['constraint' . $i] = array(
+                        'value' => $value,
+                        'type'  => \PDO::PARAM_STR
+                    );
+
+                    $i++;
+                }
+
+                if (!empty($constraintEntriesOr)) {
+                    $fieldConstraintsEntries[] = "(" . implode(" OR ", $constraintEntriesOr) . ")";
+                }
+            }
+
+            if (!empty($fieldConstraintsEntries)) {
+                $whereFieldConstraints = ' AND (' . implode(" AND ", $fieldConstraintsEntries) . ')';
+            }
+        }
 
         // query
         if (is_int(key($availableFields))) {
@@ -187,22 +237,6 @@ class Fulltext extends QUI\QDOM
         } else {
             $selectedFields = implode(',', array_keys($availableFields));
         }
-
-        $query = "
-            SELECT e_date,urlParameter,siteId,{$selectedFields}
-            FROM
-                {$table}
-            WHERE
-                (name LIKE :search OR
-                title LIKE :search OR
-                short LIKE :search OR
-                data  LIKE :search)
-                {$datatypeQuery}
-            GROUP BY
-                urlParameter,siteId,e_date,{$selectedFields}
-            ORDER BY
-                e_date DESC
-        ";
 
         $minWordLength = QUI::getPackage('quiqqer/search')
             ->getConfig()
@@ -214,7 +248,10 @@ class Fulltext extends QUI\QDOM
 
         $match = str_replace(array('*', '+'), '', $search);
 
-        if (strlen($match) >= $minWordLength) {
+        // Relevance search (MATCH.. AGAINST)
+        if ($this->getAttribute('relevanceSearch')
+            && strlen($match) >= $minWordLength
+        ) {
             $query = "
                 SELECT
                     siteId,
@@ -224,15 +261,60 @@ class Fulltext extends QUI\QDOM
                 FROM
                     {$table}
                 WHERE
-                    MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE)
+                    (MATCH ({$whereMatch}) AGAINST (:search IN BOOLEAN MODE))
                     {$datatypeQuery}
+                    {$whereFieldConstraints}
                 GROUP BY
                     urlParameter,siteId,{$selectedFields}
                 ORDER BY
                     relevance DESC
             ";
+
+//            if (strlen($search) > 2 || $search == '%%') {
+            $binds['search'] = array(
+                'value' => $search,
+                'type'  => \PDO::PARAM_STR
+            );
+//            }
         } else {
-            $search = "%{$match}%";
+            $whereOr = array();
+
+            $searchFields = array(
+                'name',
+                'title',
+                'short',
+                'data'
+            );
+
+            $searchFields = array_merge($searchFields, $fields);
+            $searchTerms  = explode(' ', $str);
+
+            foreach ($searchTerms as $k => $searchTerm) {
+                foreach ($searchFields as $field) {
+                    $whereOr[] = $field . ' LIKE :search' . $k;
+                }
+
+                $binds['search' . $k] = array(
+                    'value' => '%' . $searchTerm . '%',
+                    'type'  => \PDO::PARAM_STR
+                );
+            }
+
+            $where = implode(" OR ", $whereOr);
+
+            $query = "
+            SELECT e_date,urlParameter,siteId,{$selectedFields}
+            FROM
+                {$table}
+            WHERE
+                ({$where})
+                {$whereFieldConstraints}
+                {$datatypeQuery}
+            GROUP BY
+                urlParameter,siteId,e_date,{$selectedFields}
+            ORDER BY
+                e_date DESC
+            ";
         }
 
         $selectQuery = "{$query} {$limit['limit']}";
@@ -256,18 +338,8 @@ class Fulltext extends QUI\QDOM
             \PDO::PARAM_INT
         );
 
-        if (strlen($search) > 2 || $search == '%%') {
-            $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
-        }
-
-        if ($datatypes) {
-            for ($i = 0, $len = count($datatypes); $i < $len; $i++) {
-                $Statement->bindValue(
-                    ':type' . $i,
-                    $datatypes[$i],
-                    \PDO::PARAM_STR
-                );
-            }
+        foreach ($binds as $placeholder => $bind) {
+            $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
         }
 
         $Statement->execute();
@@ -276,18 +348,8 @@ class Fulltext extends QUI\QDOM
         // count
         $Statement = $PDO->prepare($countQuery);
 
-        if (strlen($search) > 2 || $search == '%%') {
-            $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
-        }
-
-        if ($datatypes) {
-            for ($i = 0, $len = count($datatypes); $i < $len; $i++) {
-                $Statement->bindValue(
-                    ':type' . $i,
-                    $datatypes[$i],
-                    \PDO::PARAM_STR
-                );
-            }
+        foreach ($binds as $placeholder => $bind) {
+            $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
         }
 
         $Statement->execute();
@@ -298,7 +360,6 @@ class Fulltext extends QUI\QDOM
             'count' => $count[0]['count']
         );
     }
-
 
     /**
      * Creation
@@ -368,6 +429,17 @@ class Fulltext extends QUI\QDOM
         $urlParameter = json_encode($siteParams);
         $siteId       = (int)$siteId;
 
+        // cannot set entry for inactive sites!
+        try {
+            $Site = $Project->get($siteId);
+
+            if (!$Site->getAttribute('active')) {
+                return;
+            }
+        } catch (\Exception $Exception) {
+            return;
+        }
+
         try {
             $data = self::getEntry($Project, $siteId, $siteParams);
 
@@ -408,6 +480,8 @@ class Fulltext extends QUI\QDOM
             $data[$field] = $params[$field];
         }
 
+        $data['datatype'] = $Site->getAttribute('type');
+
         QUI::getDataBase()->update($table, $data, array(
             'siteId'       => (int)$siteId,
             'urlParameter' => $urlParameter
@@ -428,6 +502,17 @@ class Fulltext extends QUI\QDOM
         $data = '',
         $siteParams = array()
     ) {
+        // cannot set entry for inactive sites!
+        try {
+            $Site = $Project->get($siteId);
+
+            if (!$Site->getAttribute('active')) {
+                return;
+            }
+        } catch (\Exception $Exception) {
+            return;
+        }
+
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_FULL,
             $Project
@@ -540,6 +625,7 @@ class Fulltext extends QUI\QDOM
                 $Fulltext->setEntry($Project, $siteId, array(
                     'name'     => $Site->getAttribute('name'),
                     'title'    => $Site->getAttribute('title'),
+                    'siteType' => $Site->getAttribute('type'),
                     'short'    => $Site->getAttribute('short'),
                     'data'     => $Site->getAttribute('content'),
                     'datatype' => $Site->getAttribute('type'),

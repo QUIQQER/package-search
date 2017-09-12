@@ -16,11 +16,26 @@ use QUI\Utils\Security\Orthos;
  *
  * @author www.pcsg.de (Henning Leutz)
  */
-class Quicksearch
+class Quicksearch extends QUI\QDOM
 {
     /**
      * Search
      */
+
+    /**
+     * Constructor
+     *
+     * @param array $params - Attributes
+     */
+    public function __construct($params = array())
+    {
+        // defaults
+        $this->setAttributes(array(
+            'siteTypes' => false   // restrict search to certain site types
+        ));
+
+        $this->setAttributes($params);
+    }
 
     /**
      * Search something in a project
@@ -51,22 +66,58 @@ class Quicksearch
             $params['limit'] = 10;
         }
 
-        $search = '%' . $str . '%';
+        $search = '%'.$str.'%';
         $limit  = QUI\Database\DB::createQueryLimit($params['limit']);
+        $binds  = array();
 
-        $groupedBy = 'GROUP BY data';
+        // restrict search to certain site types
+        $siteTypes      = $this->getAttribute('siteTypes');
+        $siteTypesQuery = '';
 
-        if (isset($params['group']) && $params['group'] === false) {
-            $groupedBy = '';
+        if ($siteTypes) {
+            if (!is_array($siteTypes)) {
+                $siteTypes = array($siteTypes);
+            }
+
+            $siteTypesQuery = ' AND (';
+
+            for ($i = 0, $len = count($siteTypes); $i < $len; $i++) {
+                $siteTypesQuery .= ' siteType LIKE :type'.$i;
+
+                if ($len - 1 > $i) {
+                    $siteTypesQuery .= ' OR ';
+                }
+
+                $binds['type'.$i] = array(
+                    'value' => $siteTypes[$i],
+                    'type'  => \PDO::PARAM_STR
+                );
+            }
+
+            $siteTypesQuery .= ' )';
         }
 
-        $query = "
-            SELECT id, siteId, urlParameter, data, rights, icon
+        if (version_compare(QUI::getDataBase()->getVersion(), '5.7.0')) {
+            $query = "
+                SELECT ANY_VALUE(id) AS id, 
+                    siteId, 
+                    urlParameter, 
+                    ANY_VALUE(data) AS data, 
+                    ANY_VALUE(rights) AS rights, 
+                    ANY_VALUE(icon) AS icon
+            ";
+        } else {
+            $query = "SELECT id, siteId, urlParameter, data, rights, icon";
+        }
+
+
+        $query .= "
             FROM
                 {$table}
             WHERE
                 data LIKE :search
-            {$groupedBy}
+                {$siteTypesQuery}
+            GROUP BY siteId, urlParameter, id
         ";
 
         $selectQuery = "{$query} {$limit['limit']}";
@@ -79,6 +130,10 @@ class Quicksearch
         // search
         $Statement = $PDO->prepare($selectQuery);
         $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
+
+        foreach ($binds as $placeholder => $bind) {
+            $Statement->bindValue(':'.$placeholder, $bind['value'], $bind['type']);
+        }
 
         if (isset($limit['prepare'][':limit1'])) {
             $Statement->bindValue(
@@ -100,13 +155,30 @@ class Quicksearch
 
         $result = $Statement->fetchAll(\PDO::FETCH_ASSOC);
 
+        if (!isset($params['group']) || $params['group'] !== false) {
+            $groups = array();
+
+            foreach ($result as $k => $row) {
+                if (isset($groups[$row['data']])) {
+                    unset($result[$k]);
+                    continue;
+                }
+
+                $groups[$row['data']] = true;
+            }
+        }
+
         // count
         $Statement = $PDO->prepare($countQuery);
         $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
+
+        foreach ($binds as $placeholder => $bind) {
+            $Statement->bindValue(':'.$placeholder, $bind['value'], $bind['type']);
+        }
+
         $Statement->execute();
 
         $count = $Statement->fetchAll(\PDO::FETCH_ASSOC);
-
 
         return array(
             'list'  => $result,
@@ -148,6 +220,17 @@ class Quicksearch
             return;
         }
 
+        // cannot set entry for inactive sites!
+        try {
+            $Site = $Project->get($siteId);
+
+            if (!$Site->getAttribute('active')) {
+                return;
+            }
+        } catch (\Exception $Exception) {
+            return;
+        }
+
         // clear the entries
         self::removeEntries($Project, $siteId);
 
@@ -157,8 +240,8 @@ class Quicksearch
         // site params
         if (is_array($siteParams) && !empty($siteParams)) {
             foreach ($siteParams as $key => $value) {
-                $key   = Orthos::clear($key);
-                $value = Orthos::clear($value);
+                $key   = Orthos::clearMySQL($key, false);
+                $value = Orthos::clearMySQL($value, false);
 
                 $siteUrlParams[$key] = $value;
             }
@@ -171,7 +254,8 @@ class Quicksearch
             QUI::getDataBase()->insert($table, array(
                 'siteId'       => $siteId,
                 'urlParameter' => $urlParameter,
-                'data'         => Orthos::clear($dataEntry)
+                'data'         => Orthos::clearMySQL($dataEntry, false),
+                'siteType'     => $Site->getAttribute('type')
             ));
         }
 
@@ -211,13 +295,44 @@ class Quicksearch
             return;
         }
 
-        $urlParameter = json_encode($siteParams);
+        // cannot set entry for inactive sites!
+        try {
+            $Site = $Project->get($siteId);
 
+            if (!$Site->getAttribute('active')) {
+                return;
+            }
+        } catch (\Exception $Exception) {
+            return;
+        }
+
+        $urlParameter = json_encode($siteParams);
+//        $data         = QUI::getPDO()->quote($data);
+
+        // check if entry exists
+        if (self::existsEntry($Project, $siteId, $data, $siteParams)) {
+            QUI::getDataBase()->update(
+                $table,
+                array(
+                    'rights'   => null, // @todo auf was richtiges setzen, wenn der parameter implementiert wird
+                    'icon'     => null,  // @todo auf was richtiges setzen, wenn der parameter implementiert wird
+                    'siteType' => $Site->getAttribute('type')
+                ),
+                array(
+                    'siteId'       => $siteId,
+                    'urlParameter' => $urlParameter,
+                    'data'         => $data
+                )
+            );
+
+            return;
+        }
 
         QUI::getDataBase()->insert($table, array(
             'siteId'       => $siteId,
             'urlParameter' => $urlParameter,
-            'data'         => Orthos::clear($data)
+            'data'         => $data,
+            'siteType'     => $Site->getAttribute('type')
         ));
     }
 
@@ -288,6 +403,41 @@ class Quicksearch
         }
 
         return $result[0];
+    }
+
+    /**
+     * Check if a quicksearch entry already exists
+     *
+     * @param Project $Project
+     * @param int $siteId
+     * @param string $data
+     * @param array $siteParams
+     * @return bool
+     */
+    public static function existsEntry(
+        Project $Project,
+        $siteId,
+        $data,
+        $siteParams = array()
+    ) {
+        $table = QUI::getDBProjectTableName(
+            Search::TABLE_SEARCH_QUICK,
+            $Project
+        );
+
+        $urlParameter = json_encode($siteParams);
+
+        $result = QUI::getDataBase()->fetch(array(
+            'count' => 1,
+            'from'  => $table,
+            'where' => array(
+                'siteId'       => (int)$siteId,
+                'data'         => $data,
+                'urlParameter' => $urlParameter
+            )
+        ));
+
+        return boolval(current(current($result)));
     }
 
     /**

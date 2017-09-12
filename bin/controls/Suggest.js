@@ -8,6 +8,8 @@
  * @require qui/QUI
  * @require qui/controls/Control
  * @require Ajax
+ *
+ * @event onSuggestionClick [text, url, self] - fires if the user clicks a search suggestion
  */
 define('package/quiqqer/search/bin/controls/Suggest', [
 
@@ -38,9 +40,10 @@ define('package/quiqqer/search/bin/controls/Suggest', [
         ],
 
         options: {
-            name       : 'search',
-            placeholder: 'Search...',
-            delay      : 300
+            name          : 'search',
+            placeholder   : 'Search...',
+            delay         : 300,
+            fireClickEvent: false
         },
 
         initialize: function (options) {
@@ -52,6 +55,7 @@ define('package/quiqqer/search/bin/controls/Suggest', [
             this.$CurrentInput = null;
             this.$FX           = null;
             this.$Datalist     = null;
+            this.$Form         = null;
 
             this.parent(options);
 
@@ -102,6 +106,8 @@ define('package/quiqqer/search/bin/controls/Suggest', [
             if (!Elm.get('placeholder') || Elm.get('placeholder') === '') {
                 Elm.set('placeholder', this.getAttribute('placeholder'));
             }
+
+            this.$Form = Elm.getParent('form');
 
             this.$FX = moofx(this.getDataList());
             this.bindElement(Elm);
@@ -230,6 +236,7 @@ define('package/quiqqer/search/bin/controls/Suggest', [
                 QUIAjax.get('package_quiqqer_search_ajax_suggest', resolve, {
                     'package': 'quiqqer/search',
                     project  : JSON.encode(QUIQQER_PROJECT),
+                    siteId   : QUIQQER_SITE.id,
                     search   : search
                 });
             }.bind(this));
@@ -242,6 +249,7 @@ define('package/quiqqer/search/bin/controls/Suggest', [
          * @return {Promise}
          */
         $renderSearch: function (data) {
+            var self     = this;
             var DropDown = this.getDataList();
 
             if (data === '') {
@@ -266,6 +274,15 @@ define('package/quiqqer/search/bin/controls/Suggest', [
 
                     if (Target.nodeName !== 'LI') {
                         Target = Target.getParent('li');
+                    }
+
+                    if (self.getAttribute('fireClickEvent')) {
+                        self.fireEvent('suggestionClick', [
+                            Target.getElement('.quiqqer-search-suggest-text').innerHTML,
+                            Target.get('data-url'),
+                            self
+                        ]);
+                        return;
                     }
 
                     window.location = Target.get('data-url');

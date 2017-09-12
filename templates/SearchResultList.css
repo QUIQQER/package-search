@@ -1,0 +1,180 @@
+@CHARSET "UTF-8";
+
+.qui-control-childrenlist-default {
+    clear: both;
+    float: none;
+}
+
+.qui-control-childrenlist-default-entry {
+    clear: both;
+    float: left;
+    margin-bottom: 80px;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+}
+
+.qui-control-childrenlist-default-entry-image {
+    max-height: 300px;
+    overflow: hidden;
+    padding: 0;
+    text-align: center;
+}
+
+.qui-control-childrenlist-default-entry-image a {
+    height: 100%;
+    display: block;
+    color: inherit;
+}
+
+.qui-control-childrenlist-default-entry-image img {
+    max-height: 100%;
+}
+
+/* vertical align fontawesome icon */
+.qui-control-childrenlist-default-entry-image .fa:after {
+    content: '';
+    vertical-align: middle;
+    height: 100%;
+    display: inline-block;
+    width: 0;
+}
+
+.qui-control-childrenlist-default-entry-image .fa {
+    font-size: 120px;
+    height: 100%;
+}
+
+
+.qui-control-childrenlist-default-entry-content-headerLink,
+.qui-control-childrenlist-default-entry-content-headerLink:hover {
+    color: inherit;
+}
+
+.qui-control-childrenlist-default-entry-content {
+    display: flex;
+    flex-direction: column;
+    margin-left: 40px;
+    min-height: 240px;
+    padding: 0;
+}
+
+.qui-control-childrenlist-default-entry-content-short {
+    margin-bottom: 20px;
+}
+
+.qui-control-childrenlist-default-entry-content h1 {
+    font-size: 2em;
+}
+
+.qui-control-childrenlist-default-entry-content-footer {
+    border-bottom: 1px solid #e5e5e5;
+    border-top: 1px solid #e5e5e5;
+    display: block;
+    align-items: center;
+    line-height: 40px;
+    margin-top: auto;
+    font-size: 0.9em;
+}
+
+.qui-control-childrenlist-default-entry-content-footer-wrapper {
+    display: inline;
+    color: #999;
+    font-size: 12px;
+    line-height: 12px;
+}
+
+.qui-control-childrenlist-default-entry-content-footer-wrapper .fa {
+    clear: both;
+    color: rgba(128, 128, 128, 0.75);
+}
+
+.qui-control-childrenlist-default-entry-content-footer-author {
+    font-style: italic;
+}
+
+.qui-control-childrenlist-default-entry-content-footer-author,
+.qui-control-childrenlist-default-entry-content-footer-date,
+.qui-control-childrenlist-default-entry-content-footer-time {
+    margin-right: 16px;
+}
+
+.qui-control-childrenlist-default-entry-content-footer-wrapper span:last-child {
+    margin-right: 0;
+}
+
+/* button link */
+.qui-control-childrenlist-default-entry-content-footer .qui-control-childrenlist-default-entry-content-footer-link {
+    margin: 0;
+    float: right;
+    padding: 0 10px;
+    min-width: 100px;
+    text-align: center;
+    border-radius: 0;
+    border: none;
+    position: relative;
+}
+
+
+.qui-control-childrenlist-default-entry-image span.quiqqer-icon {
+    font-size: 120px;
+}
+
+.qui-control-childrenlist-default-entry-short-noImage {
+    margin-left: 0 !important;
+    width: 100%;
+}
+
+.qui-control-childrenlist-default-entry-image-noShort {
+    height: 200px;
+    width: 100%;
+}
+
+/* hyphenate / word break */
+.qui-control-childrenlist-default-entry-content header {
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-word; /* Non standard for webkit */
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+}
+
+@media screen and (max-width: 767px) {
+
+    .qui-control-childrenlist-default-entry {
+        display: block;
+        margin-bottom: 60px;
+    }
+
+    .qui-control-childrenlist-default-entry {
+        background: none;
+        border: none;
+        border-radius: 0;
+        padding: 10px 10px 30px 10px;
+        /*padding: 40px 0;*/
+    }
+
+    .qui-control-childrenlist-longFooter-entry:first-of-type {
+        margin-top: 60px;
+    }
+
+    .qui-control-childrenlist-default-entry-image {
+        max-height: initial;
+        margin-bottom: 20px;
+    }
+
+    .qui-control-childrenlist-default-entry-content {
+        min-height: initial;
+        margin-left: 0;
+    }
+    .qui-control-childrenlist-default-entry-image,
+    .qui-control-childrenlist-default-entry-content {
+        padding: 0;
+    }
+    
+    .qui-control-childrenlist-default-entry-content-footer-time {
+        display: none;
+    }
+}

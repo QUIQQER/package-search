@@ -4,6 +4,12 @@
     <!-- javascript locale -->
     <groups name="quiqqer/search" datatype="js">
 
+        <!-- Control: SearchInput -->
+        <locale name="controls.searchinput.searchfieldselect.placeholder">
+            <de><![CDATA[Suchbereiche]]></de>
+            <en><![CDATA[Search areas]]></en>
+        </locale>
+
     </groups>
 
     <!-- php + javascript locale -->
@@ -14,14 +20,10 @@
         </locale>
         <locale name="package.description">
             <de><![CDATA[
-            Die Erweiterte Suche bringt eine umfangreiche Volltexte-Suche mit.
-            Sie ist durch andere Module flexibel erweiterbar und dient so als Ausgangspunkt für alle Suchfunktionen im QUIQQER Frontend.
-            Neben der Volltextsuche liefert sie auch Bausteine zur Einbindung einer Schnellsuche (Sugguest-Search).
+            Das Paket stellt eine erweiterte Suche für QUIQQER zur Verfügung. Durchsuchen Sie Ihre Projekte über eine Relevanzssuche.
             ]]></de>
             <en><![CDATA[
-            The Advanced Search includes a comprehensive full-text search.
-            It is flexibly expandable by other modules and thus serves as the starting point for all search functions in the QUIQQER front end.
-            In addition to full-text search, it also provides building blocks for the integration of a quick search (Sugguest-Search).
+            The package provides an advanced search for QUIQQER. Search your projects through a relevancy search.
             ]]></en>
         </locale>
         <locale name="quiqqer/search:types/search.title">
@@ -53,6 +55,167 @@
             This makes it possible for visitors of the page to display certain results (for example, certain page types) without having to create a list of the information manually.
             The user can not perform a search by himself. This page type allows you to quickly define individual search results lists.
             ]]></en>
+        </locale>
+
+        <locale name="tpl.search.no.results">
+            <de><![CDATA[Keine Ergebnisse gefunden. Bitte nutzen Sie einen anderen Suchbegriff.]]></de>
+            <en><![CDATA[No results found. Please use a different search.]]></en>
+        </locale>
+        <locale name="tpl.search.one.result">
+            <de><![CDATA[Es wurde ein Ergebnis gefunden.]]></de>
+            <en><![CDATA[One result has been found.]]></en>
+        </locale>
+        <locale name="tpl.search.more.result">
+            <de><![CDATA[Es wurden [count] Ergebnisse gefunden.]]></de>
+            <en><![CDATA[[count] results has been found.]]></en>
+        </locale>
+        <locale name="tpl.search.pagination.inifinitescroll.btn.loading">
+            <de><![CDATA[Lade...]]></de>
+            <en><![CDATA[Loading...]]></en>
+        </locale>
+
+        <!-- Settings -->
+        <locale name="search.pagination.type">
+            <de><![CDATA[Blätter-Funktion Typ]]></de>
+            <en><![CDATA[Pagination type]]></en>
+        </locale>
+        <locale name="search.pagination.type.pagination">
+            <de><![CDATA[Standard Blätter-Funktion]]></de>
+            <en><![CDATA[Standard pagination]]></en>
+        </locale>
+        <locale name="search.pagination.type.infinitescroll">
+            <de><![CDATA[Automatisches Nachladen beim Scrollen ("Infinite Scrolling")]]></de>
+            <en><![CDATA[Infinite Scrolling]]></en>
+        </locale>
+        <locale name="search.suggestSearch">
+            <de><![CDATA[Suchvorschläge anzeigen]]></de>
+            <en><![CDATA[Show search suggestions]]></en>
+        </locale>
+        <locale name="search.suggestSearch.option.off">
+            <de><![CDATA[Aus]]></de>
+            <en><![CDATA[Off]]></en>
+        </locale>
+        <locale name="search.suggestSearch.option.clicktosite">
+            <de><![CDATA[Suchvorschläge anzeigen - Klick auf Suchvorschlag wechselt auf Seite]]></de>
+            <en><![CDATA[Show search suggestions - Click on a suggestion switches to site]]></en>
+        </locale>
+        <locale name="search.suggestSearch.option.clicktosearch">
+            <de><![CDATA[Suchvorschläge anzeigen - Klick auf Suchvorschlag sucht nach Vorschlagstext]]></de>
+            <en><![CDATA[Show search suggestions - Click on a suggestion searches for suggestions text]]></en>
+        </locale>
+        <locale name="quiqqer.search.sitetypes.search.filter">
+            <de><![CDATA[Suche auf bestimmte Seiten-Typen beschränken]]></de>
+            <en><![CDATA[Restrict search to certain site types]]></en>
+        </locale>
+
+        <!-- search brick -->
+        <locale name="bricks.search.title">
+            <de><![CDATA[Suche: Suchfeld]]></de>
+            <en><![CDATA[Search: Input search]]></en>
+            <pl><![CDATA[Search: Pole wyszukiwania]]></pl>
+        </locale>
+        <locale name="bricks.search.description">
+            <de><![CDATA[Erstellt einen Suchbaustein.]]></de>
+            <en><![CDATA[Create a search brick]]></en>
+            <pl><![CDATA[Umożliwia umieszczenie wyszukiwarki w dowolnym miejscu.]]></pl>
+        </locale>
+        <locale name="bricks.search.resultSite">
+            <de><![CDATA[Ergebnisse]]></de>
+            <en><![CDATA[Results site]]></en>
+            <pl><![CDATA[Strona z wynikami]]></pl>
+        </locale>
+        <locale name="bricks.search.suggestSearch" html="true">
+            <de><![CDATA[Vorschläge beim Eintippen anzeigen? <br/>(Suggest search)]]></de>
+            <en><![CDATA[Use suggest search?]]></en>
+            <pl><![CDATA[Podpowiedzi podczas wpisywania? <br/>(Suggest search)]]></pl>
+        </locale>
+        <locale name="bricks.search.placeholder">
+            <de><![CDATA[Suchbegriff eingeben]]></de>
+            <en><![CDATA[Enter your search term]]></en>
+            <pl><![CDATA[Wpisz zapytanie]]></pl>
+        </locale>
+        <locale name="bricks.search.button.value">
+            <de><![CDATA[Suchen]]></de>
+            <en><![CDATA[Search]]></en>
+            <pl><![CDATA[Szukaj]]></pl>
+        </locale>
+
+        <!-- cron.xml -->
+        <locale name="cron.title">
+            <de><![CDATA[Such-Datenbank aufbauen]]></de>
+            <en><![CDATA[Build search database]]></en>
+        </locale>
+        <locale name="cron.description">
+            <de>
+                <![CDATA[Parst alle aktiven Seiten und fügt die relevanten Information zur Volltext- und Schnellsuch-Datenbank hinzu]]></de>
+            <en><![CDATA[Parses active sites and adds relevant data to the fulltext and quicksearch database]]></en>
+        </locale>
+        <locale name="cron.param.project">
+            <de><![CDATA[Projekt-Titel]]></de>
+            <en><![CDATA[Project title]]></en>
+        </locale>
+        <locale name="cron.param.lang">
+            <de><![CDATA[Projekt-Sprache]]></de>
+            <en><![CDATA[Project language]]></en>
+        </locale>
+
+        <!-- search template -->
+        <locale name="tpl.search.button">
+            <de><![CDATA[Suche starten]]></de>
+            <en><![CDATA[Start search]]></en>
+        </locale>
+        <locale name="tpl.search.placeholder">
+            <de><![CDATA[Bitte hier Ihre Suche eingeben...]]></de>
+            <en><![CDATA[Please insert your search here...]]></en>
+        </locale>
+        <locale name="tpl.search.list.more">
+            <de><![CDATA[mehr]]></de>
+            <en><![CDATA[more]]></en>
+        </locale>
+        <locale name="tpl.search.relevance">
+            <de><![CDATA[Relevanz:]]></de>
+            <en><![CDATA[Relevance:]]></en>
+        </locale>
+
+        <locale name="tpl.search.and.type">
+            <de><![CDATA[Alle Begriffe müssen im Ergebnis enthalten sein.]]></de>
+            <en><![CDATA[All words must be included in the result.]]></en>
+        </locale>
+        <locale name="tpl.search.field.searchTypeAnd">
+            <de><![CDATA[UND Suche]]></de>
+            <en><![CDATA[and Search]]></en>
+        </locale>
+        <locale name="tpl.search.field.name">
+            <de><![CDATA[In Namen suchen]]></de>
+            <en><![CDATA[Search in names]]></en>
+        </locale>
+        <locale name="tpl.search.field.title">
+            <de><![CDATA[In Titeln suchen]]></de>
+            <en><![CDATA[Search in titles]]></en>
+        </locale>
+        <locale name="tpl.search.field.short">
+            <de><![CDATA[In der Kurzbeschreibung suchen]]></de>
+            <en><![CDATA[Search in short description]]></en>
+        </locale>
+        <locale name="tpl.search.field.data">
+            <de><![CDATA[Im Inhalt suchen]]></de>
+            <en><![CDATA[Search in the content]]></en>
+        </locale>
+        <locale name="tpl.search.field.icon">
+            <de><![CDATA[Bilder durchsuchen]]></de>
+            <en><![CDATA[Search in images]]></en>
+        </locale>
+        <locale name="tpl.search.field.datatype">
+            <de><![CDATA[Nach Seitentyp suchen]]></de>
+            <en><![CDATA[Search as sitetypes]]></en>
+        </locale>
+        <locale name="tpl.search.field.e_date">
+            <de><![CDATA[In Editierungsdatum suchen]]></de>
+            <en><![CDATA[Search in edit date]]></en>
+        </locale>
+        <locale name="tpl.search.pagination.inifinitescroll.btn">
+            <de><![CDATA[Mehr Ergebnisse laden]]></de>
+            <en><![CDATA[Load more results]]></en>
         </locale>
     </groups>
 
@@ -120,6 +283,12 @@
             <en><![CDATA[Modern list without picture]]></en>
             <pl><![CDATA[Nowoczesna lista bez obrazków]]></pl>
         </locale>
+        <locale name="search.listTemplate.standardSearch">
+            <de><![CDATA[Standard Liste (von search)]]></de>
+            <en><![CDATA[Standard list (from search)]]></en>
+            <pl><![CDATA[Standardowa lista (z pakietu search)]]></pl>
+        </locale>
+
 
         <!-- result type settings -->
         <locale name="quiqqer.search.results.settings.title">
@@ -134,77 +303,6 @@
             <de><![CDATA[Stellen Sie hier ein welche Seitentypen in Ihrer Liste angezeigt werden soll.]]></de>
             <en><![CDATA[Setup the page types which will be displayed in your list.]]></en>
         </locale>
-
-
-        <!-- search template -->
-        <locale name="tpl.search.button">
-            <de><![CDATA[Suche starten]]></de>
-            <en><![CDATA[Start search]]></en>
-        </locale>
-        <locale name="tpl.search.placeholder">
-            <de><![CDATA[Bitte hier Ihre Suche eingeben...]]></de>
-            <en><![CDATA[Please insert your search here...]]></en>
-        </locale>
-        <locale name="tpl.search.list.more">
-            <de><![CDATA[mehr]]></de>
-            <en><![CDATA[more]]></en>
-        </locale>
-        <locale name="tpl.search.relevance">
-            <de><![CDATA[Relevanz:]]></de>
-            <en><![CDATA[Relevance:]]></en>
-        </locale>
-
-        <locale name="tpl.search.no.results">
-            <de><![CDATA[Keine Ergebnisse gefunden. Bitte nutzen Sie einen anderen Suchbegriff.]]></de>
-            <en><![CDATA[No results found. Please use a different search.]]></en>
-        </locale>
-        <locale name="tpl.search.one.result">
-            <de><![CDATA[Es wurde ein Ergebnis gefunden.]]></de>
-            <en><![CDATA[One result has been found.]]></en>
-        </locale>
-        <locale name="tpl.search.more.result">
-            <de><![CDATA[Es wurden [count] Ergebnisse gefunden.]]></de>
-            <en><![CDATA[[count] results has been found.]]></en>
-        </locale>
-
-
-        <locale name="tpl.search.and.type">
-            <de><![CDATA[Alle Begriffe müssen im Ergebnis enthalten sein.]]></de>
-            <en><![CDATA[All words must be included in the result.]]></en>
-        </locale>
-        <locale name="tpl.search.field.searchTypeAnd">
-            <de><![CDATA[UND Suche]]></de>
-            <en><![CDATA[and Search]]></en>
-        </locale>
-        <locale name="tpl.search.field.name">
-            <de><![CDATA[In Namen suchen.]]></de>
-            <en><![CDATA[Search in names.]]></en>
-        </locale>
-        <locale name="tpl.search.field.title">
-            <de><![CDATA[In Titeln suchen.]]></de>
-            <en><![CDATA[Search in titles.]]></en>
-        </locale>
-        <locale name="tpl.search.field.short">
-            <de><![CDATA[In der Kurzbeschreibung suchen.]]></de>
-            <en><![CDATA[Search in short description.]]></en>
-        </locale>
-        <locale name="tpl.search.field.data">
-            <de><![CDATA[Im Inhalt suchen.]]></de>
-            <en><![CDATA[Search in the content]]></en>
-        </locale>
-        <locale name="tpl.search.field.icon ">
-            <de><![CDATA[In Schwerpunkte suchen.]]></de>
-            <en><![CDATA[]]></en>
-        </locale>
-        <locale name="tpl.search.field.datatype">
-            <de><![CDATA[Nach Seitentyp suchen.]]></de>
-            <en><![CDATA[Search as sitetypes.]]></en>
-        </locale>
-        <locale name="tpl.search.field.e_date">
-            <de><![CDATA[In Editierungsdatum suchen.]]></de>
-            <en><![CDATA[Search in edit date.]]></en>
-        </locale>
-
     </groups>
 
 </locales>

@@ -1,0 +1,24 @@
+.quiqqer-search {
+    float: left;
+    width: 100%;
+}
+
+.quiqqer-search-pagination {
+    float: left;
+    width: 100%;
+}
+
+.quiqqer-search-pagination-inifinitescroll-more {
+    float: left;
+    width: 100%;
+}
+
+.quiqqer-search-pagination-inifinitescroll-more-btn {
+    margin: auto;
+    text-align: center;
+    width: 300px;
+}
+
+.quiqqer-search-pagination-inifinitescroll-more-btn .loading-btn-text {
+    margin-left: 10px;
+}

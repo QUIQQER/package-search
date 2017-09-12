@@ -1,0 +1,22 @@
+.quiqqer-search-searchinput {
+    float: left;
+    width: 100%;
+}
+
+.quiqqer-search-searchinput-input {
+    float: left;
+    margin-right: 10px;
+    min-width: 400px;
+}
+
+.quiqqer-search-searchinput-submit {
+    float: left;
+}
+
+.qui-search-searchinput-settings {
+    float: left;
+}
+
+.qui-search-searchinput-settings__hidden {
+    display: none;
+}
