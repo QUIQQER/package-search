@@ -413,7 +413,7 @@ define('package/quiqqer/search/bin/controls/Search', [
             this.Loader.show();
 
             var searchTerms      = [];
-            var FieldConstraints = {};
+            var FieldConstraints = this.$SearchParams.fieldConstraints;
 
             this.$extensions.each(function (Extension) {
                 if ("getSearchTerms" in Extension) {
