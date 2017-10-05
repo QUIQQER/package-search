@@ -216,13 +216,29 @@ class Search
         $Quicksearch = new Quicksearch();
         $Fulltext    = new Fulltext();
 
+        $e_date = $Site->getAttribute('e_date');
+        $e_date = strtotime($e_date);
+
+        if (!$e_date) {
+            $e_date = 0;
+        }
+
+        $c_date = $Site->getAttribute('c_date');
+        $c_date = strtotime($c_date);
+
+        if (!$c_date) {
+            $c_date = 0;
+        }
+
         // Fulltext
         $Fulltext->setEntry($Project, $Site->getId(), array(
-            'name'  => $Site->getAttribute('name'),
-            'title' => $Site->getAttribute('title'),
-            'short' => $Site->getAttribute('short'),
-            'data'  => $Site->getAttribute('content'),
-            'icon'  => $Site->getAttribute('image_site')
+            'name'   => $Site->getAttribute('name'),
+            'title'  => $Site->getAttribute('title'),
+            'short'  => $Site->getAttribute('short'),
+            'data'   => $Site->getAttribute('content'),
+            'icon'   => $Site->getAttribute('image_site'),
+            'e_date' => $e_date,
+            'c_date' => $c_date
         ));
 
         // Quicksearch

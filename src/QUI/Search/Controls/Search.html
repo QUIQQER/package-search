@@ -1,15 +1,17 @@
 <section class="content-template quiqqer-search">
 
-    <p class="quiqqer-search-result-count">
-        {if $count == 0}
-        {locale group="quiqqer/search" value="tpl.search.no.results"}
-        {elseif $count == 1}
-        {locale group="quiqqer/search" value="tpl.search.one.result"}
-        {elseif $count > 1}
-        {locale group="quiqqer/search" value="tpl.search.more.result"
-        count=$count}
-        {/if}
-    </p>
+    {if $showResultCount}
+        <p class="quiqqer-search-result-count">
+            {if $count == 0}
+            {locale group="quiqqer/search" value="tpl.search.no.results"}
+            {elseif $count == 1}
+            {locale group="quiqqer/search" value="tpl.search.one.result"}
+            {elseif $count > 1}
+            {locale group="quiqqer/search" value="tpl.search.more.result"
+            count=$count}
+            {/if}
+        </p>
+    {/if}
 
     <noscript>
         {if $sheets > 1}

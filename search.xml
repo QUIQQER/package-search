@@ -9,6 +9,7 @@
             <field type="text" fulltext="1">short</field>
             <field type="text" fulltext="1">data</field>
             <field type="int(11)">e_date</field>
+            <field type="int(11)">c_date</field>
             <field type="varchar(255)">icon</field>
         </searchfields>
     </search>

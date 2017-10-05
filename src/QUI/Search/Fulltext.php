@@ -622,6 +622,13 @@ class Fulltext extends QUI\QDOM
                     $e_date = 0;
                 }
 
+                $c_date = $Site->getAttribute('c_date');
+                $c_date = strtotime($c_date);
+
+                if (!$c_date) {
+                    $c_date = 0;
+                }
+
                 $Fulltext->setEntry($Project, $siteId, array(
                     'name'     => $Site->getAttribute('name'),
                     'title'    => $Site->getAttribute('title'),
@@ -630,7 +637,8 @@ class Fulltext extends QUI\QDOM
                     'data'     => $Site->getAttribute('content'),
                     'datatype' => $Site->getAttribute('type'),
                     'icon'     => $Site->getAttribute('image_site'),
-                    'e_date'   => $e_date
+                    'e_date'   => $e_date,
+                    'c_date'   => $c_date
                 ));
             } catch (QUI\Exception $Exception) {
                 Log::writeException($Exception);

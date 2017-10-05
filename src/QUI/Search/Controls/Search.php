@@ -77,7 +77,8 @@ class Search extends QUI\Control
             // use Fulltext relevance search
             'relevanceSearch'      => true,
             'childrenListTemplate' => $directory . '/templates/SearchResultList.html',
-            'childrenListCss'      => $directory . '/templates/SearchResultList.css'
+            'childrenListCss'      => $directory . '/templates/SearchResultList.css',
+            'showResultCount'      => true
         ));
 
         // set attributes
@@ -287,7 +288,8 @@ class Search extends QUI\Control
             'searchType'      => $this->getAttribute('searchType'),
             'availableFields' => $this->Site->getAttribute('quiqqer.settings.search.list.fields'),
             'ChildrenList'    => $this->getChildrenList(),
-            'paginationType'  => $this->getPaginationType()
+            'paginationType'  => $this->getPaginationType(),
+            'showResultCount' => $this->getAttribute('showResultCount')
         ));
 
         $this->setJavaScriptControlOption('resultcount', $searchResult['count']);
@@ -554,11 +556,15 @@ class Search extends QUI\Control
     /**
      * Get search list pagination type
      *
-     * @return string
+     * @return string|false - pagination type or false if no pagination required
      */
     protected function getPaginationType()
     {
         $paginationType = $this->getAttribute('paginationType');
+
+        if ($paginationType === false) {
+            return false;
+        }
 
         if (empty($paginationType)) {
             $paginationType = $this->Site->getAttribute('quiqqer.search.sitetypes.search.pagination.type');
