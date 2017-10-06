@@ -89,7 +89,7 @@ class Search extends QUI\Control
 
         // set javascript control data
         $this->setJavaScriptControl('package/quiqqer/search/bin/controls/Search');
-        $this->setJavaScriptControlOption('searchparams', json_encode($this->getAttributes()));
+        $this->setJavaScriptControlOption('searchparams', json_encode($this->getJavaScriptControlAttributes()));
 
         // set template data
         $this->addCSSClass('quiqqer-search');
@@ -489,6 +489,22 @@ class Search extends QUI\Control
                         $v = $this->getPaginationType();
                     }
                     break;
+
+                case 'childrenListTemplate':
+                    $directory = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+
+                    if (!file_exists($v)) {
+                        $v = $directory . '/templates/SearchResultList.html';
+                    }
+                    break;
+
+                case 'childrenListCss':
+                    $directory = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+
+                    if (!file_exists($v)) {
+                        $v = $directory . '/templates/SearchResultList.css';
+                    }
+                    break;
             }
 
             $attributes[$k] = $v;
@@ -551,6 +567,24 @@ class Search extends QUI\Control
         }
 
         return $settingsFieldsSelected;
+    }
+
+    /**
+     * Get attributes for the javascript control
+     *
+     * @return array
+     */
+    protected function getJavaScriptControlAttributes()
+    {
+        $attributes = $this->getAttributes();
+
+        foreach ($attributes as $k => $v) {
+            if (is_string($v)) {
+                $attributes[$k] = str_replace(OPT_DIR, '', $v);
+            }
+        }
+
+        return $attributes;
     }
 
     /**
