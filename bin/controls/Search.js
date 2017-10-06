@@ -102,7 +102,7 @@ define('package/quiqqer/search/bin/controls/Search', [
             this.$SearchParams   = JSON.decode(this.getAttribute('searchparams'));
             this.$paginationType = this.$SearchParams.paginationType;
 
-            if (this.$paginationType !== 'pagination') {
+            if (this.$paginationType === 'infinitescroll') {
                 this.$initializeInfiniteScrolling();
                 return;
             }
