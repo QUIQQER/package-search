@@ -5,14 +5,6 @@
  * @author www.pcsg.de (Henning Leutz)
  * @author www.pcsg.de (Patrick Müller)
  *
- * @require qui/QUI
- * @require qui/controls/Control
- * @require qui/controls/buttons/Button
- * @require qui/controls/loader/Loader
- * @require utils/Controls
- * @require Ajax
- * @require Locale
- *
  * @event onSearch [SearchResult, this]
  */
 define('package/quiqqer/search/bin/controls/Search', [
@@ -47,13 +39,16 @@ define('package/quiqqer/search/bin/controls/Search', [
             '$onPaginationChange',
             'setSearchParams',
             'search',
-            'reset'
+            'reset',
+            '$getSearchSiteUrl',
+            '$getUriParams'
         ],
 
         options: {
             delay       : 300,
             resultcount : 0,
-            searchparams: {}
+            searchparams: {},
+            async       : true // set this to false if search requests should be redirected to the Project Search site
         },
 
         initialize: function (options) {
@@ -415,6 +410,10 @@ define('package/quiqqer/search/bin/controls/Search', [
             var searchTerms      = [];
             var FieldConstraints = this.$SearchParams.fieldConstraints;
 
+            if (!FieldConstraints) {
+                FieldConstraints = {};
+            }
+
             this.$extensions.each(function (Extension) {
                 if ("getSearchTerms" in Extension) {
                     if (typeOf(Extension.getSearchTerms) === 'function') {
@@ -442,6 +441,14 @@ define('package/quiqqer/search/bin/controls/Search', [
 
             this.$SearchParams.search           = searchTerms.join(' ');
             this.$SearchParams.fieldConstraints = FieldConstraints;
+
+            if (!this.getAttribute('async')) {
+                return new Promise(function (resolve, reject) {
+                    self.$getSearchSiteUrl().then(function (url) {
+                        window.location = url;
+                    }, reject);
+                });
+            }
 
             return new Promise(function (resolve, reject) {
                 QUIAjax.get(
@@ -473,21 +480,9 @@ define('package/quiqqer/search/bin/controls/Search', [
          * Set URI based on current search parameters
          */
         $setUri: function () {
-            var Uri       = new URI();
-            var UriParams = {
-                max       : this.$SearchParams.max,
-                search    : this.$SearchParams.search,
-                searchIn  : this.$SearchParams.searchFields.join(','),
-                searchType: this.$SearchParams.searchType
-            };
+            var Uri = new URI();
 
-            if (this.$paginationType === 'pagination') {
-                UriParams.sheet = this.$sheet;
-            }
-
-            // keep url params that are not set by this class
-            var ExternalUrlParams = Uri.search(true);
-            Uri.search(Object.merge(ExternalUrlParams, UriParams));
+            Uri.search(this.$getUriParams());
 
             var url = Uri.toString();
 
@@ -497,6 +492,40 @@ define('package/quiqqer/search/bin/controls/Search', [
             } else {
                 window.location = url;
             }
+        },
+
+        /**
+         * Get all URI GET parameters
+         *
+         * @return {Object}
+         */
+        $getUriParams: function () {
+            var Uri       = new URI();
+            var UriParams = {};
+
+            if ("max" in this.$SearchParams) {
+                UriParams.max = this.$SearchParams.max;
+            }
+
+            if ("search" in this.$SearchParams) {
+                UriParams.search = this.$SearchParams.search;
+            }
+
+            if ("searchFields" in this.$SearchParams) {
+                UriParams.searchIn = this.$SearchParams.searchFields.join(',');
+            }
+
+            if ("searchType" in this.$SearchParams) {
+                UriParams.searchType = this.$SearchParams.searchType;
+            }
+
+            if (this.$paginationType === 'pagination') {
+                UriParams.sheet = this.$sheet;
+            }
+
+            // keep url params that are not set by this class
+            var ExternalUrlParams = Uri.search(true);
+            return Object.merge(ExternalUrlParams, UriParams);
         },
 
         /**
@@ -591,6 +620,24 @@ define('package/quiqqer/search/bin/controls/Search', [
                     })
                 );
             }
+        },
+
+        /**
+         * Get search URL for synchronous search
+         *
+         * @return {Promise}
+         */
+        $getSearchSiteUrl: function () {
+            var self = this;
+
+            return new Promise(function (resolve, reject) {
+                QUIAjax.get('package_quiqqer_search_ajax_getSearchSiteUrl', resolve, {
+                    'package': 'quiqqer/search',
+                    getParams: JSON.encode(self.$getUriParams()),
+                    project  : JSON.encode(QUIQQER_PROJECT),
+                    onError  : reject
+                })
+            });
         },
 
         /**
