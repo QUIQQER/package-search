@@ -24,10 +24,10 @@ use QUI\Rating\Handler as RatingHandler;
  */
 class Search extends QUI\Control
 {
-    const SEARCH_TYPE_OR = 'OR';
+    const SEARCH_TYPE_OR  = 'OR';
     const SEARCH_TYPE_AND = 'AND';
 
-    const PAGINATION_TYPE_PAGINATION = 'pagination';
+    const PAGINATION_TYPE_PAGINATION      = 'pagination';
     const PAGINATION_TYPE_INIFINITESCROLL = 'infinitescroll';
 
     /**
@@ -78,7 +78,8 @@ class Search extends QUI\Control
             'relevanceSearch'      => true,
             'childrenListTemplate' => $directory . '/templates/SearchResultList.html',
             'childrenListCss'      => $directory . '/templates/SearchResultList.css',
-            'showResultCount'      => true
+            'showResultCount'      => true,
+            'orderFields'          => array()
         ));
 
         // set attributes
@@ -132,7 +133,8 @@ class Search extends QUI\Control
             'searchtype'       => $this->getAttribute('searchType'),
             'Project'          => $this->Site->getProject(),
             'relevanceSearch'  => $this->getAttribute('relevanceSearch'),
-            'datatypes'        => $siteTypesFilter
+            'datatypes'        => $siteTypesFilter,
+            'orderFields'      => $this->getAttribute('orderFields')
         ));
 
         $result = $FulltextSearch->search($search);
@@ -437,6 +439,13 @@ class Search extends QUI\Control
                     }
 
                     $v = $this->clearSearchFields($v);
+                    break;
+
+                case 'orderFields':
+                    if (!is_array($v)) {
+                        $v = $this->getDefaultSearchFields();
+                        break;
+                    }
                     break;
 
                 case 'suggestSearch':

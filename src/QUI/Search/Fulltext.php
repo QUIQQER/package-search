@@ -38,7 +38,8 @@ class Fulltext extends QUI\QDOM
             'fieldConstraints' => array(), // restrict certain search fields to specific values
             'searchtype'       => 'OR',    // search type: OR / AND
             'datatypes'        => false,   // restrict search to certain site types
-            'relevanceSearch'  => true     // use relevance search (if search string has minimum length)
+            'relevanceSearch'  => true,     // use relevance search (if search string has minimum length),
+            'orderFields'      => array()   // fields that the search results are ordered by (ordered by priority)
         ));
 
         $this->setAttributes($params);
@@ -231,13 +232,6 @@ class Fulltext extends QUI\QDOM
             }
         }
 
-        // query
-        if (is_int(key($availableFields))) {
-            $selectedFields = implode(',', $availableFields);
-        } else {
-            $selectedFields = implode(',', array_keys($availableFields));
-        }
-
         $minWordLength = QUI::getPackage('quiqqer/search')
             ->getConfig()
             ->get('search', 'booleanSearchMaxLength');
@@ -247,6 +241,30 @@ class Fulltext extends QUI\QDOM
         }
 
         $match = str_replace(array('*', '+'), '', $search);
+
+        // order Fields
+        $orderFields = $this->getAttribute('orderFields');
+        $order       = '';
+
+        if (is_array($orderFields) && !empty($orderFields)) {
+            $order = implode(',', $orderFields) . ',';
+
+            foreach ($orderFields as $orderField) {
+                $orderFieldParts = explode(' ', $orderField);
+                $orderField      = current($orderFieldParts);
+
+                if (!in_array($orderField, $availableFields)) {
+                    $availableFields[] = $orderField;
+                }
+            }
+        }
+
+        // query
+        if (is_int(key($availableFields))) {
+            $selectedFields = implode(',', $availableFields);
+        } else {
+            $selectedFields = implode(',', array_keys($availableFields));
+        }
 
         // Relevance search (MATCH.. AGAINST)
         if ($this->getAttribute('relevanceSearch')
@@ -267,7 +285,7 @@ class Fulltext extends QUI\QDOM
                 GROUP BY
                     urlParameter,siteId,{$selectedFields}
                 ORDER BY
-                    relevance DESC
+                    {$order}relevance DESC
             ";
 
 //            if (strlen($search) > 2 || $search == '%%') {
@@ -313,7 +331,7 @@ class Fulltext extends QUI\QDOM
             GROUP BY
                 urlParameter,siteId,e_date,{$selectedFields}
             ORDER BY
-                e_date DESC
+                {$order}e_date DESC
             ";
         }
 
