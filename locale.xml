@@ -245,7 +245,22 @@
             <de><![CDATA[Legt fest ab welcher Wortlänge die Volltextsuche verwendet wird.]]></de>
             <en><![CDATA[Specifies from which word length full-text search is used.]]></en>
         </locale>
-
+        <locale name="quiqqer.search.globale.settings.defaultSearchSite.text">
+            <de><![CDATA[Standard Such-Seite]]></de>
+            <en><![CDATA[Default Search Site]]></en>
+        </locale>
+        <locale name="quiqqer.search.globale.settings.defaultSearchSite.description" html="true">
+            <de><![CDATA[Legt die <b>Seiten-ID für die jeweilige Sprache</b> für die Seite fest, die Standardmäßig als Such-Seite aufgerufen wird, wenn auf einer beliebigen Seite, die keine Such-Seite ist, Such-Controls eingebunden werden (z.B. Such-Input).]]></de>
+            <en><![CDATA[Sets the <b>Site ID for the respective language</b> for the Site that is called by default as the search Site when a search control is included on any page that is not a Site page (for example, search input).]]></en>
+        </locale>
+        <locale name="project.settings.category.quiqqerSearch.title">
+            <de><![CDATA[Suche]]></de>
+            <en><![CDATA[Search]]></en>
+        </locale>
+        <locale name="templatePackageStore.settings.general.title">
+            <de><![CDATA[Such-Einstellungen]]></de>
+            <en><![CDATA[Search settings]]></en>
+        </locale>
 
         <!-- search settings -->
         <locale name="quiqqer.search.settings.title">

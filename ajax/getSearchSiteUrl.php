@@ -1,27 +1,45 @@
 <?php
 
-use QUI\Search\Controls\Search;
-use QUI\Utils\Security\Orthos;
+use QUI\Projects\Site\Utils;
 
 /**
  * Get Project main Search Site
  *
- * @param string $searchParams - search parameters
- * @return array - search result data
+ * @param string $project - json encoded project
+ * @param array $getParams - Search get params
+ * @return string|false - SearchSite URL with search params or false if no SearchSite set
  */
 QUI::$Ajax->registerFunction(
     'package_quiqqer_search_ajax_getSearchSiteUrl',
     function ($project, $getParams) {
         $getParams = json_decode($getParams, true);
 
-        $Project    = QUI::getProjectManager()->decode($project);
-        $SearchSite = $Project->get(8081); // @todo korrekte Seite holen
+        $Project              = QUI::getProjectManager()->decode($project);
+        $SearchSite           = false;
+        $defaultSearchSiteIds = $Project->getConfig('quiqqer_search_settings.defaultSearchSite');
+
+        if (!empty($defaultSearchSiteIds)) {
+            $defaultSearchSiteIds = json_decode($defaultSearchSiteIds, true);
+            $lang                 = $Project->getLang();
+
+            if (!empty($defaultSearchSiteIds[$lang])) {
+                try {
+                    $SearchSite = $Project->get($defaultSearchSiteIds[$Project->getLang()]);
+                } catch (\Exception $Exception) {
+                    // nothing
+                }
+            }
+        }
+
+        if (!$SearchSite) {
+            return false;
+        }
 
         // set default search params
         $defaultSearchParams = array(
             'quiqqer.settings.search.list.max'             => 'max',
             'quiqqer.settings.search.list.fields'          => 'searchFields',
-            'quiqqer.settings.search.list.fields.selected' => 'fieldConstraints',
+            'quiqqer.settings.search.list.fields.selected' => 'fieldConstraints'
         );
 
         foreach ($defaultSearchParams as $siteParam => $searchParam) {

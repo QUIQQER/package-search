@@ -30,6 +30,7 @@
                         <title>
                             <locale group="quiqqer/search" var="quiqqer.search.globale.settings.title"/>
                         </title>
+
                         <input conf="search.booleanSearchMaxLength">
                             <text>
                                 <locale group="quiqqer/search" var="quiqqer.search.globale.settings.booleanSearchMaxLength.text"/>
@@ -44,4 +45,54 @@
         </window>
 
     </settings>
+
+    <project>
+
+        <settings>
+            <config>
+                <section name="quiqqer_search_settings">
+                    <!-- general settings -->
+                    <conf name="defaultSearchSite">
+                        <type><![CDATA[string]]></type>
+                    </conf>
+                </section>
+            </config>
+
+            <window>
+                <categories>
+                    <category name="quiqqerSearch">
+                        <text>
+                            <locale group="quiqqer/search"
+                                    var="project.settings.category.quiqqerSearch.title"
+                            />
+                        </text>
+
+                        <icon>fa fa-search</icon>
+
+                        <settings title="templatePackageStore.settings"
+                                  name="templatePackageStore.settings.general">
+                            <title>
+                                <locale group="quiqqer/search"
+                                        var="templatePackageStore.settings.general.title"
+                                />
+                            </title>
+
+                            <input conf="quiqqer_search_settings.defaultSearchSite" data-qui="controls/lang/InputMultiLang">
+                                <text>
+                                    <locale group="quiqqer/search" var="quiqqer.search.globale.settings.defaultSearchSite.text"/>
+                                </text>
+                                <description>
+                                    <locale group="quiqqer/search" var="quiqqer.search.globale.settings.defaultSearchSite.description"/>
+                                </description>
+                            </input>
+
+                        </settings>
+
+                    </category>
+                </categories>
+
+            </window>
+        </settings>
+
+    </project>
 </quiqqer>
