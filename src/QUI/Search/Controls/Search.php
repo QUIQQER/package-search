@@ -6,6 +6,7 @@
 
 namespace QUI\Search\Controls;
 
+use function GuzzleHttp\Promise\queue;
 use QUI;
 use QUI\Search\Fulltext;
 use QUI\Utils\Security\Orthos;
@@ -476,12 +477,21 @@ class Search extends QUI\Control
                         $constraints[$field] = array();
 
                         if (is_array($constraint)) {
-                            foreach ($constraint as $value) {
-                                if (!is_string($value)) {
+                            foreach ($constraint as $k => $value) {
+                                if (!is_string($value) && !is_array($value)) {
                                     continue;
                                 }
 
-                                $constraints[$field][] = self::sanitizeSearchString($value);
+                                if (is_array($value)) {
+                                    if (!isset($value['value'])
+                                        && !isset($value['type'])) {
+                                        continue;
+                                    }
+
+                                    $constraints[$field][$k]['value'] = self::sanitizeSearchString($value['value']);
+                                } else {
+                                    $constraints[$field][] = self::sanitizeSearchString($value);
+                                }
                             }
 
                             continue;

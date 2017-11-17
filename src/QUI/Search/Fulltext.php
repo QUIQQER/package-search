@@ -14,6 +14,7 @@ use QUI\Projects\Project;
 use QUI\Projects\Site\Edit as SiteEdit;
 use QUI\System\Log;
 use QUI\Utils\Security\Orthos;
+use Tracy\Debugger;
 
 /**
  * Fulltextsearch Manager
@@ -213,11 +214,23 @@ class Fulltext extends QUI\QDOM
                         continue;
                     }
 
-                    $constraintEntriesOr[]    = $field . ' = :constraint' . $i;
-                    $binds['constraint' . $i] = array(
-                        'value' => $value,
-                        'type'  => \PDO::PARAM_STR
-                    );
+                    if (is_array($value)
+                        && !empty($value['value'])
+                        && !empty($value['type'])) {
+                        if ($value['type'] === 'LIKE') {
+                            $constraintEntriesOr[]    = $field . ' LIKE :constraint' . $i;
+                            $binds['constraint' . $i] = array(
+                                'value' => '%' . $value['value'] . '%',
+                                'type'  => \PDO::PARAM_STR
+                            );
+                        }
+                    } else {
+                        $constraintEntriesOr[]    = $field . ' = :constraint' . $i;
+                        $binds['constraint' . $i] = array(
+                            'value' => $value,
+                            'type'  => \PDO::PARAM_STR
+                        );
+                    }
 
                     $i++;
                 }

@@ -408,7 +408,7 @@ define('package/quiqqer/search/bin/controls/Search', [
             this.Loader.show();
 
             var searchTerms      = [];
-            var FieldConstraints = this.$SearchParams.fieldConstraints;
+            var FieldConstraints = Object.clone(this.$SearchParams.fieldConstraints);
 
             if (!FieldConstraints) {
                 FieldConstraints = {};
