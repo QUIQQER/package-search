@@ -602,6 +602,10 @@ define('package/quiqqer/search/bin/controls/Search', [
             this.Loader.hide();
 
             // set result count
+            if (!this.$ResultCountElm) {
+                return;
+            }
+
             if (!SearchResult.count) {
                 this.$ResultCountElm.set(
                     'html',
