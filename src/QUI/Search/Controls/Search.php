@@ -312,6 +312,14 @@ class Search extends QUI\Control
             $this->setAttribute('sheet', $_REQUEST['sheet']);
         }
 
+        if (isset($_REQUEST['max'])) {
+            $this->setAttribute('max', (int)$_REQUEST['max']);
+        }
+
+        if (!empty($_REQUEST['fieldConstraints'])) {
+            $this->setAttribute('fieldConstraints', $_REQUEST['fieldConstraints']);
+        }
+
         if (isset($_REQUEST['search'])) {
             $this->setAttribute('search', $_REQUEST['search']);
         }

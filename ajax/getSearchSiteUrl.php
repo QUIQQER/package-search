@@ -12,8 +12,7 @@ use QUI\Projects\Site\Utils;
 QUI::$Ajax->registerFunction(
     'package_quiqqer_search_ajax_getSearchSiteUrl',
     function ($project, $getParams) {
-        $getParams = json_decode($getParams, true);
-
+        $getParams            = json_decode($getParams, true);
         $Project              = QUI::getProjectManager()->decode($project);
         $SearchSite           = false;
         $defaultSearchSiteIds = $Project->getConfig('quiqqer_search_settings.defaultSearchSite');
@@ -37,9 +36,8 @@ QUI::$Ajax->registerFunction(
 
         // set default search params
         $defaultSearchParams = array(
-            'quiqqer.settings.search.list.max'             => 'max',
-            'quiqqer.settings.search.list.fields'          => 'searchFields',
-            'quiqqer.settings.search.list.fields.selected' => 'fieldConstraints'
+            'quiqqer.settings.search.list.max'    => 'max',
+            'quiqqer.settings.search.list.fields' => 'searchFields'
         );
 
         foreach ($defaultSearchParams as $siteParam => $searchParam) {

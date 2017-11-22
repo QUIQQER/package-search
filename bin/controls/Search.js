@@ -519,6 +519,10 @@ define('package/quiqqer/search/bin/controls/Search', [
                 UriParams.searchType = this.$SearchParams.searchType;
             }
 
+            if ("fieldConstraints" in this.$SearchParams) {
+                UriParams.fieldConstraints =this.$SearchParams.fieldConstraints;
+            }
+
             if (this.$paginationType === 'pagination') {
                 UriParams.sheet = this.$sheet;
             }
