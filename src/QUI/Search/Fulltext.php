@@ -274,15 +274,22 @@ class Fulltext extends QUI\QDOM
 
         // query
         if (is_int(key($availableFields))) {
-            $selectedFields = implode(',', $availableFields);
+            $selectedFields = $availableFields;
         } else {
-            $selectedFields = implode(',', array_keys($availableFields));
+            $selectedFields = array_keys($availableFields);
         }
 
         // Relevance search (MATCH.. AGAINST)
         if ($this->getAttribute('relevanceSearch')
             && strlen($match) >= $minWordLength
         ) {
+            // filter $selectedFields
+            $selectedFields = array_filter($selectedFields, function($v) {
+                return !in_array($v, array('urlParameter', 'siteId'));
+            });
+
+            $selectedFields = implode(',', $selectedFields);
+
             $query = "
                 SELECT
                     siteId,
@@ -332,6 +339,13 @@ class Fulltext extends QUI\QDOM
             }
 
             $where = implode(" OR ", $whereOr);
+
+            // filter $selectedFields
+            $selectedFields = array_filter($selectedFields, function($v) {
+                return !in_array($v, array('e_date', 'urlParameter', 'siteId'));
+            });
+
+            $selectedFields = implode(',', $selectedFields);
 
             $query = "
             SELECT e_date,urlParameter,siteId,{$selectedFields}
