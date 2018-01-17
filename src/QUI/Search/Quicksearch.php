@@ -97,7 +97,7 @@ class Quicksearch extends QUI\QDOM
             $siteTypesQuery .= ' )';
         }
 
-        if (version_compare(QUI::getDataBase()->getVersion(), '5.7.0')) {
+        if (version_compare(QUI::getDataBase()->getVersion(), '5.7.0') >= 0) {
             $query = "
                 SELECT ANY_VALUE(id) AS id, 
                     siteId, 
