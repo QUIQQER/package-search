@@ -128,12 +128,12 @@ define('package/quiqqer/search/bin/controls/Suggest', [
             });
 
             Node.addEvents({
-                keyup   : this.$keyUp,
-                blur    : this.$blur
+                keyup: this.$keyUp,
+                blur : this.$blur
             });
 
             // hide results if users click "x" in search input
-            Node.addEventListener('search', function(event) {
+            Node.addEventListener('search', function (event) {
                 event.stopPropagation();
 
                 if (event.target.value.trim() === '') {
