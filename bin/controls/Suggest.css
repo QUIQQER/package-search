@@ -48,7 +48,7 @@
     padding: 20px;
 }
 
-.quiqqer-search-suggest-noproducts {
+.quiqqer-search-suggest-noresult {
     float: left;
-    padding: 0 10px;
+    padding: 10px 15px;
 }

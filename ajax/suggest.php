@@ -29,6 +29,10 @@ QUI::$Ajax->registerFunction(
             'limit' => 10
         ));
 
+        if (empty($result['list'])) {
+            return false;
+        }
+
         $list = '<ul>';
 
         foreach ($result['list'] as $entry) {

@@ -10,6 +10,12 @@
             <en><![CDATA[Search areas]]></en>
         </locale>
 
+        <!-- Control: Suggest -->
+        <locale name="controls.Suggest.no_results">
+            <de><![CDATA[Es wurden keine Ergebnisse gefunden]]></de>
+            <en><![CDATA[No results were found]]></en>
+        </locale>
+
     </groups>
 
     <!-- php + javascript locale -->
