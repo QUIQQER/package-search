@@ -12,7 +12,7 @@ use QUI\Search\Fulltext;
 use QUI\Utils\Security\Orthos;
 use QUI\Projects\Site;
 use QUI\Utils\StringHelper;
-use QUI\Bricks\Controls\Pagination;
+use QUI\Controls\Navigating\Pagination;
 use QUI\Controls\ChildrenList;
 use QUI\Rating\Handler as RatingHandler;
 
@@ -372,7 +372,7 @@ class Search extends QUI\Control
             $allFields[] = $entry['field'];
         }
 
-        $settingsFields = $this->Site->getAttribute('quiqqer.settings.search.list.fields');
+        $settingsFields = $this->Site->getAttribute('quiqqer.settings.search.list.fields.selected');
         $filteredFields = array();
 
         if (!empty($settingsFields)
@@ -445,6 +445,27 @@ class Search extends QUI\Control
                     if (!is_array($v)) {
                         $v = $this->getDefaultSearchFields();
                         break;
+                    }
+
+                    $availableFields = $this->Site->getAttribute(
+                        'quiqqer.settings.search.list.fields'
+                    );
+                    $selectedFields  = $this->Site->getAttribute(
+                        'quiqqer.settings.search.list.fields.selected'
+                    );
+
+                    if (empty($availableFields)) {
+                        $availableFields = array();
+                    }
+
+                    if (!empty($selectedFields)) {
+                        foreach ($selectedFields as $j => $field) {
+                            if (!in_array($field, $v) && in_array($field, $availableFields)) {
+                                unset($selectedFields[$j]);
+                            }
+                        }
+
+                        $v = array_values($selectedFields);
                     }
 
                     $v = $this->clearSearchFields($v);
@@ -583,12 +604,7 @@ class Search extends QUI\Control
             $settingsFieldsSelected = array();
         }
 
-        // if no available fields have been set for the site, use all fields
-        if (empty($settingsFields)) {
-            return $allFields;
-        }
-
-        // if no available fields have been selected by the user, use all fields
+        // if no available fields have been selected by the user (or the admin), use all fields
         if (empty($settingsFieldsSelected)) {
             return $settingsFields;
         }

@@ -211,6 +211,11 @@ class Search
      */
     public static function onSiteChange($Site)
     {
+        // check default settings
+        if ($Site->getAttribute('type') === 'quiqqer/search:types/search') {
+            self::setSiteDefaultSettings($Site);
+        }
+
         if (!$Site->getAttribute('active')) {
             return;
         }
@@ -218,7 +223,6 @@ class Search
         if ($Site->getAttribute('deleted')) {
             return;
         }
-
 
         /* @param $Site \QUI\Projects\Site */
         $Project = $Site->getProject();
@@ -256,6 +260,29 @@ class Search
 //            $Site->getAttribute('name'),
             $Site->getAttribute('title')
         ));
+    }
+
+    /**
+     * Set default search params for search sites
+     *
+     * @param Site $Site
+     * @return void
+     *
+     * @throws QUI\Exception
+     */
+    protected static function setSiteDefaultSettings(Site $Site)
+    {
+        $fields         = $Site->getAttribute('quiqqer.settings.search.list.fields');
+        $selectedFields = $Site->getAttribute('quiqqer.settings.search.list.fields.selected');
+
+        if (!empty($fields) || !empty($selectedFields)) {
+            return;
+        }
+
+        $selectedFields = array('name', 'title', 'short', 'data');
+        $Site           = $Site->getEdit();
+        $Site->setAttribute('quiqqer.settings.search.list.fields.selected', $selectedFields);
+        $Site->save();
     }
 
     /**

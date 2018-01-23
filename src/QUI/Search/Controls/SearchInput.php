@@ -71,15 +71,22 @@ class SearchInput extends QUI\Control
     {
         $Engine = QUI::getTemplateManager()->getEngine();
 
+        $showFieldSettings = $this->getAttribute('showFieldSettings');
+        $availableFields   = $this->getAttribute('availableFields');
+
+        if (empty($availableFields)) {
+            $showFieldSettings = false;
+        }
+
         $Engine->assign(array(
             'Site'              => $this->Site,
             'searchType'        => $this->getAttribute('searchType'),
             'search'            => $this->getAttribute('search'),
-            'availableFields'   => $this->getAttribute('availableFields'),
+            'availableFields'   => $availableFields,
             'fields'            => $this->getAttribute('fields'),
             'suggestSearch'     => $this->getAttribute('suggestSearch'),
             'placeholder'       => $this->getAttribute('placeholder'),
-            'showFieldSettings' => $this->getAttribute('showFieldSettings'),
+            'showFieldSettings' => $showFieldSettings,
             'submitIcon'        => $this->getAttribute('submitIcon')
         ));
 
@@ -136,7 +143,7 @@ class SearchInput extends QUI\Control
         $availableFields = $this->getAttribute('availableFields');
 
         if (!is_array($availableFields)
-            || empty($availableFields)
+            /*|| empty($availableFields)*/
         ) {
             $availableFields = $allFields;
         } else {

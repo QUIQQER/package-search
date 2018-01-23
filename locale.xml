@@ -6,8 +6,8 @@
 
         <!-- Control: SearchInput -->
         <locale name="controls.searchinput.searchfieldselect.placeholder">
-            <de><![CDATA[Suchbereiche]]></de>
-            <en><![CDATA[Search areas]]></en>
+            <de><![CDATA[Sucheinstellungen]]></de>
+            <en><![CDATA[Search settings]]></en>
         </locale>
 
         <!-- Control: Suggest -->
