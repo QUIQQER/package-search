@@ -62,6 +62,7 @@ class Fulltext extends QUI\QDOM
      */
     public function search($str = '')
     {
+        $str        = $this->sanitizeSearchString($str);
         $Project    = $this->getAttribute('Project');
         $attrLimit  = $this->getAttribute('limit');
         $attrFields = $this->getAttribute('fields');
@@ -404,6 +405,23 @@ class Fulltext extends QUI\QDOM
             'list'  => $result,
             'count' => $count[0]['count']
         );
+    }
+
+    /**
+     * Sanitizes a search string
+     *
+     * @param string $str
+     * @return string - sanitized string
+     */
+    protected function sanitizeSearchString($str)
+    {
+        /* http://www.regular-expressions.info/unicode.html#prop */
+        $str = preg_replace("/[^\p{L}\p{N}\p{P}\-\+]/iu", " ", $str);
+        $str = Orthos::clear($str);
+        $str = preg_replace('#([ ]){2,}#', "$1", $str);
+        $str = trim($str);
+
+        return $str;
     }
 
     /**

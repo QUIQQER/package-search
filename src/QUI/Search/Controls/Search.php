@@ -416,8 +416,6 @@ class Search extends QUI\Control
                         $v = '';
                         break;
                     }
-
-                    $v = self::sanitizeSearchString($v);
                     break;
 
                 case 'searchType':
@@ -559,23 +557,6 @@ class Search extends QUI\Control
         }
 
         $this->setAttributes($attributes);
-    }
-
-    /**
-     * Sanitizes a search string
-     *
-     * @param string $str
-     * @return string - sanitized string
-     */
-    protected function sanitizeSearchString($str)
-    {
-        /* http://www.regular-expressions.info/unicode.html#prop */
-        $str = preg_replace("/[^\p{L}\p{N}\p{P}\-]/iu", " ", $str);
-        $str = Orthos::clear($str);
-        $str = preg_replace('#([ ]){2,}#', "$1", $str);
-        $str = trim($str);
-
-        return $str;
     }
 
     /**
