@@ -281,7 +281,7 @@ class Fulltext extends QUI\QDOM
 
         // Relevance search (MATCH.. AGAINST)
         if ($this->getAttribute('relevanceSearch')
-            && strlen($match) >= $minWordLength
+            && mb_strlen($match) >= $minWordLength
         ) {
             // filter $selectedFields
             $selectedFields = array_filter($selectedFields, function ($v) {

@@ -200,7 +200,13 @@ define('package/quiqqer/search/bin/controls/SearchInput', [
 
             // search fields
             if (this.$SearchFieldSelect) {
-                SearchParams.searchFields = this.$SearchFieldSelect.getValue();
+                var searchFields = this.$SearchFieldSelect.getValue();
+
+                if (searchFields.contains('AND')) {
+                    SearchParams.searchType = 'AND';
+                }
+
+                SearchParams.searchFields = searchFields;
             } else {
                 var settingInputs = this.$SettingsElm.getElements(
                     '.qui-search-searchinput-settings-setting'

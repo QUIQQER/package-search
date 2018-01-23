@@ -27,11 +27,18 @@ if (QUI::getRewrite()->getHeaderCode() === 404) {
 /**
  * Settings
  */
+$fields = $Site->getAttribute('quiqqer.settings.search.list.fields');
+$searchType = Search::SEARCH_TYPE_OR;
+
+if (in_array('searchTypeAnd', $fields)) {
+    $searchType = Search::SEARCH_TYPE_AND;
+}
 
 $SearchInput = new SearchInput(array(
     'suggestSearch'     => $Site->getAttribute('quiqqer.search.sitetypes.search.suggestSearch'),
-    'availableFields'   => $Site->getAttribute('quiqqer.settings.search.list.fields'),
+    'availableFields'   => $fields,
     'fields'            => $Site->getAttribute('quiqqer.settings.search.list.fields.selected'),
+    'searchType'        => $searchType,
     'showFieldSettings' => !boolval($Site->getAttribute('quiqqer.settings.search.list.hideSettings'))
 ));
 
