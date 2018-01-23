@@ -284,7 +284,7 @@ class Fulltext extends QUI\QDOM
             && strlen($match) >= $minWordLength
         ) {
             // filter $selectedFields
-            $selectedFields = array_filter($selectedFields, function($v) {
+            $selectedFields = array_filter($selectedFields, function ($v) {
                 return !in_array($v, array('urlParameter', 'siteId'));
             });
 
@@ -341,7 +341,7 @@ class Fulltext extends QUI\QDOM
             $where = implode(" OR ", $whereOr);
 
             // filter $selectedFields
-            $selectedFields = array_filter($selectedFields, function($v) {
+            $selectedFields = array_filter($selectedFields, function ($v) {
                 return !in_array($v, array('e_date', 'urlParameter', 'siteId'));
             });
 
@@ -712,7 +712,7 @@ class Fulltext extends QUI\QDOM
         $result = array();
         $files  = self::getSearchXmlList();
 
-        foreach ($files as $file) {
+        foreach ($files as $package => $file) {
             $Dom  = QUI\Utils\Text\XML::getDomFromXml($file);
             $Path = new \DOMXPath($Dom);
 
@@ -723,7 +723,8 @@ class Fulltext extends QUI\QDOM
                 $result[] = array(
                     'field'    => trim($Field->nodeValue),
                     'type'     => $Field->getAttribute('type'),
-                    'fulltext' => $Field->getAttribute('fulltext') ? true : false
+                    'fulltext' => $Field->getAttribute('fulltext') ? true : false,
+                    'package'  => $package
                 );
             }
         }
@@ -754,7 +755,7 @@ class Fulltext extends QUI\QDOM
             $xmlFile = OPT_DIR . $package['name'] . '/search.xml';
 
             if (file_exists($xmlFile)) {
-                $result[] = $xmlFile;
+                $result[$package['name']] = $xmlFile;
             }
         }
 

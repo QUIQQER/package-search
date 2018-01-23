@@ -108,6 +108,8 @@ class Search
      */
     public static function setup()
     {
+        QUI\Cache\Manager::clear('quiqqer/search');
+
         $Table    = QUI::getDataBase()->table();
         $Manager  = QUI::getProjectManager();
         $projects = $Manager->getProjects(true);
@@ -121,9 +123,15 @@ class Search
             $fields[$fieldEntry['field']] = $fieldEntry['type'];
 
             if ($fieldEntry['fulltext']) {
-                $fulltext[] = $fieldEntry['field'];
+                $fulltext[] = array(
+                    'field'   => $fieldEntry['field'],
+                    'package' => $fieldEntry['package']
+                );
             } else {
-                $index[] = $fieldEntry['field'];
+                $index[] = array(
+                    'field'   => $fieldEntry['field'],
+                    'package' => $fieldEntry['package']
+                );
             }
         }
 
@@ -143,16 +151,18 @@ class Search
                 $Table->addColumn($table, $fields);
 
                 foreach ($fulltext as $field) {
-                    $Table->setFulltext($table, $field);
+                    $Table->setFulltext($table, $field['field']);
                 }
 
                 foreach ($index as $field) {
                     try {
-                        $Table->setIndex($table, $field);
+                        $Table->setIndex($table, $field['field']);
                     } catch (\Exception $Exception) {
                         QUI\System\Log::addWarning(
                             self::class . ' :: setup() -> Could not create Index for Fulltext'
-                            . ' search column "' . $field . '": ' . $Exception->getMessage()
+                            . ' search column "' . $field['field'] . '" (Package: ' . $field['package'] . ').'
+                            . ' The search column may be needed to be defined as "fulltext" for this to work.'
+                            . ' Error Message: ' . $Exception->getMessage()
                         );
                     }
                 }
