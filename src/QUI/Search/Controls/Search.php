@@ -6,7 +6,6 @@
 
 namespace QUI\Search\Controls;
 
-use function GuzzleHttp\Promise\queue;
 use QUI;
 use QUI\Search\Fulltext;
 use QUI\Utils\Security\Orthos;
@@ -14,7 +13,6 @@ use QUI\Projects\Site;
 use QUI\Utils\StringHelper;
 use QUI\Controls\Navigating\Pagination;
 use QUI\Controls\ChildrenList;
-use QUI\Rating\Handler as RatingHandler;
 
 /**
  * Class Search

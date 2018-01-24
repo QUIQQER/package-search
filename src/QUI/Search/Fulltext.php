@@ -59,6 +59,8 @@ class Fulltext extends QUI\QDOM
      *        'list'   => array list of results
      *        'count'  => count of results
      * )
+     *
+     * @throws QUI\Exception
      */
     public function search($str = '')
     {
@@ -250,6 +252,7 @@ class Fulltext extends QUI\QDOM
             ->getConfig()
             ->get('search', 'booleanSearchMaxLength');
 
+        // fallback
         if (!$minWordLength) {
             $minWordLength = 3;
         }
@@ -309,6 +312,8 @@ class Fulltext extends QUI\QDOM
                     {$order}relevance DESC
             ";
 
+            $search = str_replace('*', '', $search);
+
 //            if (strlen($search) > 2 || $search == '%%') {
             $binds['search'] = array(
                 'value' => $search,
@@ -316,7 +321,7 @@ class Fulltext extends QUI\QDOM
             );
 //            }
         } else {
-            $whereOr = array();
+            $where = array();
 
             $searchFields = array(
                 'name',
@@ -329,6 +334,8 @@ class Fulltext extends QUI\QDOM
             $searchTerms  = explode(' ', $str);
 
             foreach ($searchTerms as $k => $searchTerm) {
+                $whereOr = array();
+
                 foreach ($searchFields as $field) {
                     $whereOr[] = $field . ' LIKE :search' . $k;
                 }
@@ -337,9 +344,15 @@ class Fulltext extends QUI\QDOM
                     'value' => '%' . $searchTerm . '%',
                     'type'  => \PDO::PARAM_STR
                 );
+
+                $where[] = "(" . implode(" OR ", $whereOr) . ")";
             }
 
-            $where = implode(" OR ", $whereOr);
+            if ($this->getAttribute('searchtype') === Search\Controls\Search::SEARCH_TYPE_AND) {
+                $where = implode(" AND ", $where);
+            } else {
+                $where = implode(" OR ", $where);
+            }
 
             // filter $selectedFields
             $selectedFields = array_filter($selectedFields, function ($v) {
