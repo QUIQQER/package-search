@@ -8,7 +8,13 @@
             <locale group="quiqqer/search" var="package.description"/>
         </description>
 
-        <image src="URL_OPT_DIR/quiqqer/package-search/bin/images/Logo.jpg"/>
+        <image src="URL_OPT_DIR/quiqqer/search/bin/images/Logo.jpg"/>
+
+        <preview>
+            <image src="URL_OPT_DIR/quiqqer/search/bin/images/preview/Frontend_View.png"/>
+            <image src="URL_OPT_DIR/quiqqer/search/bin/images/preview/Mobile_View.png"/>
+            <image src="URL_OPT_DIR/quiqqer/search/bin/images/preview/Search_Site_Settings.png"/>
+        </preview>
 
         <support>
             <email><![CDATA[support@pcsg.de]]></email>
