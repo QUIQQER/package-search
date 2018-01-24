@@ -1,8 +1,12 @@
+<style>
+    .quiqqer-search-result-count {
+        display: none;
+    }
+</style>
 
 <div itemscope itemtype="http://schema.org/ItemList">
-
     {if $Template->getAttribute('content-header')}
-    <section class="content-header grid-100 mobile-grid-100">
+    <section class="content-header">
         <header>
             <h1>{$Site->getAttribute('title')}</h1>
         </header>
@@ -16,58 +20,11 @@
     {/if}
 
     {if $Template->getAttribute('content-body') && $Site->getAttribute('content')}
-    <section class="content-body grid-100 mobile-grid-100">
+    <section class="content-body">
         {$Site->getAttribute('content')}
     </section>
     {/if}
 
+    {$Search->create()}
 
-    <section class="content-template grid-100 mobile-grid-100 qui-search-result">
-    {$Pagination->create()}
-
-    {foreach from=$children item=Child}
-    {assign var=Child value=$Child->load()}
-
-    <article class="qui-search-result-list-entry">
-
-        <h2>
-            <a href="{$Child->getAttribute('search-url')}">
-                <span>{$Child->getAttribute('search-title')}</span>
-            </a>
-        </h2>
-
-        <div class="qui-search-result-list-entry-content grid-100 mobile-grid-100 grid-parent">
-            {assign var=bg value=""}
-            {if $Child->getAttribute('search-icon')}
-                {image src=$Child->getAttribute('search-icon') width="300" type="resize" onlysrc=1 assign=bg}
-            {/if}
-
-            <a href="{$Child->getAttribute('search-url')}"
-               title="{$Child->getAttribute('search-title')|escape:"html"}"
-               class="qui-search-result-list-entry-imagelink grid-25 hide-on-mobile content-image-placeholder"
-               {if $bg}style="background-image: url('{$bg}')"{/if}
-            >
-                <span>{$Child->getAttribute('search-title')}</span>
-            </a>
-
-            <div class="qui-search-result-list-entry-short grid-75 mobile-grid-100">
-                {$Child->getAttribute('search-short')}
-            </div>
-        </div>
-
-        <div class="qui-search-result-list-entry-data grid-100 mobile-grid-100 grid-parent">
-
-            <a href="{$Child->getAttribute('search-url')}"
-               class="qui-button"
-               title="{$Child->getAttribute('search-title')|escape:"html"}"
-            >
-                {locale group="quiqqer/search" value="tpl.search.list.more"}
-            </a>
-        </div>
-
-    </article>
-    {/foreach}
-
-    {$Pagination->create()}
-    </section>
 </div>

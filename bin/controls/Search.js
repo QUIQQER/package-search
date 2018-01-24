@@ -439,7 +439,10 @@ define('package/quiqqer/search/bin/controls/Search', [
                 searchTerms.push(searchTerm);
             });
 
-            this.$SearchParams.search           = searchTerms.join(' ');
+            if (searchTerms.length) {
+                this.$SearchParams.search = searchTerms.join(' ');
+            }
+
             this.$SearchParams.fieldConstraints = FieldConstraints;
 
             if (!this.getAttribute('async')) {
@@ -520,7 +523,7 @@ define('package/quiqqer/search/bin/controls/Search', [
             }
 
             if ("fieldConstraints" in this.$SearchParams) {
-                UriParams.fieldConstraints =this.$SearchParams.fieldConstraints;
+                UriParams.fieldConstraints = this.$SearchParams.fieldConstraints;
             }
 
             if (this.$paginationType === 'pagination') {

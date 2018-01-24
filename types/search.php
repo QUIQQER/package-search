@@ -1,6 +1,5 @@
 <?php
 
-use QUI\Utils\Security\Orthos;
 use QUI\Search\Controls\Search;
 use QUI\Search\Controls\SearchInput;
 

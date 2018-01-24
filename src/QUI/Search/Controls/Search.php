@@ -159,7 +159,7 @@ class Search extends QUI\Control
                 $ResultSite->setAttribute('search-name', $entry['name']);
                 $ResultSite->setAttribute('search-title', $entry['title']);
                 $ResultSite->setAttribute('search-short', $entry['short']);
-                $ResultSite->setAttribute('search-relevance', $entry['relevance']);
+                $ResultSite->setAttribute('search-relevance', round($entry['relevance'], 2));
                 $ResultSite->setAttribute('search-url', $url);
                 $ResultSite->setAttribute('search-icon', $entry['icon']);
 

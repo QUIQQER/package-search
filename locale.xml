@@ -332,6 +332,15 @@
             <de><![CDATA[Stellen Sie hier ein welche Seitentypen in Ihrer Liste angezeigt werden soll.]]></de>
             <en><![CDATA[Setup the page types which will be displayed in your list.]]></en>
         </locale>
+        <locale name="quiqqer.search.results.settings.search_term">
+            <de><![CDATA[Vordefinierter Suchbegriff]]></de>
+            <en><![CDATA[Pre-defined search term]]></en>
+        </locale>
+        <locale name="quiqqer.search.results.settings.search_term.description">
+            <de><![CDATA[Bestimmt den Suchbegriff, der die Suchergebnisse festlegt. Dieser Suchbegriff bleibt immer gleich. Er wird so behandelt, als hätte ihn der Benutzer selbst bei der Suche eingegeben.]]></de>
+            <en><![CDATA[Determines the search term that defines the search results. This search term always stays the same. It is treated as if the user had typed it in the search itself.]]></en>
+        </locale>
+
     </groups>
 
 </locales>
