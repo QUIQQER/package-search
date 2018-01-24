@@ -164,6 +164,14 @@
             <de><![CDATA[Projekt-Sprache]]></de>
             <en><![CDATA[Project language]]></en>
         </locale>
+        <locale name="cron.all_projects.title">
+            <de><![CDATA[Such-Datenbank aufbauen (alle Projekte)]]></de>
+            <en><![CDATA[Build search database (all projects)]]></en>
+        </locale>
+        <locale name="cron.all_projects.description">
+            <de><![CDATA[Baut die Such-Datenbank für alle Projekte (in allen Sprachen) auf (Schnell- und Volltext-Suche)]]></de>
+            <en><![CDATA[Builds the search database for all projects (in all languages; Quick and Fulltext Search)]]></en>
+        </locale>
 
         <!-- search template -->
         <locale name="tpl.search.button">

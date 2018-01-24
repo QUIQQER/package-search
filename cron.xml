@@ -20,4 +20,13 @@
         </params>
     </cron>
 
+    <cron exec="\QUI\Search\Cron::createSearchDatabaseAllProjects">
+        <title>
+            <locale group="quiqqer/search" var="cron.all_projects.title" />
+        </title>
+        <description>
+            <locale group="quiqqer/search" var="cron.all_projects.description" />
+        </description>
+    </cron>
+
 </crons>
