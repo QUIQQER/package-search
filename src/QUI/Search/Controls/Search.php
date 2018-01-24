@@ -618,10 +618,6 @@ class Search extends QUI\Control
     {
         $paginationType = $this->getAttribute('paginationType');
 
-        if ($paginationType === false) {
-            return false;
-        }
-
         if (empty($paginationType)) {
             $paginationType = $this->Site->getAttribute('quiqqer.search.sitetypes.search.pagination.type');
         }
