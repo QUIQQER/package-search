@@ -12,4 +12,5 @@ $Search = new Search(array(
     'datatypes'    => $Site->getAttribute('quiqqer.settings.results.list.types')
 ));
 
+
 $Engine->assign('Search', $Search);
