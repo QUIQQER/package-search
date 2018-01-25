@@ -34,7 +34,7 @@
         </locale>
         <locale name="quiqqer/search:types/search.title">
             <de><![CDATA[Erweiterte Suche]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Extended Search]]></en>
         </locale>
         <locale name="quiqqer/search:types/search.description" html="true">
             <de><![CDATA[
@@ -224,8 +224,12 @@
             <en><![CDATA[Search as sitetypes]]></en>
         </locale>
         <locale name="tpl.search.field.e_date">
-            <de><![CDATA[In Editierungsdatum suchen]]></de>
-            <en><![CDATA[Search in edit date]]></en>
+            <de><![CDATA[In Seiten-Editierungsdatum suchen]]></de>
+            <en><![CDATA[Search in Site edit date]]></en>
+        </locale>
+        <locale name="tpl.search.field.c_date">
+            <de><![CDATA[In Seiten-Erstellungssdatum suchen]]></de>
+            <en><![CDATA[Search in Site create date]]></en>
         </locale>
         <locale name="tpl.search.pagination.inifinitescroll.btn">
             <de><![CDATA[Mehr Ergebnisse laden]]></de>
