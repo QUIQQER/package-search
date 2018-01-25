@@ -311,6 +311,14 @@
             <de><![CDATA[Such-Einstellungen - Vorselektierte Felder]]></de>
             <en><![CDATA[Search settings - Selected settings]]></en>
         </locale>
+        <locale name="quiqqer.settings.sitetypes.list.showTime">
+            <de><![CDATA[Uhrzeit anzeigen]]></de>
+            <en><![CDATA[Show time]]></en>
+        </locale>
+        <locale name="quiqqer.settings.sitetypes.list.showRelevance">
+            <de><![CDATA[Relevanz anzeigen]]></de>
+            <en><![CDATA[Show relevance]]></en>
+        </locale>
         <locale name="quiqqer.search.listTemplate.advancedArticleList">
             <de><![CDATA[Moderne Liste ohne Bilder]]></de>
             <en><![CDATA[Modern list without picture]]></en>

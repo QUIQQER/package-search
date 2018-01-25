@@ -132,10 +132,12 @@
                         </span>
                     {/if}
 
+                    {if $this->getAttribute('showRelevance')}
                     <span class="qui-control-childrenlist-default-entry-content-footer-relevance">
                         <span class="fa fa-percent"></span>
                         {$Child->getAttribute('search-relevance')}
                     </span>
+                    {/if}
                 </div>
                 {/if}
 

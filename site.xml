@@ -41,6 +41,8 @@
                 <attribute>quiqqer.settings.search.list.fields.selected</attribute>
                 <attribute default="0">quiqqer.settings.sitetypes.list.showCreator</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showDate</attribute>
+                <attribute default="1">quiqqer.settings.sitetypes.list.showTime</attribute>
+                <attribute default="1">quiqqer.settings.sitetypes.list.showRelevance</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showImages</attribute>
                 <attribute default="off">quiqqer.search.sitetypes.search.suggestSearch</attribute>
                 <attribute>quiqqer.settings.search.sitetypes.filter</attribute>
@@ -137,6 +139,20 @@
                             </text>
                         </input>
 
+                        <input conf="quiqqer.settings.sitetypes.list.showTime" type="checkbox">
+                            <text>
+                                <locale group="quiqqer/search"
+                                        var="quiqqer.settings.sitetypes.list.showTime" />
+                            </text>
+                        </input>
+
+                        <input conf="quiqqer.settings.sitetypes.list.showRelevance" type="checkbox">
+                            <text>
+                                <locale group="quiqqer/search"
+                                        var="quiqqer.settings.sitetypes.list.showRelevance" />
+                            </text>
+                        </input>
+
                         <input conf="quiqqer.settings.sitetypes.list.showImages" type="checkbox">
                             <text>
                                 <locale group="quiqqer/sitetypes"
@@ -185,6 +201,8 @@
                 <attribute default="0">quiqqer.settings.sitetypes.list.showCreator</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showDate</attribute>
                 <attribute default="1">quiqqer.settings.sitetypes.list.showImages</attribute>
+                <attribute default="1">quiqqer.settings.sitetypes.list.showTime</attribute>
+                <attribute default="1">quiqqer.settings.sitetypes.list.showRelevance</attribute>
             </attributes>
 
             <!-- list settings -->
@@ -261,6 +279,20 @@
                             <text>
                                 <locale group="quiqqer/sitetypes"
                                         var="quiqqer.sitetypes.list.settings.showDate" />
+                            </text>
+                        </input>
+
+                        <input conf="quiqqer.settings.sitetypes.list.showTime" type="checkbox">
+                            <text>
+                                <locale group="quiqqer/search"
+                                        var="quiqqer.settings.sitetypes.list.showTime" />
+                            </text>
+                        </input>
+
+                        <input conf="quiqqer.settings.sitetypes.list.showRelevance" type="checkbox">
+                            <text>
+                                <locale group="quiqqer/search"
+                                        var="quiqqer.settings.sitetypes.list.showRelevance" />
                             </text>
                         </input>
 
