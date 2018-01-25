@@ -6,17 +6,16 @@
  *
  * @module package/quiqqer/search/bin/controls/SearchExtension
  * @author www.pcsg.de (Patrick Müller)
- *
- * @require qui/controls/Control
- * @require package/quiqqer/search/bin/SearchUtils
  */
 define('package/quiqqer/search/bin/controls/SearchExtension', [
 
     'qui/controls/Control',
     'package/quiqqer/search/bin/SearchUtils',
+    'package/quiqqer/search/bin/controls/Search',
+
     'URI'
 
-], function (QUIControl, SearchUtils, URI) {
+], function (QUIControl, SearchUtils, Search, URI) {
     "use strict";
 
     return new Class({
@@ -40,6 +39,12 @@ define('package/quiqqer/search/bin/controls/SearchExtension', [
 
             SearchUtils.getSearchControl().then(function (SearchControl) {
                 self.$Search = SearchControl;
+                self.$Search.registerSearchExtension(self);
+            }, function() {
+                self.$Search = new Search({
+                    async: false
+                });
+
                 self.$Search.registerSearchExtension(self);
             });
         },

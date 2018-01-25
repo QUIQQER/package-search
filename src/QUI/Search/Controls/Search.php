@@ -11,9 +11,8 @@ use QUI\Search\Fulltext;
 use QUI\Utils\Security\Orthos;
 use QUI\Projects\Site;
 use QUI\Utils\StringHelper;
-use QUI\Bricks\Controls\Pagination;
+use QUI\Controls\Navigating\Pagination;
 use QUI\Controls\ChildrenList;
-use QUI\Rating\Handler as RatingHandler;
 
 /**
  * Class Search
@@ -24,10 +23,10 @@ use QUI\Rating\Handler as RatingHandler;
  */
 class Search extends QUI\Control
 {
-    const SEARCH_TYPE_OR = 'OR';
+    const SEARCH_TYPE_OR  = 'OR';
     const SEARCH_TYPE_AND = 'AND';
 
-    const PAGINATION_TYPE_PAGINATION = 'pagination';
+    const PAGINATION_TYPE_PAGINATION      = 'pagination';
     const PAGINATION_TYPE_INIFINITESCROLL = 'infinitescroll';
 
     /**
@@ -77,7 +76,9 @@ class Search extends QUI\Control
             // use Fulltext relevance search
             'relevanceSearch'      => true,
             'childrenListTemplate' => $directory . '/templates/SearchResultList.html',
-            'childrenListCss'      => $directory . '/templates/SearchResultList.css'
+            'childrenListCss'      => $directory . '/templates/SearchResultList.css',
+            'showResultCount'      => true,
+            'orderFields'          => array()
         ));
 
         // set attributes
@@ -88,7 +89,7 @@ class Search extends QUI\Control
 
         // set javascript control data
         $this->setJavaScriptControl('package/quiqqer/search/bin/controls/Search');
-        $this->setJavaScriptControlOption('searchparams', json_encode($this->getAttributes()));
+        $this->setJavaScriptControlOption('searchparams', json_encode($this->getJavaScriptControlAttributes()));
 
         // set template data
         $this->addCSSClass('quiqqer-search');
@@ -131,7 +132,8 @@ class Search extends QUI\Control
             'searchtype'       => $this->getAttribute('searchType'),
             'Project'          => $this->Site->getProject(),
             'relevanceSearch'  => $this->getAttribute('relevanceSearch'),
-            'datatypes'        => $siteTypesFilter
+            'datatypes'        => $siteTypesFilter,
+            'orderFields'      => $this->getAttribute('orderFields')
         ));
 
         $result = $FulltextSearch->search($search);
@@ -157,7 +159,7 @@ class Search extends QUI\Control
                 $ResultSite->setAttribute('search-name', $entry['name']);
                 $ResultSite->setAttribute('search-title', $entry['title']);
                 $ResultSite->setAttribute('search-short', $entry['short']);
-                $ResultSite->setAttribute('search-relevance', $entry['relevance']);
+                $ResultSite->setAttribute('search-relevance', round($entry['relevance'], 2));
                 $ResultSite->setAttribute('search-url', $url);
                 $ResultSite->setAttribute('search-icon', $entry['icon']);
 
@@ -196,7 +198,8 @@ class Search extends QUI\Control
             'limit'                      => $searchResult['max'],
             'showDate'                   => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showDate'),
             'showCreator'                => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showCreator'),
-            'showTime'                   => true,
+            'showTime'                   => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showTime'),
+            'showRelevance'              => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showRelevance'),
             'showSheets'                 => false,
             'showImages'                 => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.showImages'),
             'showShort'                  => true,
@@ -287,7 +290,8 @@ class Search extends QUI\Control
             'searchType'      => $this->getAttribute('searchType'),
             'availableFields' => $this->Site->getAttribute('quiqqer.settings.search.list.fields'),
             'ChildrenList'    => $this->getChildrenList(),
-            'paginationType'  => $this->getPaginationType()
+            'paginationType'  => $this->getPaginationType(),
+            'showResultCount' => $this->getAttribute('showResultCount')
         ));
 
         $this->setJavaScriptControlOption('resultcount', $searchResult['count']);
@@ -305,6 +309,14 @@ class Search extends QUI\Control
         // requests
         if (isset($_REQUEST['sheet'])) {
             $this->setAttribute('sheet', $_REQUEST['sheet']);
+        }
+
+        if (isset($_REQUEST['max'])) {
+            $this->setAttribute('max', (int)$_REQUEST['max']);
+        }
+
+        if (!empty($_REQUEST['fieldConstraints'])) {
+            $this->setAttribute('fieldConstraints', $_REQUEST['fieldConstraints']);
         }
 
         if (isset($_REQUEST['search'])) {
@@ -359,7 +371,7 @@ class Search extends QUI\Control
             $allFields[] = $entry['field'];
         }
 
-        $settingsFields = $this->Site->getAttribute('quiqqer.settings.search.list.fields');
+        $settingsFields = $this->Site->getAttribute('quiqqer.settings.search.list.fields.selected');
         $filteredFields = array();
 
         if (!empty($settingsFields)
@@ -403,8 +415,6 @@ class Search extends QUI\Control
                         $v = '';
                         break;
                     }
-
-                    $v = self::sanitizeSearchString($v);
                     break;
 
                 case 'searchType':
@@ -434,7 +444,35 @@ class Search extends QUI\Control
                         break;
                     }
 
+                    $availableFields = $this->Site->getAttribute(
+                        'quiqqer.settings.search.list.fields'
+                    );
+                    $selectedFields  = $this->Site->getAttribute(
+                        'quiqqer.settings.search.list.fields.selected'
+                    );
+
+                    if (empty($availableFields)) {
+                        $availableFields = array();
+                    }
+
+                    if (!empty($selectedFields)) {
+                        foreach ($selectedFields as $j => $field) {
+                            if (!in_array($field, $v) && in_array($field, $availableFields)) {
+                                unset($selectedFields[$j]);
+                            }
+                        }
+
+                        $v = array_values($selectedFields);
+                    }
+
                     $v = $this->clearSearchFields($v);
+                    break;
+
+                case 'orderFields':
+                    if (!is_array($v)) {
+                        $v = $this->getDefaultSearchFields();
+                        break;
+                    }
                     break;
 
                 case 'suggestSearch':
@@ -465,12 +503,21 @@ class Search extends QUI\Control
                         $constraints[$field] = array();
 
                         if (is_array($constraint)) {
-                            foreach ($constraint as $value) {
-                                if (!is_string($value)) {
+                            foreach ($constraint as $k => $value) {
+                                if (!is_string($value) && !is_array($value)) {
                                     continue;
                                 }
 
-                                $constraints[$field][] = self::sanitizeSearchString($value);
+                                if (is_array($value)) {
+                                    if (!isset($value['value'])
+                                        && !isset($value['type'])) {
+                                        continue;
+                                    }
+
+                                    $constraints[$field][$k]['value'] = self::sanitizeSearchString($value['value']);
+                                } else {
+                                    $constraints[$field][] = self::sanitizeSearchString($value);
+                                }
                             }
 
                             continue;
@@ -487,29 +534,28 @@ class Search extends QUI\Control
                         $v = $this->getPaginationType();
                     }
                     break;
+
+                case 'childrenListTemplate':
+                    $directory = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+
+                    if (!file_exists($v)) {
+                        $v = $directory . '/templates/SearchResultList.html';
+                    }
+                    break;
+
+                case 'childrenListCss':
+                    $directory = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+
+                    if (!file_exists($v)) {
+                        $v = $directory . '/templates/SearchResultList.css';
+                    }
+                    break;
             }
 
             $attributes[$k] = $v;
         }
 
         $this->setAttributes($attributes);
-    }
-
-    /**
-     * Sanitizes a search string
-     *
-     * @param string $str
-     * @return string - sanitized string
-     */
-    protected function sanitizeSearchString($str)
-    {
-        /* http://www.regular-expressions.info/unicode.html#prop */
-        $str = preg_replace("/[^\p{L}\p{N}\p{P}\-]/iu", " ", $str);
-        $str = Orthos::clear($str);
-        $str = preg_replace('#([ ]){2,}#', "$1", $str);
-        $str = trim($str);
-
-        return $str;
     }
 
     /**
@@ -538,12 +584,7 @@ class Search extends QUI\Control
             $settingsFieldsSelected = array();
         }
 
-        // if no available fields have been set for the site, use all fields
-        if (empty($settingsFields)) {
-            return $allFields;
-        }
-
-        // if no available fields have been selected by the user, use all fields
+        // if no available fields have been selected by the user (or the admin), use all fields
         if (empty($settingsFieldsSelected)) {
             return $settingsFields;
         }
@@ -552,9 +593,27 @@ class Search extends QUI\Control
     }
 
     /**
+     * Get attributes for the javascript control
+     *
+     * @return array
+     */
+    protected function getJavaScriptControlAttributes()
+    {
+        $attributes = $this->getAttributes();
+
+        foreach ($attributes as $k => $v) {
+            if (is_string($v)) {
+                $attributes[$k] = str_replace(OPT_DIR, '', $v);
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
      * Get search list pagination type
      *
-     * @return string
+     * @return string|false - pagination type or false if no pagination required
      */
     protected function getPaginationType()
     {

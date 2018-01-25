@@ -119,6 +119,8 @@ define('package/quiqqer/search/bin/controls/Suggest', [
          * @param {HTMLFormElement} Node
          */
         bindElement: function (Node) {
+            var self = this;
+
             this.$binds.push(Node);
 
             Node.set({
@@ -128,6 +130,15 @@ define('package/quiqqer/search/bin/controls/Suggest', [
             Node.addEvents({
                 keyup: this.$keyUp,
                 blur : this.$blur
+            });
+
+            // hide results if users click "x" in search input
+            Node.addEventListener('search', function (event) {
+                event.stopPropagation();
+
+                if (event.target.value.trim() === '') {
+                    self.$hideResults();
+                }
             });
         },
 
@@ -252,12 +263,11 @@ define('package/quiqqer/search/bin/controls/Suggest', [
             var self     = this;
             var DropDown = this.getDataList();
 
-            if (data === '') {
+            if (!data) {
                 DropDown.set(
                     'html',
-
                     '<span class="quiqqer-search-suggest-noresult">' +
-                    QUILocale.get(lg, 'message.product.search.empty') +
+                    QUILocale.get(lg, 'controls.Suggest.no_results') +
                     '</span>'
                 );
                 return this.$showResults();

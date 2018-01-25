@@ -6,8 +6,14 @@
 
         <!-- Control: SearchInput -->
         <locale name="controls.searchinput.searchfieldselect.placeholder">
-            <de><![CDATA[Suchbereiche]]></de>
-            <en><![CDATA[Search areas]]></en>
+            <de><![CDATA[Sucheinstellungen]]></de>
+            <en><![CDATA[Search settings]]></en>
+        </locale>
+
+        <!-- Control: Suggest -->
+        <locale name="controls.Suggest.no_results">
+            <de><![CDATA[Es wurden keine Ergebnisse gefunden]]></de>
+            <en><![CDATA[No results were found]]></en>
         </locale>
 
     </groups>
@@ -20,15 +26,15 @@
         </locale>
         <locale name="package.description">
             <de><![CDATA[
-            Das Paket stellt eine erweiterte Suche für QUIQQER zur Verfügung. Durchsuchen Sie Ihre Projekte über eine Relevanzssuche.
+            Das Paket stellt eine erweiterte Frontend-Suche für QUIQQER zur Verfügung. Durchsuchen Sie Ihre Projekte über eine Relevanzssuche.
             ]]></de>
             <en><![CDATA[
-            The package provides an advanced search for QUIQQER. Search your projects through a relevancy search.
+            The package provides an advanced frontend search for QUIQQER. Search your projects through a relevancy search.
             ]]></en>
         </locale>
         <locale name="quiqqer/search:types/search.title">
             <de><![CDATA[Erweiterte Suche]]></de>
-            <en><![CDATA[]]></en>
+            <en><![CDATA[Extended Search]]></en>
         </locale>
         <locale name="quiqqer/search:types/search.description" html="true">
             <de><![CDATA[
@@ -158,6 +164,14 @@
             <de><![CDATA[Projekt-Sprache]]></de>
             <en><![CDATA[Project language]]></en>
         </locale>
+        <locale name="cron.all_projects.title">
+            <de><![CDATA[Such-Datenbank aufbauen (alle Projekte)]]></de>
+            <en><![CDATA[Build search database (all projects)]]></en>
+        </locale>
+        <locale name="cron.all_projects.description">
+            <de><![CDATA[Baut die Such-Datenbank für alle Projekte (in allen Sprachen) auf (Schnell- und Volltext-Suche)]]></de>
+            <en><![CDATA[Builds the search database for all projects (in all languages; Quick and Fulltext Search)]]></en>
+        </locale>
 
         <!-- search template -->
         <locale name="tpl.search.button">
@@ -210,8 +224,12 @@
             <en><![CDATA[Search as sitetypes]]></en>
         </locale>
         <locale name="tpl.search.field.e_date">
-            <de><![CDATA[In Editierungsdatum suchen]]></de>
-            <en><![CDATA[Search in edit date]]></en>
+            <de><![CDATA[In Seiten-Editierungsdatum suchen]]></de>
+            <en><![CDATA[Search in Site edit date]]></en>
+        </locale>
+        <locale name="tpl.search.field.c_date">
+            <de><![CDATA[In Seiten-Erstellungssdatum suchen]]></de>
+            <en><![CDATA[Search in Site create date]]></en>
         </locale>
         <locale name="tpl.search.pagination.inifinitescroll.btn">
             <de><![CDATA[Mehr Ergebnisse laden]]></de>
@@ -245,7 +263,22 @@
             <de><![CDATA[Legt fest ab welcher Wortlänge die Volltextsuche verwendet wird.]]></de>
             <en><![CDATA[Specifies from which word length full-text search is used.]]></en>
         </locale>
-
+        <locale name="quiqqer.search.globale.settings.defaultSearchSite.text">
+            <de><![CDATA[Standard Such-Seite]]></de>
+            <en><![CDATA[Default Search Site]]></en>
+        </locale>
+        <locale name="quiqqer.search.globale.settings.defaultSearchSite.description" html="true">
+            <de><![CDATA[Legt die <b>Seiten-ID für die jeweilige Sprache</b> für die Seite fest, die Standardmäßig als Such-Seite aufgerufen wird, wenn auf einer beliebigen Seite, die keine Such-Seite ist, Such-Controls eingebunden werden (z.B. Such-Input).]]></de>
+            <en><![CDATA[Sets the <b>Site ID for the respective language</b> for the Site that is called by default as the search Site when a search control is included on any page that is not a Site page (for example, search input).]]></en>
+        </locale>
+        <locale name="project.settings.category.quiqqerSearch.title">
+            <de><![CDATA[Suche]]></de>
+            <en><![CDATA[Search]]></en>
+        </locale>
+        <locale name="templatePackageStore.settings.general.title">
+            <de><![CDATA[Such-Einstellungen]]></de>
+            <en><![CDATA[Search settings]]></en>
+        </locale>
 
         <!-- search settings -->
         <locale name="quiqqer.search.settings.title">
@@ -278,6 +311,14 @@
             <de><![CDATA[Such-Einstellungen - Vorselektierte Felder]]></de>
             <en><![CDATA[Search settings - Selected settings]]></en>
         </locale>
+        <locale name="quiqqer.settings.sitetypes.list.showTime">
+            <de><![CDATA[Uhrzeit anzeigen]]></de>
+            <en><![CDATA[Show time]]></en>
+        </locale>
+        <locale name="quiqqer.settings.sitetypes.list.showRelevance">
+            <de><![CDATA[Relevanz anzeigen]]></de>
+            <en><![CDATA[Show relevance]]></en>
+        </locale>
         <locale name="quiqqer.search.listTemplate.advancedArticleList">
             <de><![CDATA[Moderne Liste ohne Bilder]]></de>
             <en><![CDATA[Modern list without picture]]></en>
@@ -303,6 +344,15 @@
             <de><![CDATA[Stellen Sie hier ein welche Seitentypen in Ihrer Liste angezeigt werden soll.]]></de>
             <en><![CDATA[Setup the page types which will be displayed in your list.]]></en>
         </locale>
+        <locale name="quiqqer.search.results.settings.search_term">
+            <de><![CDATA[Vordefinierter Suchbegriff]]></de>
+            <en><![CDATA[Pre-defined search term]]></en>
+        </locale>
+        <locale name="quiqqer.search.results.settings.search_term.description">
+            <de><![CDATA[Bestimmt den Suchbegriff, der die Suchergebnisse festlegt. Dieser Suchbegriff bleibt immer gleich. Er wird so behandelt, als hätte ihn der Benutzer selbst bei der Suche eingegeben.]]></de>
+            <en><![CDATA[Determines the search term that defines the search results. This search term always stays the same. It is treated as if the user had typed it in the search itself.]]></en>
+        </locale>
+
     </groups>
 
 </locales>

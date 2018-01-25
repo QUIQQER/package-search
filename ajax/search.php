@@ -19,6 +19,23 @@ QUI::$Ajax->registerFunction(
         $searchParams         = json_decode($searchParams, true);
         $searchParams['Site'] = $Site;
 
+        // clear certain attributes
+        foreach ($searchParams as $k => $v) {
+            switch ($k) {
+                case 'childrenListTemplate':
+                case 'childrenListCss':
+                    if (!is_string($v)) {
+                        $v = '';
+                    }
+
+                    $v = OPT_DIR . $v;
+                    $v = Orthos::clear($v);
+                    break;
+            }
+
+            $searchParams[$k] = $v;
+        }
+
         $Search       = new Search($searchParams);
         $searchResult = $Search->search();
 

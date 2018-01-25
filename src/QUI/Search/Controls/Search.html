@@ -1,15 +1,17 @@
 <section class="content-template quiqqer-search">
 
-    <p class="quiqqer-search-result-count">
-        {if $count == 0}
-        {locale group="quiqqer/search" value="tpl.search.no.results"}
-        {elseif $count == 1}
-        {locale group="quiqqer/search" value="tpl.search.one.result"}
-        {elseif $count > 1}
-        {locale group="quiqqer/search" value="tpl.search.more.result"
-        count=$count}
-        {/if}
-    </p>
+    {if $showResultCount}
+        <p class="quiqqer-search-result-count">
+            {if $count == 0}
+            {locale group="quiqqer/search" value="tpl.search.no.results"}
+            {elseif $count == 1}
+            {locale group="quiqqer/search" value="tpl.search.one.result"}
+            {elseif $count > 1}
+            {locale group="quiqqer/search" value="tpl.search.more.result"
+            count=$count}
+            {/if}
+        </p>
+    {/if}
 
     <noscript>
         {if $sheets > 1}
@@ -35,12 +37,12 @@
 
     <noscript>
         {if $sheets > 1}
-        {$Pagination->create()}
+            {$Pagination->create()}
         {/if}
     </noscript>
 
     {if $paginationType === 'infinitescroll'}
-    <div class="quiqqer-search-pagination-inifinitescroll-more" {if !$more}style="opacity: 0" data-hidden="1"{/if}>
+    <div class="quiqqer-search-pagination-inifinitescroll-more" {if !$more}style="display: none;" data-hidden="1"{/if}>
         <div class="quiqqer-search-pagination-inifinitescroll-more-btn button">
             {locale group="quiqqer/search" var="tpl.search.pagination.inifinitescroll.btn"}
         </div>

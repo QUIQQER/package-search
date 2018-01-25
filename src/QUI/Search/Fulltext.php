@@ -14,6 +14,7 @@ use QUI\Projects\Project;
 use QUI\Projects\Site\Edit as SiteEdit;
 use QUI\System\Log;
 use QUI\Utils\Security\Orthos;
+use Tracy\Debugger;
 
 /**
  * Fulltextsearch Manager
@@ -38,7 +39,8 @@ class Fulltext extends QUI\QDOM
             'fieldConstraints' => array(), // restrict certain search fields to specific values
             'searchtype'       => 'OR',    // search type: OR / AND
             'datatypes'        => false,   // restrict search to certain site types
-            'relevanceSearch'  => true     // use relevance search (if search string has minimum length)
+            'relevanceSearch'  => true,     // use relevance search (if search string has minimum length),
+            'orderFields'      => array()   // fields that the search results are ordered by (ordered by priority)
         ));
 
         $this->setAttributes($params);
@@ -57,9 +59,12 @@ class Fulltext extends QUI\QDOM
      *        'list'   => array list of results
      *        'count'  => count of results
      * )
+     *
+     * @throws QUI\Exception
      */
     public function search($str = '')
     {
+        $str        = $this->sanitizeSearchString($str);
         $Project    = $this->getAttribute('Project');
         $attrLimit  = $this->getAttribute('limit');
         $attrFields = $this->getAttribute('fields');
@@ -212,11 +217,23 @@ class Fulltext extends QUI\QDOM
                         continue;
                     }
 
-                    $constraintEntriesOr[]    = $field . ' = :constraint' . $i;
-                    $binds['constraint' . $i] = array(
-                        'value' => $value,
-                        'type'  => \PDO::PARAM_STR
-                    );
+                    if (is_array($value)
+                        && !empty($value['value'])
+                        && !empty($value['type'])) {
+                        if ($value['type'] === 'LIKE') {
+                            $constraintEntriesOr[]    = $field . ' LIKE :constraint' . $i;
+                            $binds['constraint' . $i] = array(
+                                'value' => '%' . $value['value'] . '%',
+                                'type'  => \PDO::PARAM_STR
+                            );
+                        }
+                    } else {
+                        $constraintEntriesOr[]    = $field . ' = :constraint' . $i;
+                        $binds['constraint' . $i] = array(
+                            'value' => $value,
+                            'type'  => \PDO::PARAM_STR
+                        );
+                    }
 
                     $i++;
                 }
@@ -231,27 +248,52 @@ class Fulltext extends QUI\QDOM
             }
         }
 
-        // query
-        if (is_int(key($availableFields))) {
-            $selectedFields = implode(',', $availableFields);
-        } else {
-            $selectedFields = implode(',', array_keys($availableFields));
-        }
-
         $minWordLength = QUI::getPackage('quiqqer/search')
             ->getConfig()
             ->get('search', 'booleanSearchMaxLength');
 
+        // fallback
         if (!$minWordLength) {
             $minWordLength = 3;
         }
 
         $match = str_replace(array('*', '+'), '', $search);
 
+        // order Fields
+        $orderFields = $this->getAttribute('orderFields');
+        $order       = '';
+
+        if (is_array($orderFields) && !empty($orderFields)) {
+            $order = implode(',', $orderFields) . ',';
+
+            foreach ($orderFields as $orderField) {
+                $orderFieldParts = explode(' ', $orderField);
+                $orderField      = current($orderFieldParts);
+
+                if (!in_array($orderField, $availableFields)) {
+                    $availableFields[] = $orderField;
+                }
+            }
+        }
+
+        // query
+        if (is_int(key($availableFields))) {
+            $selectedFields = $availableFields;
+        } else {
+            $selectedFields = array_keys($availableFields);
+        }
+
         // Relevance search (MATCH.. AGAINST)
         if ($this->getAttribute('relevanceSearch')
-            && strlen($match) >= $minWordLength
+            && mb_strlen($match) >= $minWordLength
         ) {
+            // filter $selectedFields
+            $selectedFields = array_filter($selectedFields, function ($v) {
+                return !in_array($v, array('urlParameter', 'siteId'));
+            });
+
+            $selectedFields = implode(',', $selectedFields);
+
             $query = "
                 SELECT
                     siteId,
@@ -267,8 +309,10 @@ class Fulltext extends QUI\QDOM
                 GROUP BY
                     urlParameter,siteId,{$selectedFields}
                 ORDER BY
-                    relevance DESC
+                    {$order}relevance DESC
             ";
+
+            $search = str_replace('*', '', $search);
 
 //            if (strlen($search) > 2 || $search == '%%') {
             $binds['search'] = array(
@@ -277,7 +321,7 @@ class Fulltext extends QUI\QDOM
             );
 //            }
         } else {
-            $whereOr = array();
+            $where = array();
 
             $searchFields = array(
                 'name',
@@ -290,6 +334,8 @@ class Fulltext extends QUI\QDOM
             $searchTerms  = explode(' ', $str);
 
             foreach ($searchTerms as $k => $searchTerm) {
+                $whereOr = array();
+
                 foreach ($searchFields as $field) {
                     $whereOr[] = $field . ' LIKE :search' . $k;
                 }
@@ -298,9 +344,22 @@ class Fulltext extends QUI\QDOM
                     'value' => '%' . $searchTerm . '%',
                     'type'  => \PDO::PARAM_STR
                 );
+
+                $where[] = "(" . implode(" OR ", $whereOr) . ")";
             }
 
-            $where = implode(" OR ", $whereOr);
+            if ($this->getAttribute('searchtype') === Search\Controls\Search::SEARCH_TYPE_AND) {
+                $where = implode(" AND ", $where);
+            } else {
+                $where = implode(" OR ", $where);
+            }
+
+            // filter $selectedFields
+            $selectedFields = array_filter($selectedFields, function ($v) {
+                return !in_array($v, array('e_date', 'urlParameter', 'siteId'));
+            });
+
+            $selectedFields = implode(',', $selectedFields);
 
             $query = "
             SELECT e_date,urlParameter,siteId,{$selectedFields}
@@ -313,7 +372,7 @@ class Fulltext extends QUI\QDOM
             GROUP BY
                 urlParameter,siteId,e_date,{$selectedFields}
             ORDER BY
-                e_date DESC
+                {$order}e_date DESC
             ";
         }
 
@@ -359,6 +418,23 @@ class Fulltext extends QUI\QDOM
             'list'  => $result,
             'count' => $count[0]['count']
         );
+    }
+
+    /**
+     * Sanitizes a search string
+     *
+     * @param string $str
+     * @return string - sanitized string
+     */
+    protected function sanitizeSearchString($str)
+    {
+        /* http://www.regular-expressions.info/unicode.html#prop */
+        $str = preg_replace("/[^\p{L}\p{N}\p{P}\-\+]/iu", " ", $str);
+        $str = Orthos::clear($str);
+        $str = preg_replace('#([ ]){2,}#', "$1", $str);
+        $str = trim($str);
+
+        return $str;
     }
 
     /**
@@ -622,6 +698,13 @@ class Fulltext extends QUI\QDOM
                     $e_date = 0;
                 }
 
+                $c_date = $Site->getAttribute('c_date');
+                $c_date = strtotime($c_date);
+
+                if (!$c_date) {
+                    $c_date = 0;
+                }
+
                 $Fulltext->setEntry($Project, $siteId, array(
                     'name'     => $Site->getAttribute('name'),
                     'title'    => $Site->getAttribute('title'),
@@ -630,7 +713,8 @@ class Fulltext extends QUI\QDOM
                     'data'     => $Site->getAttribute('content'),
                     'datatype' => $Site->getAttribute('type'),
                     'icon'     => $Site->getAttribute('image_site'),
-                    'e_date'   => $e_date
+                    'e_date'   => $e_date,
+                    'c_date'   => $c_date
                 ));
             } catch (QUI\Exception $Exception) {
                 Log::writeException($Exception);
@@ -659,7 +743,7 @@ class Fulltext extends QUI\QDOM
         $result = array();
         $files  = self::getSearchXmlList();
 
-        foreach ($files as $file) {
+        foreach ($files as $package => $file) {
             $Dom  = QUI\Utils\Text\XML::getDomFromXml($file);
             $Path = new \DOMXPath($Dom);
 
@@ -670,7 +754,8 @@ class Fulltext extends QUI\QDOM
                 $result[] = array(
                     'field'    => trim($Field->nodeValue),
                     'type'     => $Field->getAttribute('type'),
-                    'fulltext' => $Field->getAttribute('fulltext') ? true : false
+                    'fulltext' => $Field->getAttribute('fulltext') ? true : false,
+                    'package'  => $package
                 );
             }
         }
@@ -701,7 +786,7 @@ class Fulltext extends QUI\QDOM
             $xmlFile = OPT_DIR . $package['name'] . '/search.xml';
 
             if (file_exists($xmlFile)) {
-                $result[] = $xmlFile;
+                $result[$package['name']] = $xmlFile;
             }
         }
 

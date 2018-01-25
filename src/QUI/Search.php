@@ -108,6 +108,8 @@ class Search
      */
     public static function setup()
     {
+        QUI\Cache\Manager::clear('quiqqer/search');
+
         $Table    = QUI::getDataBase()->table();
         $Manager  = QUI::getProjectManager();
         $projects = $Manager->getProjects(true);
@@ -121,9 +123,15 @@ class Search
             $fields[$fieldEntry['field']] = $fieldEntry['type'];
 
             if ($fieldEntry['fulltext']) {
-                $fulltext[] = $fieldEntry['field'];
+                $fulltext[] = array(
+                    'field'   => $fieldEntry['field'],
+                    'package' => $fieldEntry['package']
+                );
             } else {
-                $index[] = $fieldEntry['field'];
+                $index[] = array(
+                    'field'   => $fieldEntry['field'],
+                    'package' => $fieldEntry['package']
+                );
             }
         }
 
@@ -143,16 +151,18 @@ class Search
                 $Table->addColumn($table, $fields);
 
                 foreach ($fulltext as $field) {
-                    $Table->setFulltext($table, $field);
+                    $Table->setFulltext($table, $field['field']);
                 }
 
                 foreach ($index as $field) {
                     try {
-                        $Table->setIndex($table, $field);
+                        $Table->setIndex($table, $field['field']);
                     } catch (\Exception $Exception) {
                         QUI\System\Log::addWarning(
                             self::class . ' :: setup() -> Could not create Index for Fulltext'
-                            . ' search column "' . $field . '": ' . $Exception->getMessage()
+                            . ' search column "' . $field['field'] . '" (Package: ' . $field['package'] . ').'
+                            . ' The search column may be needed to be defined as "fulltext" for this to work.'
+                            . ' Error Message: ' . $Exception->getMessage()
                         );
                     }
                 }
@@ -201,6 +211,11 @@ class Search
      */
     public static function onSiteChange($Site)
     {
+        // check default settings
+        if ($Site->getAttribute('type') === 'quiqqer/search:types/search') {
+            self::setSiteDefaultSettings($Site);
+        }
+
         if (!$Site->getAttribute('active')) {
             return;
         }
@@ -209,20 +224,35 @@ class Search
             return;
         }
 
-
         /* @param $Site \QUI\Projects\Site */
         $Project = $Site->getProject();
 
         $Quicksearch = new Quicksearch();
         $Fulltext    = new Fulltext();
 
+        $e_date = $Site->getAttribute('e_date');
+        $e_date = strtotime($e_date);
+
+        if (!$e_date) {
+            $e_date = 0;
+        }
+
+        $c_date = $Site->getAttribute('c_date');
+        $c_date = strtotime($c_date);
+
+        if (!$c_date) {
+            $c_date = 0;
+        }
+
         // Fulltext
         $Fulltext->setEntry($Project, $Site->getId(), array(
-            'name'  => $Site->getAttribute('name'),
-            'title' => $Site->getAttribute('title'),
-            'short' => $Site->getAttribute('short'),
-            'data'  => $Site->getAttribute('content'),
-            'icon'  => $Site->getAttribute('image_site')
+            'name'   => $Site->getAttribute('name'),
+            'title'  => $Site->getAttribute('title'),
+            'short'  => $Site->getAttribute('short'),
+            'data'   => $Site->getAttribute('content'),
+            'icon'   => $Site->getAttribute('image_site'),
+            'e_date' => $e_date,
+            'c_date' => $c_date
         ));
 
         // Quicksearch
@@ -230,6 +260,29 @@ class Search
 //            $Site->getAttribute('name'),
             $Site->getAttribute('title')
         ));
+    }
+
+    /**
+     * Set default search params for search sites
+     *
+     * @param Site $Site
+     * @return void
+     *
+     * @throws QUI\Exception
+     */
+    protected static function setSiteDefaultSettings(Site $Site)
+    {
+        $fields         = $Site->getAttribute('quiqqer.settings.search.list.fields');
+        $selectedFields = $Site->getAttribute('quiqqer.settings.search.list.fields.selected');
+
+        if (!empty($fields) || !empty($selectedFields)) {
+            return;
+        }
+
+        $selectedFields = array('name', 'title', 'short', 'data');
+        $Site           = $Site->getEdit();
+        $Site->setAttribute('quiqqer.settings.search.list.fields.selected', $selectedFields);
+        $Site->save();
     }
 
     /**
