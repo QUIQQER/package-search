@@ -3,7 +3,10 @@
   "type": "quiqqer-module",
   "description": "The package provides an advanced frontend search for QUIQQER. Search your projects through a relevancy search.",
   "version": "dev-master",
-  "license": ["PCSG QL-1.0","CC BY-NC-SA 4.0"],
+  "license": [
+    "PCSG QL-1.0",
+    "CC BY-NC-SA 4.0"
+  ],
   "authors": [
     {
       "name": "Henning Leutz",
@@ -22,7 +25,7 @@
     "email": "support@pcsg.de"
   },
   "require": {
-    "quiqqer/quiqqer": "*@dev",
+    "quiqqer/quiqqer": ">=1.1|dev-master|dev-dev",
     "quiqqer/utils": ">=1.4|dev-master|dev-dev"
   },
   "autoload": {
