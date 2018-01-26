@@ -1,6 +1,6 @@
 ![QUIQQER Search](bin/images/Readme.jpg)
 
-QUIQQER Backend Search
+QUIQQER Search
 ========
 This package provides a frontend search for QUIQQER. You can search projects, sites and customizable content via relevance search.
 
@@ -28,8 +28,8 @@ Package name is: `quiqqer/search`
 
 Contribute
 ----------
-- Issue Tracker: https://dev.quiqqer.com/quiqqer/backendsearch/issues
-- Source Code: https://dev.quiqqer.com/quiqqer/backendsearch/tree/master
+- Issue Tracker: https://dev.quiqqer.com/quiqqer/search/issues
+- Source Code: https://dev.quiqqer.com/quiqqer/search/tree/master
 
 
 Support
