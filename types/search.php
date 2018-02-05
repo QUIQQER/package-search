@@ -13,7 +13,7 @@ if (QUI::getRewrite()->getHeaderCode() === 404) {
         $path       = pathinfo($requestUrl);
 
         if (isset($path['dirname'])) {
-            $_REQUEST['search'] = $path['dirname'] . ' ' . $path['filename'];
+            $_REQUEST['search'] = $path['dirname'].' '.$path['filename'];
         } else {
             $_REQUEST['search'] = $path['filename'];
         }
@@ -26,8 +26,16 @@ if (QUI::getRewrite()->getHeaderCode() === 404) {
 /**
  * Settings
  */
-$fields = $Site->getAttribute('quiqqer.settings.search.list.fields');
+$fields     = $Site->getAttribute('quiqqer.settings.search.list.fields');
 $searchType = Search::SEARCH_TYPE_OR;
+
+if (is_string($fields)) {
+    $fields = json_decode($fields, true);
+}
+
+if (!is_array($fields)) {
+    $fields = array();
+}
 
 if (in_array('searchTypeAnd', $fields)) {
     $searchType = Search::SEARCH_TYPE_AND;
