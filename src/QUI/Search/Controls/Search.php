@@ -611,6 +611,17 @@ class Search extends QUI\Control
     }
 
     /**
+     * Sanitizes a search string
+     *
+     * @param string $str
+     * @return string - sanitized string
+     */
+    protected static function sanitizeSearchString($str)
+    {
+        return QUI\Search\Utils::sanitizeSearchString($str);
+    }
+
+    /**
      * Get search list pagination type
      *
      * @return string|false - pagination type or false if no pagination required
