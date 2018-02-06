@@ -281,7 +281,10 @@ class Search
 
         $selectedFields = array('name', 'title', 'short', 'data');
         $Site           = $Site->getEdit();
+
+        $Site->setAttribute('quiqqer.settings.search.list.fields', array());
         $Site->setAttribute('quiqqer.settings.search.list.fields.selected', $selectedFields);
+
         $Site->save();
     }
 
