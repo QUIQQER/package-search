@@ -134,7 +134,6 @@
 /* hyphenate / word break */
 .qui-control-childrenlist-default-entry-content header {
     -ms-word-break: break-all;
-    word-break: break-all;
     word-break: break-word; /* Non standard for webkit */
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
