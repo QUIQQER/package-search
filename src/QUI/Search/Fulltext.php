@@ -428,13 +428,7 @@ class Fulltext extends QUI\QDOM
      */
     protected function sanitizeSearchString($str)
     {
-        /* http://www.regular-expressions.info/unicode.html#prop */
-        $str = preg_replace("/[^\p{L}\p{N}\p{P}\-\+]/iu", " ", $str);
-        $str = Orthos::clear($str);
-        $str = preg_replace('#([ ]){2,}#', "$1", $str);
-        $str = trim($str);
-
-        return $str;
+        return Utils::sanitizeSearchString($str);
     }
 
     /**
