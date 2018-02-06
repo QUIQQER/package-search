@@ -2,7 +2,7 @@
   "name": "quiqqer/search",
   "type": "quiqqer-module",
   "description": "The package provides an advanced frontend search for QUIQQER. Search your projects through a relevancy search.",
-  "version": "dev-dev",
+  "version": "dev-master",
   "license": [
     "PCSG QL-1.0",
     "CC BY-NC-SA 4.0"
