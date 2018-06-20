@@ -316,7 +316,7 @@ class Search extends QUI\Control
         }
 
         if (!empty($_REQUEST['fieldConstraints'])) {
-            $this->setAttribute('fieldConstraints', $_REQUEST['fieldConstraints']);
+            $this->setAttribute('fieldConstraints', json_decode($_REQUEST['fieldConstraints'], true));
         }
 
         if (isset($_REQUEST['search'])) {

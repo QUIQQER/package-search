@@ -475,7 +475,7 @@ define('package/quiqqer/search/bin/controls/Search', [
                         siteId      : QUIQQER_SITE.id,
                         onError     : reject
                     }
-                )
+                );
             });
         },
 
@@ -523,7 +523,7 @@ define('package/quiqqer/search/bin/controls/Search', [
             }
 
             if ("fieldConstraints" in this.$SearchParams) {
-                UriParams.fieldConstraints = this.$SearchParams.fieldConstraints;
+                UriParams.fieldConstraints = JSON.encode(this.$SearchParams.fieldConstraints);
             }
 
             if (this.$paginationType === 'pagination') {
@@ -647,7 +647,7 @@ define('package/quiqqer/search/bin/controls/Search', [
                     getParams: JSON.encode(self.$getUriParams()),
                     project  : JSON.encode(QUIQQER_PROJECT),
                     onError  : reject
-                })
+                });
             });
         },
 
