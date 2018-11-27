@@ -224,6 +224,10 @@ class Search
             return;
         }
 
+        if ($Site->getAttribute('quiqqer.settings.search.not.indexed')) {
+            return;
+        }
+
         /* @param $Site \QUI\Projects\Site */
         $Project = $Site->getProject();
 
