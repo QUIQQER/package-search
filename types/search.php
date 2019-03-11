@@ -12,14 +12,17 @@ if (QUI::getRewrite()->getHeaderCode() === 404) {
         $requestUrl = $_REQUEST['_url'];
         $path       = pathinfo($requestUrl);
 
-        if (isset($path['dirname'])) {
-            $_REQUEST['search'] = $path['dirname'].' '.$path['filename'];
-        } else {
-            $_REQUEST['search'] = $path['filename'];
-        }
+        $search = array_values($path);              // get only the values
+        $search = implode(' ', $search);            // create a string
+        $search = str_replace('-', ' ', $search);   // replace all "-" with " " (space)
+        $search = str_replace('.', '', $search);    // remove all -
+        $search = trim($search);
 
-        // replace all "-" with " " (space)
-        $_REQUEST['search'] = str_replace($_REQUEST['search'], '-', ' ');
+        $search = explode(' ', $search);
+        $search = array_unique($search);
+        $search = implode(' ', $search);
+
+        $_REQUEST['search'] = $search;
     }
 }
 
@@ -34,27 +37,27 @@ if (is_string($fields)) {
 }
 
 if (!is_array($fields)) {
-    $fields = array();
+    $fields = [];
 }
 
 if (in_array('searchTypeAnd', $fields)) {
     $searchType = Search::SEARCH_TYPE_AND;
 }
 
-$SearchInput = new SearchInput(array(
+$SearchInput = new SearchInput([
     'suggestSearch'     => $Site->getAttribute('quiqqer.search.sitetypes.search.suggestSearch'),
     'availableFields'   => $fields,
     'fields'            => $Site->getAttribute('quiqqer.settings.search.list.fields.selected'),
     'searchType'        => $searchType,
     'showFieldSettings' => !boolval($Site->getAttribute('quiqqer.settings.search.list.hideSettings'))
-));
+]);
 
 $Search = new Search();
 
 $Search->setAttributesFromRequest();
 $SearchInput->setAttributesFromRequest();
 
-$Engine->assign(array(
+$Engine->assign([
     'SearchInput' => $SearchInput,
     'Search'      => $Search
-));
+]);
