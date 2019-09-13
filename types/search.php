@@ -32,15 +32,15 @@ if (QUI::getRewrite()->getHeaderCode() === 404) {
 $fields     = $Site->getAttribute('quiqqer.settings.search.list.fields');
 $searchType = Search::SEARCH_TYPE_OR;
 
-if (is_string($fields)) {
-    $fields = json_decode($fields, true);
+if (\is_string($fields)) {
+    $fields = \json_decode($fields, true);
 }
 
-if (!is_array($fields)) {
+if (!\is_array($fields)) {
     $fields = [];
 }
 
-if (in_array('searchTypeAnd', $fields)) {
+if (\in_array('searchTypeAnd', $fields)) {
     $searchType = Search::SEARCH_TYPE_AND;
 }
 
@@ -49,7 +49,7 @@ $SearchInput = new SearchInput([
     'availableFields'   => $fields,
     'fields'            => $Site->getAttribute('quiqqer.settings.search.list.fields.selected'),
     'searchType'        => $searchType,
-    'showFieldSettings' => !boolval($Site->getAttribute('quiqqer.settings.search.list.hideSettings'))
+    'showFieldSettings' => !\boolval($Site->getAttribute('quiqqer.settings.search.list.hideSettings'))
 ]);
 
 $Search = new Search();

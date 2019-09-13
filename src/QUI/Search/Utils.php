@@ -20,10 +20,10 @@ class Utils
     public static function sanitizeSearchString($str)
     {
         /* http://www.regular-expressions.info/unicode.html#prop */
-        $str = preg_replace("/[^\p{L}\p{N}\p{P}\-\+]/iu", " ", $str);
+        $str = \preg_replace("/[^\p{L}\p{N}\p{P}\-\+]/iu", " ", $str);
         $str = Orthos::clear($str);
-        $str = preg_replace('#([ ]){2,}#', "$1", $str);
-        $str = trim($str);
+        $str = \preg_replace('#([ ]){2,}#', "$1", $str);
+        $str = \trim($str);
 
         return $str;
     }

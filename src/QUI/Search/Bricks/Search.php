@@ -20,15 +20,15 @@ class Search extends QUI\Control
      *
      * @param array $attributes
      */
-    public function __construct($attributes = array())
+    public function __construct($attributes = [])
     {
         // default options
-        $this->setAttributes(array(
+        $this->setAttributes([
             'class'         => 'search-brick',
             'resultSite'    => false,
             'suggestSearch' => false
 
-        ));
+        ]);
 
         parent::__construct($attributes);
     }
@@ -49,22 +49,22 @@ class Search extends QUI\Control
         $resultSite = $this->getAttribute('resultSite');
 
         if (!$resultSite) {
-            $types = array(
+            $types = [
                 'quiqqer/sitetypes:types/search',
                 'quiqqer/search:types/search'
-            );
+            ];
 
-            $searchSites = $Project->getSites(array(
-                'where' => array(
-                    'type' => array(
+            $searchSites = $Project->getSites([
+                'where' => [
+                    'type' => [
                         'type'  => 'IN',
                         'value' => $types
-                    )
-                ),
+                    ]
+                ],
                 'limit' => 1
-            ));
+            ]);
 
-            if (count($searchSites)) {
+            if (\count($searchSites)) {
                 $resultSite = $searchSites[0]->getUrlRewritten();
             }
         }
@@ -76,13 +76,14 @@ class Search extends QUI\Control
         }
 
 
-        $Engine->assign(array(
+        $Engine->assign([
             'this'          => $this,
             'resultSite'    => $resultSite,
             'suggestSearch' => $suggestSearch
-        ));
+        ]);
 
-        $this->addCSSFile(dirname(__FILE__) . '/Search.css');
-        return $Engine->fetch(dirname(__FILE__) . '/Search.html');
+        $this->addCSSFile(\dirname(__FILE__).'/Search.css');
+
+        return $Engine->fetch(\dirname(__FILE__).'/Search.html');
     }
 }

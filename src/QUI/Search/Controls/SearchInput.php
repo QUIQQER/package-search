@@ -35,23 +35,23 @@ class SearchInput extends QUI\Control
      *
      * @param array $attributes
      */
-    public function __construct($attributes = array())
+    public function __construct($attributes = [])
     {
         $this->Site = QUI::getRewrite()->getSite();
 
-        $this->setAttributes(array(
+        $this->setAttributes([
             'search'            => '', // search term,
             'searchType'        => Search::SEARCH_TYPE_OR,
             'availableFields'   => $this->getAllAvaiableFields(),
-            'fields'            => array(),     // selected fields
+            'fields'            => [],     // selected fields
             'suggestSearch'     => 'off',
             'placeholder'       => QUI::getLocale()->get('quiqqer/search', 'tpl.search.placeholder'),
             'showFieldSettings' => true,
             'submitIcon'        => false
-        ));
+        ]);
 
         $this->addCSSClass('quiqqer-search-searchinput');
-        $this->addCSSFile(dirname(__FILE__) . '/SearchInput.css');
+        $this->addCSSFile(dirname(__FILE__).'/SearchInput.css');
 
         parent::__construct($attributes);
 
@@ -78,7 +78,7 @@ class SearchInput extends QUI\Control
             $showFieldSettings = false;
         }
 
-        $Engine->assign(array(
+        $Engine->assign([
             'Site'              => $this->Site,
             'searchType'        => $this->getAttribute('searchType'),
             'search'            => $this->getAttribute('search'),
@@ -88,9 +88,9 @@ class SearchInput extends QUI\Control
             'placeholder'       => $this->getAttribute('placeholder'),
             'showFieldSettings' => $showFieldSettings,
             'submitIcon'        => $this->getAttribute('submitIcon')
-        ));
+        ]);
 
-        return $Engine->fetch(dirname(__FILE__) . '/SearchInput.html');
+        return $Engine->fetch(\dirname(__FILE__).'/SearchInput.html');
     }
 
     /**
@@ -113,14 +113,14 @@ class SearchInput extends QUI\Control
 
         // search fields
         if (isset($_REQUEST['searchIn'])) {
-            $fields = array();
+            $fields = [];
 
-            if (!is_array($_REQUEST['searchIn'])) {
-                $_REQUEST['searchIn'] = explode(',', urldecode($_REQUEST['searchIn']));
+            if (!\is_array($_REQUEST['searchIn'])) {
+                $_REQUEST['searchIn'] = \explode(',', \urldecode($_REQUEST['searchIn']));
             }
 
             foreach ($_REQUEST['searchIn'] as $field) {
-                if (!is_string($field)) {
+                if (!\is_string($field)) {
                     continue;
                 }
 
@@ -142,13 +142,13 @@ class SearchInput extends QUI\Control
         $allFields       = $this->getAllAvaiableFields();
         $availableFields = $this->getAttribute('availableFields');
 
-        if (!is_array($availableFields)
+        if (!\is_array($availableFields)
             /*|| empty($availableFields)*/
         ) {
             $availableFields = $allFields;
         } else {
             foreach ($availableFields as $k => $field) {
-                if (!in_array($field, $allFields)) {
+                if (!\in_array($field, $allFields)) {
                     unset($availableFields[$k]);
                 }
             }
@@ -157,12 +157,12 @@ class SearchInput extends QUI\Control
         // selected fields
         $selectedFields = $this->getAttribute('fields');
 
-        if (!is_array($selectedFields)) {
-            $selectedFields = array();
+        if (!\is_array($selectedFields)) {
+            $selectedFields = [];
         }
 
         foreach ($selectedFields as $k => $field) {
-            if (!in_array($field, $availableFields)) {
+            if (!\in_array($field, $availableFields)) {
                 unset($selectedFields[$k]);
             }
         }
@@ -178,7 +178,7 @@ class SearchInput extends QUI\Control
      */
     protected function getAllAvaiableFields()
     {
-        $allFields = array();
+        $allFields = [];
 
         foreach (Fulltext::getFieldList() as $entry) {
             $allFields[] = $entry['field'];
