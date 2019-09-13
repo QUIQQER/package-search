@@ -7,22 +7,30 @@ use QUI\Search\Controls\SearchInput;
  * 404 Error Site
  */
 
+if (isset($_REQUEST['sheet'])
+    && \is_numeric($_REQUEST['sheet'])
+    && (int)$_REQUEST['sheet'] > 1) {
+    $Site->setAttribute('meta.robots', 'noindex,follow');
+}
+
 if (QUI::getRewrite()->getHeaderCode() === 404) {
     if (isset($_REQUEST['_url'])) {
         $requestUrl = $_REQUEST['_url'];
-        $path       = pathinfo($requestUrl);
+        $path       = \pathinfo($requestUrl);
 
-        $search = array_values($path);              // get only the values
-        $search = implode(' ', $search);            // create a string
-        $search = str_replace('-', ' ', $search);   // replace all "-" with " " (space)
-        $search = str_replace('.', '', $search);    // remove all -
-        $search = trim($search);
+        $search = \array_values($path);              // get only the values
+        $search = \implode(' ', $search);            // create a string
+        $search = \str_replace('-', ' ', $search);   // replace all "-" with " " (space)
+        $search = \str_replace('.', '', $search);    // remove all -
+        $search = \trim($search);
 
-        $search = explode(' ', $search);
-        $search = array_unique($search);
-        $search = implode(' ', $search);
+        $search = \explode(' ', $search);
+        $search = \array_unique($search);
+        $search = \implode(' ', $search);
 
         $_REQUEST['search'] = $search;
+
+        $Site->setAttribute('meta.robots', 'noindex,nofollow');
     }
 }
 
