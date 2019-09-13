@@ -49,7 +49,7 @@ class Search
 
         QUI::getEvents()->fireEvent(
             'searchFulltextCreate',
-            array($Fulltext, $Project)
+            [$Fulltext, $Project]
         );
     }
 
@@ -61,18 +61,18 @@ class Search
      */
     public function createQuicksearch(Project $Project)
     {
-        $list = $Project->getSitesIds(array(
-            'where' => array(
+        $list = $Project->getSitesIds([
+            'where' => [
                 'active' => 1
-            )
-        ));
+            ]
+        ]);
 
         $Quicksearch = new Quicksearch();
         $Quicksearch->clearSearchTable($Project);
 
         foreach ($list as $siteParams) {
             try {
-                set_time_limit(0);
+                \set_time_limit(0);
 
                 $siteId = (int)$siteParams['id'];
                 $Site   = new SiteEdit($Project, (int)$siteId);
@@ -89,9 +89,9 @@ class Search
                     continue;
                 }
 
-                $Quicksearch->setEntries($Project, $siteId, array(
-                    $Site->getAttribute('name') . ' ' . $Site->getAttribute('title'),
-                ));
+                $Quicksearch->setEntries($Project, $siteId, [
+                    $Site->getAttribute('name').' '.$Site->getAttribute('title'),
+                ]);
             } catch (QUI\Exception $Exception) {
                 Log::writeException($Exception);
             }
@@ -99,7 +99,7 @@ class Search
 
         QUI::getEvents()->fireEvent(
             'searchQuicksearchCreate',
-            array($Quicksearch, $Project)
+            [$Quicksearch, $Project]
         );
     }
 
@@ -115,23 +115,23 @@ class Search
         $projects = $Manager->getProjects(true);
 
         $fieldList = Search\Fulltext::getFieldList();
-        $fields    = array();
-        $fulltext  = array();
-        $index     = array();
+        $fields    = [];
+        $fulltext  = [];
+        $index     = [];
 
         foreach ($fieldList as $fieldEntry) {
             $fields[$fieldEntry['field']] = $fieldEntry['type'];
 
             if ($fieldEntry['fulltext']) {
-                $fulltext[] = array(
+                $fulltext[] = [
                     'field'   => $fieldEntry['field'],
                     'package' => $fieldEntry['package']
-                );
+                ];
             } else {
-                $index[] = array(
+                $index[] = [
                     'field'   => $fieldEntry['field'],
                     'package' => $fieldEntry['package']
-                );
+                ];
             }
         }
 
@@ -159,10 +159,10 @@ class Search
                         $Table->setIndex($table, $field['field']);
                     } catch (\Exception $Exception) {
                         QUI\System\Log::addWarning(
-                            self::class . ' :: setup() -> Could not create Index for Fulltext'
-                            . ' search column "' . $field['field'] . '" (Package: ' . $field['package'] . ').'
-                            . ' The search column may be needed to be defined as "fulltext" for this to work.'
-                            . ' Error Message: ' . $Exception->getMessage()
+                            self::class.' :: setup() -> Could not create Index for Fulltext'
+                            .' search column "'.$field['field'].'" (Package: '.$field['package'].').'
+                            .' The search column may be needed to be defined as "fulltext" for this to work.'
+                            .' Error Message: '.$Exception->getMessage()
                         );
                     }
                 }
@@ -195,13 +195,13 @@ class Search
         );
 
         // remove entries from tables
-        QUI::getDataBase()->delete($tableSearchFull, array(
+        QUI::getDataBase()->delete($tableSearchFull, [
             'siteId' => $Site->getId()
-        ));
+        ]);
 
-        QUI::getDataBase()->delete($tableQuicksearch, array(
+        QUI::getDataBase()->delete($tableQuicksearch, [
             'siteId' => $Site->getId()
-        ));
+        ]);
     }
 
     /**
@@ -235,21 +235,21 @@ class Search
         $Fulltext    = new Fulltext();
 
         $e_date = $Site->getAttribute('e_date');
-        $e_date = strtotime($e_date);
+        $e_date = \strtotime($e_date);
 
         if (!$e_date) {
             $e_date = 0;
         }
 
         $c_date = $Site->getAttribute('c_date');
-        $c_date = strtotime($c_date);
+        $c_date = \strtotime($c_date);
 
         if (!$c_date) {
             $c_date = 0;
         }
 
         // Fulltext
-        $Fulltext->setEntry($Project, $Site->getId(), array(
+        $Fulltext->setEntry($Project, $Site->getId(), [
             'name'   => $Site->getAttribute('name'),
             'title'  => $Site->getAttribute('title'),
             'short'  => $Site->getAttribute('short'),
@@ -257,13 +257,13 @@ class Search
             'icon'   => $Site->getAttribute('image_site'),
             'e_date' => $e_date,
             'c_date' => $c_date
-        ));
+        ]);
 
         // Quicksearch
-        $Quicksearch->setEntries($Project, $Site->getId(), array(
+        $Quicksearch->setEntries($Project, $Site->getId(), [
 //            $Site->getAttribute('name'),
             $Site->getAttribute('title')
-        ));
+        ]);
     }
 
     /**
@@ -283,10 +283,10 @@ class Search
             return;
         }
 
-        $selectedFields = array('name', 'title', 'short', 'data');
+        $selectedFields = ['name', 'title', 'short', 'data'];
         $Site           = $Site->getEdit();
 
-        $Site->setAttribute('quiqqer.settings.search.list.fields', array());
+        $Site->setAttribute('quiqqer.settings.search.list.fields', []);
         $Site->setAttribute('quiqqer.settings.search.list.fields.selected', $selectedFields);
 
         $Site->save();
@@ -301,16 +301,16 @@ class Search
     {
         $Project = $Template->getAttribute('Project');
 
-        if (!is_object($Project)) {
+        if (!\is_object($Project)) {
             $Project = QUI::getProjectManager()->get();
         }
 
-        $result = $Project->getSites(array(
-            'where' => array(
+        $result = $Project->getSites([
+            'where' => [
                 'type' => 'quiqqer/search:types/search'
-            ),
+            ],
             'limit' => 1
-        ));
+        ]);
 
         if (!isset($result[0])) {
             return;
@@ -323,9 +323,9 @@ class Search
         $searchUrl  = $SearchSite->getUrlRewritten();
         $start      = $Project->firstChild()->getUrlRewritten();
 
-        if (strpos($searchUrl, 'http') !== 0) {
-            $searchUrl = $host . $searchUrl;
-            $start     = $host . $start;
+        if (\strpos($searchUrl, 'http') !== 0) {
+            $searchUrl = $host.$searchUrl;
+            $start     = $host.$start;
         }
 
         $Template->extendHeader(
@@ -334,10 +334,10 @@ class Search
             {
                 "@context": "http://schema.org",
                 "@type": "WebSite",
-                "url": "' . $start . '",
+                "url": "'.$start.'",
                 "potentialAction": {
                     "@type": "SearchAction",
-                    "target": "' . $searchUrl . '?search={search}",
+                    "target": "'.$searchUrl.'?search={search}",
                     "query-input": "required name=search"
                 }
             }

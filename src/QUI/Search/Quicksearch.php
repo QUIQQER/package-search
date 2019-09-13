@@ -27,12 +27,12 @@ class Quicksearch extends QUI\QDOM
      *
      * @param array $params - Attributes
      */
-    public function __construct($params = array())
+    public function __construct($params = [])
     {
         // defaults
-        $this->setAttributes(array(
+        $this->setAttributes([
             'siteTypes' => false   // restrict search to certain site types
-        ));
+        ]);
 
         $this->setAttributes($params);
     }
@@ -50,7 +50,7 @@ class Quicksearch extends QUI\QDOM
      *        'count'  => count of results
      * )
      */
-    public function search($str, Project $Project, $params = array())
+    public function search($str, Project $Project, $params = [])
     {
         $PDO   = QUI::getPDO();
         $table = QUI::getDBProjectTableName(
@@ -58,8 +58,8 @@ class Quicksearch extends QUI\QDOM
             $Project
         );
 
-        if (!is_array($params)) {
-            $params = array();
+        if (!\is_array($params)) {
+            $params = [];
         }
 
         if (!isset($params['limit'])) {
@@ -68,15 +68,15 @@ class Quicksearch extends QUI\QDOM
 
         $search = '%'.$str.'%';
         $limit  = QUI\Database\DB::createQueryLimit($params['limit']);
-        $binds  = array();
+        $binds  = [];
 
         // restrict search to certain site types
         $siteTypes      = $this->getAttribute('siteTypes');
         $siteTypesQuery = '';
 
         if ($siteTypes) {
-            if (!is_array($siteTypes)) {
-                $siteTypes = array($siteTypes);
+            if (!\is_array($siteTypes)) {
+                $siteTypes = [$siteTypes];
             }
 
             $siteTypesQuery = ' AND (';
@@ -88,10 +88,10 @@ class Quicksearch extends QUI\QDOM
                     $siteTypesQuery .= ' OR ';
                 }
 
-                $binds['type'.$i] = array(
+                $binds['type'.$i] = [
                     'value' => $siteTypes[$i],
                     'type'  => \PDO::PARAM_STR
-                );
+                ];
             }
 
             $siteTypesQuery .= ' )';
@@ -156,7 +156,7 @@ class Quicksearch extends QUI\QDOM
         $result = $Statement->fetchAll(\PDO::FETCH_ASSOC);
 
         if (!isset($params['group']) || $params['group'] !== false) {
-            $groups = array();
+            $groups = [];
 
             foreach ($result as $k => $row) {
                 if (isset($groups[$row['data']])) {
@@ -180,10 +180,10 @@ class Quicksearch extends QUI\QDOM
 
         $count = $Statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        return array(
+        return [
             'list'  => $result,
             'count' => $count[0]['count']
-        );
+        ];
     }
 
     /**
@@ -202,8 +202,8 @@ class Quicksearch extends QUI\QDOM
     public static function setEntries(
         Project $Project,
         $siteId,
-        $data = array(),
-        $siteParams = array()
+        $data = [],
+        $siteParams = []
     ) {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
@@ -235,10 +235,10 @@ class Quicksearch extends QUI\QDOM
         self::removeEntries($Project, $siteId);
 
         // url params
-        $siteUrlParams = array();
+        $siteUrlParams = [];
 
         // site params
-        if (is_array($siteParams) && !empty($siteParams)) {
+        if (\is_array($siteParams) && !empty($siteParams)) {
             foreach ($siteParams as $key => $value) {
                 $key   = Orthos::clearMySQL($key, false);
                 $value = Orthos::clearMySQL($value, false);
@@ -251,18 +251,18 @@ class Quicksearch extends QUI\QDOM
 
         // data
         foreach ($data as $dataEntry) {
-            QUI::getDataBase()->insert($table, array(
+            QUI::getDataBase()->insert($table, [
                 'siteId'       => $siteId,
                 'urlParameter' => $urlParameter,
                 'data'         => Orthos::clearMySQL($dataEntry, false),
                 'siteType'     => $Site->getAttribute('type')
-            ));
+            ]);
         }
 
 
         QUI::getEvents()->fireEvent(
             'searchQuicksearchSetEntry',
-            array($Project, $siteId, $siteParams)
+            [$Project, $siteId, $siteParams]
         );
     }
 
@@ -278,7 +278,7 @@ class Quicksearch extends QUI\QDOM
         Project $Project,
         $siteId,
         $data,
-        $siteParams = array()
+        $siteParams = []
     ) {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
@@ -306,34 +306,34 @@ class Quicksearch extends QUI\QDOM
             return;
         }
 
-        $urlParameter = json_encode($siteParams);
+        $urlParameter = \json_encode($siteParams);
 //        $data         = QUI::getPDO()->quote($data);
 
         // check if entry exists
         if (self::existsEntry($Project, $siteId, $data, $siteParams)) {
             QUI::getDataBase()->update(
                 $table,
-                array(
+                [
                     'rights'   => null, // @todo auf was richtiges setzen, wenn der parameter implementiert wird
                     'icon'     => null,  // @todo auf was richtiges setzen, wenn der parameter implementiert wird
                     'siteType' => $Site->getAttribute('type')
-                ),
-                array(
+                ],
+                [
                     'siteId'       => $siteId,
                     'urlParameter' => $urlParameter,
                     'data'         => $data
-                )
+                ]
             );
 
             return;
         }
 
-        QUI::getDataBase()->insert($table, array(
+        QUI::getDataBase()->insert($table, [
             'siteId'       => $siteId,
             'urlParameter' => $urlParameter,
             'data'         => $data,
             'siteType'     => $Site->getAttribute('type')
-        ));
+        ]);
     }
 
     /**
@@ -346,7 +346,7 @@ class Quicksearch extends QUI\QDOM
     public static function removeEntries(
         Project $Project,
         $siteId,
-        $siteParams = array()
+        $siteParams = []
     ) {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
@@ -359,10 +359,10 @@ class Quicksearch extends QUI\QDOM
             return;
         }
 
-        QUI::getDataBase()->delete($table, array(
+        QUI::getDataBase()->delete($table, [
             'siteId'       => $siteId,
-            'urlParameter' => json_encode($siteParams)
-        ));
+            'urlParameter' => \json_encode($siteParams)
+        ]);
     }
 
     /**
@@ -379,22 +379,22 @@ class Quicksearch extends QUI\QDOM
     public static function getEntry(
         Project $Project,
         $siteId,
-        $siteParams = array()
+        $siteParams = []
     ) {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
             $Project
         );
 
-        $urlParameter = json_encode($siteParams);
+        $urlParameter = \json_encode($siteParams);
 
-        $result = QUI::getDataBase()->fetch(array(
+        $result = QUI::getDataBase()->fetch([
             'from'  => $table,
-            'where' => array(
+            'where' => [
                 'siteId'       => (int)$siteId,
                 'urlParameter' => $urlParameter
-            )
-        ));
+            ]
+        ]);
 
         if (!isset($result[0])) {
             throw new QUI\Exception(
@@ -418,24 +418,24 @@ class Quicksearch extends QUI\QDOM
         Project $Project,
         $siteId,
         $data,
-        $siteParams = array()
+        $siteParams = []
     ) {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
             $Project
         );
 
-        $urlParameter = json_encode($siteParams);
+        $urlParameter = \json_encode($siteParams);
 
-        $result = QUI::getDataBase()->fetch(array(
+        $result = QUI::getDataBase()->fetch([
             'count' => 1,
             'from'  => $table,
-            'where' => array(
+            'where' => [
                 'siteId'       => (int)$siteId,
                 'data'         => $data,
                 'urlParameter' => $urlParameter
-            )
-        ));
+            ]
+        ]);
 
         return boolval(current(current($result)));
     }

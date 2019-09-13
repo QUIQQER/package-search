@@ -7,19 +7,30 @@ use QUI\Search\Controls\SearchInput;
  * 404 Error Site
  */
 
+if (isset($_REQUEST['sheet'])
+    && \is_numeric($_REQUEST['sheet'])
+    && (int)$_REQUEST['sheet'] > 1) {
+    $Site->setAttribute('meta.robots', 'noindex,follow');
+}
+
 if (QUI::getRewrite()->getHeaderCode() === 404) {
     if (isset($_REQUEST['_url'])) {
         $requestUrl = $_REQUEST['_url'];
-        $path       = pathinfo($requestUrl);
+        $path       = \pathinfo($requestUrl);
 
-        if (isset($path['dirname'])) {
-            $_REQUEST['search'] = $path['dirname'].' '.$path['filename'];
-        } else {
-            $_REQUEST['search'] = $path['filename'];
-        }
+        $search = \array_values($path);              // get only the values
+        $search = \implode(' ', $search);            // create a string
+        $search = \str_replace('-', ' ', $search);   // replace all "-" with " " (space)
+        $search = \str_replace('.', '', $search);    // remove all -
+        $search = \trim($search);
 
-        // replace all "-" with " " (space)
-        $_REQUEST['search'] = str_replace($_REQUEST['search'], '-', ' ');
+        $search = \explode(' ', $search);
+        $search = \array_unique($search);
+        $search = \implode(' ', $search);
+
+        $_REQUEST['search'] = $search;
+
+        $Site->setAttribute('meta.robots', 'noindex,nofollow');
     }
 }
 
@@ -29,32 +40,32 @@ if (QUI::getRewrite()->getHeaderCode() === 404) {
 $fields     = $Site->getAttribute('quiqqer.settings.search.list.fields');
 $searchType = Search::SEARCH_TYPE_OR;
 
-if (is_string($fields)) {
-    $fields = json_decode($fields, true);
+if (\is_string($fields)) {
+    $fields = \json_decode($fields, true);
 }
 
-if (!is_array($fields)) {
-    $fields = array();
+if (!\is_array($fields)) {
+    $fields = [];
 }
 
-if (in_array('searchTypeAnd', $fields)) {
+if (\in_array('searchTypeAnd', $fields)) {
     $searchType = Search::SEARCH_TYPE_AND;
 }
 
-$SearchInput = new SearchInput(array(
+$SearchInput = new SearchInput([
     'suggestSearch'     => $Site->getAttribute('quiqqer.search.sitetypes.search.suggestSearch'),
     'availableFields'   => $fields,
     'fields'            => $Site->getAttribute('quiqqer.settings.search.list.fields.selected'),
     'searchType'        => $searchType,
-    'showFieldSettings' => !boolval($Site->getAttribute('quiqqer.settings.search.list.hideSettings'))
-));
+    'showFieldSettings' => !\boolval($Site->getAttribute('quiqqer.settings.search.list.hideSettings'))
+]);
 
 $Search = new Search();
 
 $Search->setAttributesFromRequest();
 $SearchInput->setAttributesFromRequest();
 
-$Engine->assign(array(
+$Engine->assign([
     'SearchInput' => $SearchInput,
     'Search'      => $Search
-));
+]);
