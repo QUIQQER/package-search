@@ -9,7 +9,10 @@ use QUI\Search\Controls\SearchInput;
 
 if (isset($_REQUEST['sheet'])
     && \is_numeric($_REQUEST['sheet'])
-    && (int)$_REQUEST['sheet'] > 1) {
+    && (int)$_REQUEST['sheet'] > 1
+
+    || isset($_REQUEST['limit'])
+) {
     $Site->setAttribute('meta.robots', 'noindex,follow');
 }
 
@@ -29,8 +32,6 @@ if (QUI::getRewrite()->getHeaderCode() === 404) {
         $search = \implode(' ', $search);
 
         $_REQUEST['search'] = $search;
-
-        $Site->setAttribute('meta.robots', 'noindex,nofollow');
     }
 }
 
