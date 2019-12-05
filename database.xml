@@ -9,7 +9,7 @@
             <field type="bigint(11)">id</field>
             <field type="bigint(11)">siteId</field>
             <field type="text NULL">urlParameter</field>
-            <field type="text NULL">data</field>
+            <field type="longtext NULL">data</field>
             <field type="text NULL">rights</field>
             <field type="varchar(255) NULL">icon</field>
             <field type="varchar(255) NULL">siteType</field>
