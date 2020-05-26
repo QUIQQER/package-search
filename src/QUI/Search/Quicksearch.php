@@ -9,6 +9,7 @@ namespace QUI\Search;
 use QUI;
 use QUI\Search;
 use QUI\Projects\Project;
+use QUI\Search\Items\CustomSearchItem;
 use QUI\Utils\Security\Orthos;
 
 /**
@@ -104,10 +105,14 @@ class Quicksearch extends QUI\QDOM
                     urlParameter, 
                     ANY_VALUE(data) AS data, 
                     ANY_VALUE(rights) AS rights, 
-                    ANY_VALUE(icon) AS icon
+                    ANY_VALUE(icon) AS icon,
+                    siteType,
+                    custom_id,
+                    custom_data,
+                    origin
             ";
         } else {
-            $query = "SELECT id, siteId, urlParameter, data, rights, icon";
+            $query = "SELECT id, siteId, urlParameter, data, rights, icon, siteType, custom_id, custom_data, origin";
         }
 
 
@@ -258,7 +263,6 @@ class Quicksearch extends QUI\QDOM
                 'siteType'     => $Site->getAttribute('type')
             ]);
         }
-
 
         QUI::getEvents()->fireEvent(
             'searchQuicksearchSetEntry',
@@ -439,6 +443,109 @@ class Quicksearch extends QUI\QDOM
 
         return boolval(current(current($result)));
     }
+
+    // region Custom entries
+
+    /**
+     * Edit a Fulltext search custom entry
+     *
+     * @param Project $Project
+     * @param CustomSearchItem $CustomFulltextItem
+     * @param array $searchStrings - every item represents a searchable string
+     */
+    public static function setCustomEntry(
+        Project $Project,
+        CustomSearchItem $CustomFulltextItem,
+        $searchStrings
+    ) {
+        $table = QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project);
+
+        $baseEntryData = [
+            'custom_id'   => $CustomFulltextItem->getId(),
+            'custom_data' => \json_encode($CustomFulltextItem->toArray()),
+            'origin'      => $CustomFulltextItem->getOrigin(),
+            'siteType'    => 'custom',
+            'icon'        => $CustomFulltextItem->getAttribute('icon') ?: null
+        ];
+
+        foreach ($searchStrings as $searchString) {
+            if (empty($searchString)) {
+                continue;
+            }
+
+            try {
+                if (self::existsCustomEntry($Project, $CustomFulltextItem, $searchString)) {
+                    QUI::getDataBase()->update(
+                        $table,
+                        [
+                            'icon'        => $baseEntryData['icon'],
+                            'custom_data' => $baseEntryData['custom_data']
+                        ],
+                        [
+                            'custom_id' => $CustomFulltextItem->getId(),
+                            'origin'    => $CustomFulltextItem->getOrigin(),
+                            'data'      => $searchString
+                        ]
+                    );
+                } else {
+                    $baseEntryData['data'] = $searchString;
+                    QUI::getDataBase()->insert($table, $baseEntryData);
+                }
+            } catch (\Exception $Exception) {
+                QUI\System\Log::writeException($Exception);
+            }
+        }
+    }
+
+    /**
+     * Check if a custom entry already exists
+     *
+     * @param Project $Project
+     * @param CustomSearchItem $CustomFulltextItem
+     * @param string $searchString
+     * @return bool
+     *
+     * @throws QUI\Exception
+     */
+    public static function existsCustomEntry(
+        Project $Project,
+        CustomSearchItem $CustomFulltextItem,
+        string $searchString
+    ) {
+        $table = QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project);
+
+        $result = QUI::getDataBase()->fetch([
+            'from'  => $table,
+            'where' => [
+                'custom_id' => $CustomFulltextItem->getId(),
+                'origin'    => $CustomFulltextItem->getOrigin(),
+                'data'      => $searchString
+            ]
+        ]);
+
+        return !empty($result);
+    }
+
+    /**
+     * Removes all entries specific to CustomSearchItem
+     *
+     * @param Project $Project
+     * @param CustomSearchItem $CustomSearchItem
+     * @return void
+     */
+    public static function removeCustomEntries(Project $Project, CustomSearchItem $CustomSearchItem)
+    {
+        QUI::getDataBase()->delete(
+            QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project),
+            [
+                'siteType'  => 'custom',
+                'custom_id' => $CustomSearchItem->getId(),
+                'origin'    => $CustomSearchItem->getOrigin()
+            ]
+        );
+    }
+
+    // endregion
 
     /**
      * Clear a complete fulltext search table

@@ -14,7 +14,7 @@ use QUI\Projects\Project;
 use QUI\Projects\Site\Edit as SiteEdit;
 use QUI\System\Log;
 use QUI\Utils\Security\Orthos;
-use Tracy\Debugger;
+use QUI\Search\Items\CustomSearchItem;
 
 /**
  * Fulltextsearch Manager
@@ -298,6 +298,9 @@ class Fulltext extends QUI\QDOM
                 SELECT
                     siteId,
                     urlParameter,
+                    custom_id,
+                    custom_data,
+                    origin,
                     100 / {$relevanceSum} * ({$relevanceMatch}) AS relevance,
                     {$selectedFields}
                 FROM
@@ -307,7 +310,7 @@ class Fulltext extends QUI\QDOM
                     {$datatypeQuery}
                     {$whereFieldConstraints}
                 GROUP BY
-                    urlParameter,siteId,{$selectedFields}
+                    urlParameter,siteId,custom_id,custom_data,origin,{$selectedFields}
                 ORDER BY
                     {$order}relevance DESC
             ";
@@ -362,7 +365,7 @@ class Fulltext extends QUI\QDOM
             $selectedFields = \implode(',', $selectedFields);
 
             $query = "
-            SELECT e_date,urlParameter,siteId,{$selectedFields}
+            SELECT e_date,urlParameter,siteId,custom_id,custom_data,origin,{$selectedFields}
             FROM
                 {$table}
             WHERE
@@ -370,7 +373,7 @@ class Fulltext extends QUI\QDOM
                 {$whereFieldConstraints}
                 {$datatypeQuery}
             GROUP BY
-                urlParameter,siteId,e_date,{$selectedFields}
+                urlParameter,siteId,e_date,custom_id,custom_data,origin,{$selectedFields}
             ORDER BY
                 {$order}e_date DESC
             ";
@@ -639,6 +642,93 @@ class Fulltext extends QUI\QDOM
 
         return $result[0];
     }
+
+    // region Custom entries
+
+    /**
+     * Edit a Fulltext search custom entry
+     *
+     * @param Project $Project
+     * @param CustomSearchItem $CustomFulltextItem
+     * @param array $params (optional) - fulltext searchtable column values
+     */
+    public static function setCustomEntry(
+        Project $Project,
+        CustomSearchItem $CustomFulltextItem,
+        $params = []
+    ) {
+        $table  = QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project);
+        $fields = self::getFieldList();
+
+        try {
+            $data = self::getCustomEntry($Project, $CustomFulltextItem);
+        } catch (QUI\Exception $Exception) {
+            QUI::getDataBase()->insert($table, [
+                'custom_id'   => $CustomFulltextItem->getId(),
+                'custom_data' => \json_encode($CustomFulltextItem->toArray()),
+                'origin'      => $CustomFulltextItem->getOrigin(),
+                'datatype'    => 'custom'
+            ]);
+
+            $data = [];
+        }
+
+        // data
+        foreach ($fields as $entry) {
+            $field = $entry['field'];
+
+            if (!isset($params[$field])) {
+                continue;
+            }
+
+            $data[$field] = $params[$field];
+        }
+
+        $data['datatype']    = 'custom';
+        $data['custom_data'] = \json_encode($CustomFulltextItem->toArray());
+
+        QUI::getDataBase()->update($table, $data, [
+            'custom_id' => $CustomFulltextItem->getId(),
+            'origin'    => $CustomFulltextItem->getOrigin()
+        ]);
+    }
+
+    /**
+     * Return a fulltext custom entry
+     *
+     * @param Project $Project
+     * @param CustomSearchItem $CustomFulltextItem
+     * @return array - Entry data as array (straight from db)
+     *
+     * @throws QUI\Exception
+     */
+    public static function getCustomEntry(
+        Project $Project,
+        CustomSearchItem $CustomFulltextItem
+    ) {
+        $table = QUI::getDBProjectTableName(
+            Search::TABLE_SEARCH_FULL,
+            $Project
+        );
+
+        $result = QUI::getDataBase()->fetch([
+            'from'  => $table,
+            'where' => [
+                'custom_id' => $CustomFulltextItem->getId(),
+                'origin'    => $CustomFulltextItem->getOrigin(),
+            ]
+        ]);
+
+        if (!isset($result[0])) {
+            throw new QUI\Exception(
+                'Search entry not exists'
+            );
+        }
+
+        return $result[0];
+    }
+
+    // endregion
 
     /**
      * Clear a complete fulltext search table
