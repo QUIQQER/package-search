@@ -702,10 +702,8 @@ class Fulltext extends QUI\QDOM
      *
      * @throws QUI\Exception
      */
-    public static function getCustomEntry(
-        Project $Project,
-        CustomSearchItem $CustomFulltextItem
-    ) {
+    public static function getCustomEntry(Project $Project, CustomSearchItem $CustomFulltextItem)
+    {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_FULL,
             $Project
@@ -726,6 +724,26 @@ class Fulltext extends QUI\QDOM
         }
 
         return $result[0];
+    }
+
+    /**
+     * Remove a custom entry from fulltext search table
+     *
+     * @param Project $Project
+     * @param CustomSearchItem $CustomFulltextItem
+     * @return void
+     *
+     * @throws QUI\Database\Exception
+     */
+    public static function removeCustomEntry(Project $Project, CustomSearchItem $CustomFulltextItem)
+    {
+        QUI::getDataBase()->delete(
+            QUI::getDBProjectTableName(Search::TABLE_SEARCH_FULL, $Project),
+            [
+                'custom_id' => $CustomFulltextItem->getId(),
+                'origin'    => $CustomFulltextItem->getOrigin(),
+            ]
+        );
     }
 
     // endregion
