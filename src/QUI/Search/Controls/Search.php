@@ -23,10 +23,10 @@ use QUI\Controls\ChildrenList;
  */
 class Search extends QUI\Control
 {
-    const SEARCH_TYPE_OR = 'OR';
+    const SEARCH_TYPE_OR  = 'OR';
     const SEARCH_TYPE_AND = 'AND';
 
-    const PAGINATION_TYPE_PAGINATION = 'pagination';
+    const PAGINATION_TYPE_PAGINATION      = 'pagination';
     const PAGINATION_TYPE_INIFINITESCROLL = 'infinitescroll';
 
     /**
@@ -142,8 +142,21 @@ class Search extends QUI\Control
             try {
                 // immer neues site objekt
                 // falls die gleiche seite mit unterschiedlichen url params existiert
-                $ResultSite = $Project->get((int)$entry['siteId']);//new Site($Project, );
-                $urlParams  = \json_decode($entry['urlParameter'], true);
+                if ($entry['datatype'] === 'custom') {
+                    $customData = \json_decode($entry['custom_data'], true);
+
+                    $ResultSite = new QUI\Search\Items\CustomSearchItem(
+                        $entry['custom_id'],
+                        $entry['origin'],
+                        $customData['title'],
+                        $customData['url'],
+                        $customData['attributes']
+                    );
+                } else {
+                    $ResultSite = $Project->get((int)$entry['siteId']);//new Site($Project, );
+                }
+
+                $urlParams = \json_decode($entry['urlParameter'], true);
 
                 if (!\is_array($urlParams)) {
                     $urlParams = [];

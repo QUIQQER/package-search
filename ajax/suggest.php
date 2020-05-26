@@ -18,16 +18,16 @@ QUI::$Ajax->registerFunction(
         if (!empty($siteTypesFilter)) {
             $siteTypesFilter = explode(';', $siteTypesFilter);
         } else {
-            $siteTypesFilter = array();
+            $siteTypesFilter = [];
         }
 
-        $QuickSearch = new QUI\Search\Quicksearch(array(
+        $QuickSearch = new QUI\Search\Quicksearch([
             'siteTypes' => $siteTypesFilter
-        ));
+        ]);
 
-        $result = $QuickSearch->search($search, $Project, array(
+        $result = $QuickSearch->search($search, $Project, [
             'limit' => 10
-        ));
+        ]);
 
         if (empty($result['list'])) {
             return false;
@@ -37,19 +37,32 @@ QUI::$Ajax->registerFunction(
 
         foreach ($result['list'] as $entry) {
             try {
-                $Site = $Project->get($entry['siteId']);
-                $url  = $Site->getUrlRewritten();
+                if ($entry['siteType'] === 'custom') {
+                    $customData = \json_decode($entry['custom_data'], true);
+
+                    $Site = new QUI\Search\Items\CustomSearchItem(
+                        $entry['custom_id'],
+                        $entry['origin'],
+                        $customData['title'],
+                        $customData['url'],
+                        $customData['attributes']
+                    );
+                } else {
+                    $Site = $Project->get($entry['siteId']);
+                }
+
+                $url = $Site->getUrlRewritten();
             } catch (QUI\Exception $exception) {
                 continue;
             }
 
-            $list .= '<li data-id="' . $entry['id'] . '" data-url="' . $url . '">';
+            $list .= '<li data-id="'.$entry['id'].'" data-url="'.$url.'">';
             $list .= '<div class="quiqqer-search-suggest-icon">';
 
             if (empty($entry['icon'])) {
                 $list .= '<span class="fa fa-file-o"></span>';
             } else {
-                $list .= '<span class="fa ' . $entry['icon'] . '"></span>';
+                $list .= '<span class="fa '.$entry['icon'].'"></span>';
             }
 
             $list .= '</div>';
@@ -63,5 +76,5 @@ QUI::$Ajax->registerFunction(
 
         return $list;
     },
-    array('project', 'siteId', 'search')
+    ['project', 'siteId', 'search']
 );
