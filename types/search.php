@@ -49,7 +49,7 @@ if (!\is_array($fields)) {
     $fields = [];
 }
 
-if (\in_array('searchTypeAnd', $fields)) {
+if (\is_array($fields) && \in_array('searchTypeAnd', $fields)) {
     $searchType = Search::SEARCH_TYPE_AND;
 }
 
