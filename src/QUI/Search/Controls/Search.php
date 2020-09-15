@@ -23,10 +23,10 @@ use QUI\Controls\ChildrenList;
  */
 class Search extends QUI\Control
 {
-    const SEARCH_TYPE_OR  = 'OR';
+    const SEARCH_TYPE_OR = 'OR';
     const SEARCH_TYPE_AND = 'AND';
 
-    const PAGINATION_TYPE_PAGINATION      = 'pagination';
+    const PAGINATION_TYPE_PAGINATION = 'pagination';
     const PAGINATION_TYPE_INIFINITESCROLL = 'infinitescroll';
 
     /**
@@ -85,7 +85,7 @@ class Search extends QUI\Control
         parent::__construct($attributes);
 
         // sanitize attributes
-        $this->sanitizeAttribues();
+        $this->sanitizeAttributes();
 
         // set javascript control data
         $this->setJavaScriptControl('package/quiqqer/search/bin/controls/Search');
@@ -112,6 +112,16 @@ class Search extends QUI\Control
         $max      = $this->getAttribute('max');
         $sheet    = $this->getAttribute('sheet');
         $children = [];
+
+        if (empty($search)) {
+            return [
+                'count'    => 0,
+                'max'      => $max,
+                'sheets'   => 0,
+                'children' => [],
+                'more'     => false
+            ];
+        }
 
         $siteTypesFilter = $this->getAttribute('datatypes');
 
@@ -361,7 +371,7 @@ class Search extends QUI\Control
             $this->setAttribute('searchFields', $fields);
         }
 
-        $this->sanitizeAttribues();
+        $this->sanitizeAttributes();
     }
 
     /**
@@ -413,7 +423,7 @@ class Search extends QUI\Control
      *
      * @return void
      */
-    protected function sanitizeAttribues()
+    protected function sanitizeAttributes()
     {
         $attributes = $this->getAttributes();
 
