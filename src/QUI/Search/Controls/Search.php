@@ -258,7 +258,10 @@ class Search extends QUI\Control
             $params = \array_merge($childrenListAttributes, $params);
         }
 
-        return new ChildrenList($params);
+        $List = new ChildrenList($params);
+        $this->addCSSFiles($List->getCSSFiles());
+
+        return $List;
     }
 
     /**
