@@ -344,7 +344,7 @@ define('package/quiqqer/search/bin/controls/Suggest', [
                     width  : size.x
                 });
 
-                List.setStyle('display', null);
+                List.setStyle('display', 'block');
                 this.$showed = true;
 
                 this.$FX.animate({
