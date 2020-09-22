@@ -23,10 +23,10 @@ use QUI\Controls\ChildrenList;
  */
 class Search extends QUI\Control
 {
-    const SEARCH_TYPE_OR = 'OR';
+    const SEARCH_TYPE_OR  = 'OR';
     const SEARCH_TYPE_AND = 'AND';
 
-    const PAGINATION_TYPE_PAGINATION = 'pagination';
+    const PAGINATION_TYPE_PAGINATION      = 'pagination';
     const PAGINATION_TYPE_INIFINITESCROLL = 'infinitescroll';
 
     /**
@@ -62,23 +62,24 @@ class Search extends QUI\Control
         $directory = \dirname(\dirname(\dirname(\dirname(\dirname(__FILE__)))));
 
         $this->setAttributes([
-            'search'               => '',
+            'search'                            => '',
             // search term
-            'searchType'           => $this::SEARCH_TYPE_OR,
-            'max'                  => $this->Site->getAttribute('quiqqer.settings.search.list.max') ?: 10,
-            'searchFields'         => $this->getDefaultSearchFields(),
-            'fieldConstraints'     => [],
+            'searchType'                        => $this::SEARCH_TYPE_OR,
+            'max'                               => $this->Site->getAttribute('quiqqer.settings.search.list.max') ?: 10,
+            'searchFields'                      => $this->getDefaultSearchFields(),
+            'fieldConstraints'                  => [],
             // restrict search to certain site types
-            'datatypes'            => [],
-            'sheet'                => 1,
+            'datatypes'                         => [],
+            'sheet'                             => 1,
             // "pagination" or "infinitescroll" (determined by getPaginationType())
-            'paginationType'       => false,
+            'paginationType'                    => false,
             // use Fulltext relevance search
-            'relevanceSearch'      => true,
-            'childrenListTemplate' => $directory.'/templates/SearchResultList.html',
-            'childrenListCss'      => $directory.'/templates/SearchResultList.css',
-            'showResultCount'      => true,
-            'orderFields'          => []
+            'relevanceSearch'                   => true,
+            'childrenListTemplate'              => $directory.'/templates/SearchResultList.html',
+            'childrenListCss'                   => $directory.'/templates/SearchResultList.css',
+            'showResultCount'                   => true,
+            'orderFields'                       => [],
+            'showAllResultsOnEmptySearchString' => false
         ]);
 
         // set attributes
@@ -113,7 +114,7 @@ class Search extends QUI\Control
         $sheet    = $this->getAttribute('sheet');
         $children = [];
 
-        if (empty($search)) {
+        if (empty($search) && !$this->getAttribute('showAllResultsOnEmptySearchString')) {
             return [
                 'count'    => 0,
                 'max'      => $max,
