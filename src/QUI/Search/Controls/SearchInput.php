@@ -44,7 +44,7 @@ class SearchInput extends QUI\Control
             'searchType'        => Search::SEARCH_TYPE_OR,
             'availableFields'   => $this->getAllAvailableFields(),
             'fields'            => [],     // selected fields
-            'suggestSearch'     => 'off',
+            'suggestSearch'     => true,
             'placeholder'       => QUI::getLocale()->get('quiqqer/search', 'tpl.search.placeholder'),
             'showFieldSettings' => true,
             'submitIcon'        => false
