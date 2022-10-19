@@ -3,29 +3,40 @@
 
     <cron exec="\QUI\Search\Cron::createSearchDatabase">
         <title>
-            <locale group="quiqqer/search" var="cron.title" />
+            <locale group="quiqqer/search" var="cron.title"/>
         </title>
         <description>
-            <locale group="quiqqer/search" var="cron.description" />
+            <locale group="quiqqer/search" var="cron.description"/>
         </description>
 
         <!-- available params -->
         <params>
             <param name="project">
-                <locale group="quiqqer/search" var="cron.param.project" />
+                <locale group="quiqqer/search" var="cron.param.project"/>
             </param>
             <param name="lang">
-                <locale group="quiqqer/search" var="cron.param.lang" />
+                <locale group="quiqqer/search" var="cron.param.lang"/>
             </param>
         </params>
+
+        <autocreate>
+            <scope>projects</scope>
+            <interval>0 0 * * *</interval>
+            <active>1</active>
+
+            <params>
+                <param name="project">[projectName]</param>
+                <param name="lang">[projectLang]</param>
+            </params>
+        </autocreate>
     </cron>
 
     <cron exec="\QUI\Search\Cron::createSearchDatabaseAllProjects">
         <title>
-            <locale group="quiqqer/search" var="cron.all_projects.title" />
+            <locale group="quiqqer/search" var="cron.all_projects.title"/>
         </title>
         <description>
-            <locale group="quiqqer/search" var="cron.all_projects.description" />
+            <locale group="quiqqer/search" var="cron.all_projects.description"/>
         </description>
     </cron>
 
