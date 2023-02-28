@@ -42,9 +42,9 @@ class SearchInput extends QUI\Control
         $this->setAttributes([
             'search'            => '', // search term,
             'searchType'        => Search::SEARCH_TYPE_OR,
-            'availableFields'   => $this->getAllAvaiableFields(),
+            'availableFields'   => $this->getAllAvailableFields(),
             'fields'            => [],     // selected fields
-            'suggestSearch'     => 'off',
+            'suggestSearch'     => true,
             'placeholder'       => QUI::getLocale()->get('quiqqer/search', 'tpl.search.placeholder'),
             'showFieldSettings' => true,
             'submitIcon'        => false
@@ -139,7 +139,7 @@ class SearchInput extends QUI\Control
     protected function sanitizeFields()
     {
         // available fields
-        $allFields       = $this->getAllAvaiableFields();
+        $allFields       = $this->getAllAvailableFields();
         $availableFields = $this->getAttribute('availableFields');
 
         if (!\is_array($availableFields)
@@ -176,7 +176,7 @@ class SearchInput extends QUI\Control
      *
      * @return array
      */
-    protected function getAllAvaiableFields()
+    protected function getAllAvailableFields()
     {
         $allFields = [];
 

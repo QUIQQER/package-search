@@ -62,30 +62,31 @@ class Search extends QUI\Control
         $directory = \dirname(\dirname(\dirname(\dirname(\dirname(__FILE__)))));
 
         $this->setAttributes([
-            'search'               => '',
+            'search'                            => '',
             // search term
-            'searchType'           => $this::SEARCH_TYPE_OR,
-            'max'                  => $this->Site->getAttribute('quiqqer.settings.search.list.max') ?: 10,
-            'searchFields'         => $this->getDefaultSearchFields(),
-            'fieldConstraints'     => [],
+            'searchType'                        => $this::SEARCH_TYPE_OR,
+            'max'                               => $this->Site->getAttribute('quiqqer.settings.search.list.max') ?: 10,
+            'searchFields'                      => $this->getDefaultSearchFields(),
+            'fieldConstraints'                  => [],
             // restrict search to certain site types
-            'datatypes'            => [],
-            'sheet'                => 1,
+            'datatypes'                         => [],
+            'sheet'                             => 1,
             // "pagination" or "infinitescroll" (determined by getPaginationType())
-            'paginationType'       => false,
+            'paginationType'                    => false,
             // use Fulltext relevance search
-            'relevanceSearch'      => true,
-            'childrenListTemplate' => $directory.'/templates/SearchResultList.html',
-            'childrenListCss'      => $directory.'/templates/SearchResultList.css',
-            'showResultCount'      => true,
-            'orderFields'          => []
+            'relevanceSearch'                   => true,
+            'childrenListTemplate'              => $directory.'/templates/SearchResultList.html',
+            'childrenListCss'                   => $directory.'/templates/SearchResultList.css',
+            'showResultCount'                   => true,
+            'orderFields'                       => [],
+            'showAllResultsOnEmptySearchString' => false
         ]);
 
         // set attributes
         parent::__construct($attributes);
 
         // sanitize attributes
-        $this->sanitizeAttribues();
+        $this->sanitizeAttributes();
 
         // set javascript control data
         $this->setJavaScriptControl('package/quiqqer/search/bin/controls/Search');
@@ -112,6 +113,16 @@ class Search extends QUI\Control
         $max      = $this->getAttribute('max');
         $sheet    = $this->getAttribute('sheet');
         $children = [];
+
+        if (empty($search) && !$this->getAttribute('showAllResultsOnEmptySearchString')) {
+            return [
+                'count'    => 0,
+                'max'      => $max,
+                'sheets'   => 0,
+                'children' => [],
+                'more'     => false
+            ];
+        }
 
         $siteTypesFilter = $this->getAttribute('datatypes');
 
@@ -248,7 +259,10 @@ class Search extends QUI\Control
             $params = \array_merge($childrenListAttributes, $params);
         }
 
-        return new ChildrenList($params);
+        $List = new ChildrenList($params);
+        $this->addCSSFiles($List->getCSSFiles());
+
+        return $List;
     }
 
     /**
@@ -361,7 +375,7 @@ class Search extends QUI\Control
             $this->setAttribute('searchFields', $fields);
         }
 
-        $this->sanitizeAttribues();
+        $this->sanitizeAttributes();
     }
 
     /**
@@ -413,7 +427,7 @@ class Search extends QUI\Control
      *
      * @return void
      */
-    protected function sanitizeAttribues()
+    protected function sanitizeAttributes()
     {
         $attributes = $this->getAttributes();
 

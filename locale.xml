@@ -73,7 +73,7 @@
         </locale>
         <locale name="tpl.search.more.result">
             <de><![CDATA[Es wurden [count] Ergebnisse gefunden.]]></de>
-            <en><![CDATA[[count] results has been found.]]></en>
+            <en><![CDATA[[count] results have been found.]]></en>
         </locale>
         <locale name="tpl.search.pagination.inifinitescroll.btn.loading">
             <de><![CDATA[Lade...]]></de>
