@@ -10,10 +10,9 @@ use QUI;
 use QUI\Projects\Project;
 use QUI\Projects\Site;
 use QUI\Projects\Site\Edit as SiteEdit;
-use QUI\System\Log;
-
 use QUI\Search\Fulltext;
 use QUI\Search\Quicksearch;
+use QUI\System\Log;
 
 /**
  * Hauptsuche
@@ -75,7 +74,7 @@ class Search
                 \set_time_limit(0);
 
                 $siteId = (int)$siteParams['id'];
-                $Site   = new SiteEdit($Project, (int)$siteId);
+                $Site = new SiteEdit($Project, (int)$siteId);
 
                 if (!$Site->getAttribute('active')) {
                     continue;
@@ -90,7 +89,7 @@ class Search
                 }
 
                 $Quicksearch->setEntries($Project, $siteId, [
-                    $Site->getAttribute('name').' '.$Site->getAttribute('title'),
+                    $Site->getAttribute('name') . ' ' . $Site->getAttribute('title'),
                 ]);
             } catch (QUI\Exception $Exception) {
                 Log::writeException($Exception);
@@ -110,26 +109,26 @@ class Search
     {
         QUI\Cache\Manager::clear('quiqqer/search');
 
-        $Table    = QUI::getDataBase()->table();
-        $Manager  = QUI::getProjectManager();
+        $Table = QUI::getDataBase()->table();
+        $Manager = QUI::getProjectManager();
         $projects = $Manager->getProjects(true);
 
         $fieldList = Search\Fulltext::getFieldList();
-        $fields    = [];
-        $fulltext  = [];
-        $index     = [];
+        $fields = [];
+        $fulltext = [];
+        $index = [];
 
         foreach ($fieldList as $fieldEntry) {
             $fields[$fieldEntry['field']] = $fieldEntry['type'];
 
             if ($fieldEntry['fulltext']) {
                 $fulltext[] = [
-                    'field'   => $fieldEntry['field'],
+                    'field' => $fieldEntry['field'],
                     'package' => $fieldEntry['package']
                 ];
             } else {
                 $index[] = [
-                    'field'   => $fieldEntry['field'],
+                    'field' => $fieldEntry['field'],
                     'package' => $fieldEntry['package']
                 ];
             }
@@ -137,7 +136,7 @@ class Search
 
         foreach ($projects as $_Project) {
             /* @var $_Project Project */
-            $name  = $_Project->getName();
+            $name = $_Project->getName();
             $langs = $_Project->getLanguages();
 
             foreach ($langs as $lang) {
@@ -159,10 +158,10 @@ class Search
                         $Table->setIndex($table, $field['field']);
                     } catch (\Exception $Exception) {
                         QUI\System\Log::addWarning(
-                            self::class.' :: setup() -> Could not create Index for Fulltext'
-                            .' search column "'.$field['field'].'" (Package: '.$field['package'].').'
-                            .' The search column may be needed to be defined as "fulltext" for this to work.'
-                            .' Error Message: '.$Exception->getMessage()
+                            self::class . ' :: setup() -> Could not create Index for Fulltext'
+                            . ' search column "' . $field['field'] . '" (Package: ' . $field['package'] . ').'
+                            . ' The search column may be needed to be defined as "fulltext" for this to work.'
+                            . ' Error Message: ' . $Exception->getMessage()
                         );
                     }
                 }
@@ -232,7 +231,7 @@ class Search
         $Project = $Site->getProject();
 
         $Quicksearch = new Quicksearch();
-        $Fulltext    = new Fulltext();
+        $Fulltext = new Fulltext();
 
         $e_date = $Site->getAttribute('e_date');
         $e_date = \strtotime($e_date);
@@ -250,11 +249,11 @@ class Search
 
         // Fulltext
         $Fulltext->setEntry($Project, $Site->getId(), [
-            'name'   => $Site->getAttribute('name'),
-            'title'  => $Site->getAttribute('title'),
-            'short'  => $Site->getAttribute('short'),
-            'data'   => $Site->getAttribute('content'),
-            'icon'   => $Site->getAttribute('image_site'),
+            'name' => $Site->getAttribute('name'),
+            'title' => $Site->getAttribute('title'),
+            'short' => $Site->getAttribute('short'),
+            'data' => $Site->getAttribute('content'),
+            'icon' => $Site->getAttribute('image_site'),
             'e_date' => $e_date,
             'c_date' => $c_date
         ]);
@@ -276,7 +275,7 @@ class Search
      */
     protected static function setSiteDefaultSettings(Site $Site)
     {
-        $fields         = $Site->getAttribute('quiqqer.settings.search.list.fields');
+        $fields = $Site->getAttribute('quiqqer.settings.search.list.fields');
         $selectedFields = $Site->getAttribute('quiqqer.settings.search.list.fields.selected');
 
         if (!empty($fields) || !empty($selectedFields)) {
@@ -284,7 +283,7 @@ class Search
         }
 
         $selectedFields = ['name', 'title', 'short', 'data'];
-        $Site           = $Site->getEdit();
+        $Site = $Site->getEdit();
 
         $Site->setAttribute('quiqqer.settings.search.list.fields', []);
         $Site->setAttribute('quiqqer.settings.search.list.fields.selected', $selectedFields);
@@ -320,12 +319,12 @@ class Search
 
         /* @var $SearchSite QUI\Projects\Site */
         $SearchSite = $result[0];
-        $searchUrl  = $SearchSite->getUrlRewritten();
-        $start      = $Project->firstChild()->getUrlRewritten();
+        $searchUrl = $SearchSite->getUrlRewritten();
+        $start = $Project->firstChild()->getUrlRewritten();
 
         if (\strpos($searchUrl, 'http') !== 0) {
-            $searchUrl = $host.$searchUrl;
-            $start     = $host.$start;
+            $searchUrl = $host . $searchUrl;
+            $start = $host . $start;
         }
 
         $Template->extendHeader(
@@ -334,10 +333,10 @@ class Search
             {
                 "@context": "http://schema.org",
                 "@type": "WebSite",
-                "url": "'.$start.'",
+                "url": "' . $start . '",
                 "potentialAction": {
                     "@type": "SearchAction",
-                    "target": "'.$searchUrl.'?search={search}",
+                    "target": "' . $searchUrl . '?search={search}",
                     "query-input": "required name=search"
                 }
             }

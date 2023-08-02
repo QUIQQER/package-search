@@ -24,8 +24,8 @@ class Search extends QUI\Control
     {
         // default options
         $this->setAttributes([
-            'class'         => 'search-brick',
-            'resultSite'    => false,
+            'class' => 'search-brick',
+            'resultSite' => false,
             'suggestSearch' => false
 
         ]);
@@ -42,8 +42,8 @@ class Search extends QUI\Control
     public function getBody()
     {
         //QUI::getPackage('quiqqer/search');
-        $Engine  = QUI::getTemplateManager()->getEngine();
-        $Site    = $this->getAttribute('Site');
+        $Engine = QUI::getTemplateManager()->getEngine();
+        $Site = $this->getAttribute('Site');
         $Project = $Site->getProject();
 
         $resultSite = $this->getAttribute('resultSite');
@@ -57,7 +57,7 @@ class Search extends QUI\Control
             $searchSites = $Project->getSites([
                 'where' => [
                     'type' => [
-                        'type'  => 'IN',
+                        'type' => 'IN',
                         'value' => $types
                     ]
                 ],
@@ -77,13 +77,13 @@ class Search extends QUI\Control
 
 
         $Engine->assign([
-            'this'          => $this,
-            'resultSite'    => $resultSite,
+            'this' => $this,
+            'resultSite' => $resultSite,
             'suggestSearch' => $suggestSearch
         ]);
 
-        $this->addCSSFile(\dirname(__FILE__).'/Search.css');
+        $this->addCSSFile(\dirname(__FILE__) . '/Search.css');
 
-        return $Engine->fetch(\dirname(__FILE__).'/Search.html');
+        return $Engine->fetch(\dirname(__FILE__) . '/Search.html');
     }
 }

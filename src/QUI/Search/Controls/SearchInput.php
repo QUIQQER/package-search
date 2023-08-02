@@ -9,10 +9,6 @@ namespace QUI\Search\Controls;
 use QUI;
 use QUI\Search\Fulltext;
 use QUI\Utils\Security\Orthos;
-use QUI\Projects\Site;
-use QUI\Utils\StringHelper;
-use QUI\Bricks\Controls\Pagination;
-use QUI\Controls\ChildrenList;
 
 /**
  * Class SearchInput
@@ -40,18 +36,18 @@ class SearchInput extends QUI\Control
         $this->Site = QUI::getRewrite()->getSite();
 
         $this->setAttributes([
-            'search'            => '', // search term,
-            'searchType'        => Search::SEARCH_TYPE_OR,
-            'availableFields'   => $this->getAllAvailableFields(),
-            'fields'            => [],     // selected fields
-            'suggestSearch'     => true,
-            'placeholder'       => QUI::getLocale()->get('quiqqer/search', 'tpl.search.placeholder'),
+            'search' => '', // search term,
+            'searchType' => Search::SEARCH_TYPE_OR,
+            'availableFields' => $this->getAllAvailableFields(),
+            'fields' => [],     // selected fields
+            'suggestSearch' => true,
+            'placeholder' => QUI::getLocale()->get('quiqqer/search', 'tpl.search.placeholder'),
             'showFieldSettings' => true,
-            'submitIcon'        => false
+            'submitIcon' => false
         ]);
 
         $this->addCSSClass('quiqqer-search-searchinput');
-        $this->addCSSFile(dirname(__FILE__).'/SearchInput.css');
+        $this->addCSSFile(dirname(__FILE__) . '/SearchInput.css');
 
         parent::__construct($attributes);
 
@@ -72,25 +68,25 @@ class SearchInput extends QUI\Control
         $Engine = QUI::getTemplateManager()->getEngine();
 
         $showFieldSettings = $this->getAttribute('showFieldSettings');
-        $availableFields   = $this->getAttribute('availableFields');
+        $availableFields = $this->getAttribute('availableFields');
 
         if (empty($availableFields)) {
             $showFieldSettings = false;
         }
 
         $Engine->assign([
-            'Site'              => $this->Site,
-            'searchType'        => $this->getAttribute('searchType'),
-            'search'            => $this->getAttribute('search'),
-            'availableFields'   => $availableFields,
-            'fields'            => $this->getAttribute('fields'),
-            'suggestSearch'     => $this->getAttribute('suggestSearch'),
-            'placeholder'       => $this->getAttribute('placeholder'),
+            'Site' => $this->Site,
+            'searchType' => $this->getAttribute('searchType'),
+            'search' => $this->getAttribute('search'),
+            'availableFields' => $availableFields,
+            'fields' => $this->getAttribute('fields'),
+            'suggestSearch' => $this->getAttribute('suggestSearch'),
+            'placeholder' => $this->getAttribute('placeholder'),
             'showFieldSettings' => $showFieldSettings,
-            'submitIcon'        => $this->getAttribute('submitIcon')
+            'submitIcon' => $this->getAttribute('submitIcon')
         ]);
 
-        return $Engine->fetch(\dirname(__FILE__).'/SearchInput.html');
+        return $Engine->fetch(\dirname(__FILE__) . '/SearchInput.html');
     }
 
     /**
@@ -105,7 +101,8 @@ class SearchInput extends QUI\Control
             $this->setAttribute('search', $_REQUEST['searchterms']);
         }
 
-        if (isset($_REQUEST['searchType'])
+        if (
+            isset($_REQUEST['searchType'])
             && $_REQUEST['searchType'] == Search::SEARCH_TYPE_AND
         ) {
             $this->setAttribute('searchType', Search::SEARCH_TYPE_AND);
@@ -139,10 +136,11 @@ class SearchInput extends QUI\Control
     protected function sanitizeFields()
     {
         // available fields
-        $allFields       = $this->getAllAvailableFields();
+        $allFields = $this->getAllAvailableFields();
         $availableFields = $this->getAttribute('availableFields');
 
-        if (!\is_array($availableFields)
+        if (
+            !\is_array($availableFields)
             /*|| empty($availableFields)*/
         ) {
             $availableFields = $allFields;
