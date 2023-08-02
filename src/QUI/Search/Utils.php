@@ -4,6 +4,9 @@ namespace QUI\Search;
 
 use QUI\Utils\Security\Orthos;
 
+use function preg_replace;
+use function trim;
+
 /**
  * Class Utils
  *
@@ -17,13 +20,13 @@ class Utils
      * @param string $str
      * @return string - sanitized string
      */
-    public static function sanitizeSearchString($str)
+    public static function sanitizeSearchString($str): string
     {
         /* http://www.regular-expressions.info/unicode.html#prop */
-        $str = \preg_replace("/[^\p{L}\p{N}\p{P}\-\+]/iu", " ", $str);
+        $str = preg_replace("/[^\p{L}\p{N}\p{P}\-\+]/iu", " ", $str);
         $str = Orthos::clear($str);
-        $str = \preg_replace('#([ ]){2,}#', "$1", $str);
-        $str = \trim($str);
+        $str = preg_replace('#([ ]){2,}#', "$1", $str);
+        $str = trim($str);
 
         return $str;
     }

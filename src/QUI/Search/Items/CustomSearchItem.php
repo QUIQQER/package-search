@@ -38,7 +38,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * CustomFulltextItem constructor.
      *
      * @param int $id - Custom ID that can be freely chosen and that uniquely represents the search item; must be unique for your origin!
-     * @param string $origin  - Package this instance originates from (e.g. "quiqqer/search")
+     * @param string $origin - Package this instance originates from (e.g. "quiqqer/search")
      * @param string $title - Title that is shown as a search list result item title or quicksearch suggestion
      * @param string $url - The URL that leads to your search item Site
      * @param array $attributes (optional) - Site-like attributes (e.g. "image_site", "short" etc.)
@@ -50,9 +50,9 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
         string $url,
         array $attributes = []
     ) {
-        $this->id     = $id;
+        $this->id = $id;
         $this->origin = $origin;
-        $this->url    = $url;
+        $this->url = $url;
 
         $this->setAttributes($attributes);
         $this->setAttribute('title', $title);
@@ -507,10 +507,10 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
     public function toArray()
     {
         return [
-            'id'         => $this->id,
-            'origin'     => $this->origin,
-            'title'      => $this->getAttribute('title'),
-            'url'        => $this->url,
+            'id' => $this->id,
+            'origin' => $this->origin,
+            'title' => $this->getAttribute('title'),
+            'url' => $this->url,
             'attributes' => $this->getAttributes()
         ];
     }
