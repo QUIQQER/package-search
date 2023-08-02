@@ -7,8 +7,8 @@
 namespace QUI\Search;
 
 use QUI;
-use QUI\Search;
 use QUI\Projects\Project;
+use QUI\Search;
 use QUI\Search\Items\CustomSearchItem;
 use QUI\Utils\Security\Orthos;
 
@@ -28,7 +28,7 @@ class Quicksearch extends QUI\QDOM
      *
      * @param array $params - Attributes
      */
-    public function __construct($params = [])
+    public function __construct(array $params = [])
     {
         // defaults
         $this->setAttributes([
@@ -53,7 +53,7 @@ class Quicksearch extends QUI\QDOM
      */
     public function search($str, Project $Project, $params = [])
     {
-        $PDO   = QUI::getPDO();
+        $PDO = QUI::getPDO();
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
             $Project
@@ -67,12 +67,12 @@ class Quicksearch extends QUI\QDOM
             $params['limit'] = 10;
         }
 
-        $search = '%'.$str.'%';
-        $limit  = QUI\Database\DB::createQueryLimit($params['limit']);
-        $binds  = [];
+        $search = '%' . $str . '%';
+        $limit = QUI\Database\DB::createQueryLimit($params['limit']);
+        $binds = [];
 
         // restrict search to certain site types
-        $siteTypes      = $this->getAttribute('siteTypes');
+        $siteTypes = $this->getAttribute('siteTypes');
         $siteTypesQuery = '';
 
         if ($siteTypes) {
@@ -83,15 +83,15 @@ class Quicksearch extends QUI\QDOM
             $siteTypesQuery = ' AND (';
 
             for ($i = 0, $len = count($siteTypes); $i < $len; $i++) {
-                $siteTypesQuery .= ' siteType LIKE :type'.$i;
+                $siteTypesQuery .= ' siteType LIKE :type' . $i;
 
                 if ($len - 1 > $i) {
                     $siteTypesQuery .= ' OR ';
                 }
 
-                $binds['type'.$i] = [
+                $binds['type' . $i] = [
                     'value' => $siteTypes[$i],
-                    'type'  => \PDO::PARAM_STR
+                    'type' => \PDO::PARAM_STR
                 ];
             }
 
@@ -137,7 +137,7 @@ class Quicksearch extends QUI\QDOM
         $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
 
         foreach ($binds as $placeholder => $bind) {
-            $Statement->bindValue(':'.$placeholder, $bind['value'], $bind['type']);
+            $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
         }
 
         if (isset($limit['prepare'][':limit1'])) {
@@ -178,7 +178,7 @@ class Quicksearch extends QUI\QDOM
         $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
 
         foreach ($binds as $placeholder => $bind) {
-            $Statement->bindValue(':'.$placeholder, $bind['value'], $bind['type']);
+            $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
         }
 
         $Statement->execute();
@@ -186,7 +186,7 @@ class Quicksearch extends QUI\QDOM
         $count = $Statement->fetchAll(\PDO::FETCH_ASSOC);
 
         return [
-            'list'  => $result,
+            'list' => $result,
             'count' => $count[0]['count']
         ];
     }
@@ -245,7 +245,7 @@ class Quicksearch extends QUI\QDOM
         // site params
         if (\is_array($siteParams) && !empty($siteParams)) {
             foreach ($siteParams as $key => $value) {
-                $key   = Orthos::clearMySQL($key, false);
+                $key = Orthos::clearMySQL($key, false);
                 $value = Orthos::clearMySQL($value, false);
 
                 $siteUrlParams[$key] = $value;
@@ -257,10 +257,10 @@ class Quicksearch extends QUI\QDOM
         // data
         foreach ($data as $dataEntry) {
             QUI::getDataBase()->insert($table, [
-                'siteId'       => $siteId,
+                'siteId' => $siteId,
                 'urlParameter' => $urlParameter,
-                'data'         => Orthos::clearMySQL($dataEntry, false),
-                'siteType'     => $Site->getAttribute('type')
+                'data' => Orthos::clearMySQL($dataEntry, false),
+                'siteType' => $Site->getAttribute('type')
             ]);
         }
 
@@ -318,14 +318,14 @@ class Quicksearch extends QUI\QDOM
             QUI::getDataBase()->update(
                 $table,
                 [
-                    'rights'   => null, // @todo auf was richtiges setzen, wenn der parameter implementiert wird
-                    'icon'     => null,  // @todo auf was richtiges setzen, wenn der parameter implementiert wird
+                    'rights' => null, // @todo auf was richtiges setzen, wenn der parameter implementiert wird
+                    'icon' => null,  // @todo auf was richtiges setzen, wenn der parameter implementiert wird
                     'siteType' => $Site->getAttribute('type')
                 ],
                 [
-                    'siteId'       => $siteId,
+                    'siteId' => $siteId,
                     'urlParameter' => $urlParameter,
-                    'data'         => $data
+                    'data' => $data
                 ]
             );
 
@@ -333,10 +333,10 @@ class Quicksearch extends QUI\QDOM
         }
 
         QUI::getDataBase()->insert($table, [
-            'siteId'       => $siteId,
+            'siteId' => $siteId,
             'urlParameter' => $urlParameter,
-            'data'         => $data,
-            'siteType'     => $Site->getAttribute('type')
+            'data' => $data,
+            'siteType' => $Site->getAttribute('type')
         ]);
     }
 
@@ -364,7 +364,7 @@ class Quicksearch extends QUI\QDOM
         }
 
         QUI::getDataBase()->delete($table, [
-            'siteId'       => $siteId,
+            'siteId' => $siteId,
             'urlParameter' => \json_encode($siteParams)
         ]);
     }
@@ -393,9 +393,9 @@ class Quicksearch extends QUI\QDOM
         $urlParameter = \json_encode($siteParams);
 
         $result = QUI::getDataBase()->fetch([
-            'from'  => $table,
+            'from' => $table,
             'where' => [
-                'siteId'       => (int)$siteId,
+                'siteId' => (int)$siteId,
                 'urlParameter' => $urlParameter
             ]
         ]);
@@ -433,10 +433,10 @@ class Quicksearch extends QUI\QDOM
 
         $result = QUI::getDataBase()->fetch([
             'count' => 1,
-            'from'  => $table,
+            'from' => $table,
             'where' => [
-                'siteId'       => (int)$siteId,
-                'data'         => $data,
+                'siteId' => (int)$siteId,
+                'data' => $data,
                 'urlParameter' => $urlParameter
             ]
         ]);
@@ -461,11 +461,11 @@ class Quicksearch extends QUI\QDOM
         $table = QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project);
 
         $baseEntryData = [
-            'custom_id'   => $CustomFulltextItem->getId(),
+            'custom_id' => $CustomFulltextItem->getId(),
             'custom_data' => \json_encode($CustomFulltextItem->toArray()),
-            'origin'      => $CustomFulltextItem->getOrigin(),
-            'siteType'    => 'custom',
-            'icon'        => $CustomFulltextItem->getAttribute('icon') ?: null
+            'origin' => $CustomFulltextItem->getOrigin(),
+            'siteType' => 'custom',
+            'icon' => $CustomFulltextItem->getAttribute('icon') ?: null
         ];
 
         foreach ($searchStrings as $searchString) {
@@ -478,13 +478,13 @@ class Quicksearch extends QUI\QDOM
                     QUI::getDataBase()->update(
                         $table,
                         [
-                            'icon'        => $baseEntryData['icon'],
+                            'icon' => $baseEntryData['icon'],
                             'custom_data' => $baseEntryData['custom_data']
                         ],
                         [
                             'custom_id' => $CustomFulltextItem->getId(),
-                            'origin'    => $CustomFulltextItem->getOrigin(),
-                            'data'      => $searchString
+                            'origin' => $CustomFulltextItem->getOrigin(),
+                            'data' => $searchString
                         ]
                     );
                 } else {
@@ -515,11 +515,11 @@ class Quicksearch extends QUI\QDOM
         $table = QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project);
 
         $result = QUI::getDataBase()->fetch([
-            'from'  => $table,
+            'from' => $table,
             'where' => [
                 'custom_id' => $CustomFulltextItem->getId(),
-                'origin'    => $CustomFulltextItem->getOrigin(),
-                'data'      => $searchString
+                'origin' => $CustomFulltextItem->getOrigin(),
+                'data' => $searchString
             ]
         ]);
 
@@ -538,9 +538,9 @@ class Quicksearch extends QUI\QDOM
         QUI::getDataBase()->delete(
             QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project),
             [
-                'siteType'  => 'custom',
+                'siteType' => 'custom',
                 'custom_id' => $CustomSearchItem->getId(),
-                'origin'    => $CustomSearchItem->getOrigin()
+                'origin' => $CustomSearchItem->getOrigin()
             ]
         );
     }

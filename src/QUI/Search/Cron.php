@@ -35,7 +35,7 @@ class Cron
         }
 
         $Project = QUI::getProject($params['project'], $params['lang']);
-        $Search  = new Search();
+        $Search = new Search();
 
         $Search->createFulltextSearch($Project);
         $Search->createQuicksearch($Project);
@@ -51,7 +51,7 @@ class Cron
     public static function createSearchDatabaseAllProjects($params, $CronManager)
     {
         $projects = QUI::getProjectManager()->getProjects();
-        $Search   = new Search();
+        $Search = new Search();
 
         foreach ($projects as $project) {
             $Project = QUI::getProject($project);
