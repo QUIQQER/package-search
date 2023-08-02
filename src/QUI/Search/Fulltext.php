@@ -918,6 +918,10 @@ class Fulltext extends QUI\QDOM
             }
         }
 
+        if (!isset($result['quiqqer/search'])) {
+            $result['quiqqer/search'] = OPT_DIR . '/quiqqer/search/search.xml';
+        }
+
         QUI\Cache\Manager::set($cache, $result);
 
         return $result;
