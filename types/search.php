@@ -12,9 +12,9 @@
 use QUI\Search\Controls\Search;
 use QUI\Search\Controls\SearchInput;
 
-/**
- * 404 Error Site
- */
+//
+// 404 Error Site
+//
 
 if (
     isset($_REQUEST['sheet'])
