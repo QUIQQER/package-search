@@ -3,36 +3,26 @@
 namespace QUI\Search\Items;
 
 use QUI;
+use QUI\Exception;
 use QUI\Interfaces\Projects\Site as QUISiteInterface;
+use QUI\Interfaces\Users\User;
 
 /**
  * Class CustomSearchItem
  *
- * Special custom search item for fulltext and quicksearch
+ * Special custom search item for fulltext and quick search
  *
  * This is handled like a real Site in the search context
  */
 class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
 {
-    /**
-     * @var int
-     */
-    protected $id;
+    protected int $id;
 
-    /**
-     * @var string
-     */
-    protected $origin;
+    protected string $origin;
 
-    /**
-     * @var string
-     */
-    protected $url;
+    protected string $url;
 
-    /**
-     * @var QUI\Projects\Project
-     */
-    protected $Project = null;
+    protected QUI\Projects\Project|null $Project = null;
 
     /**
      * CustomFulltextItem constructor.
@@ -70,8 +60,9 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * Return the project object of the site
      *
      * @return QUI\Projects\Project
+     * @throws Exception
      */
-    public function getProject()
+    public function getProject(): QUI\Projects\Project
     {
         if (empty($this->Project)) {
             return QUI::getRewrite()->getProject();
@@ -91,11 +82,11 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
     /**
      * Lädt die Plugins der Seite
      *
-     * @param string|boolean $plugin - Plugin welches geladen werden soll, optional, ansonsten werden alle geladen
+     * @param boolean|string $plugin - Plugin welches geladen werden soll, optional, ansonsten werden alle geladen
      *
      * @return QUISiteInterface
      */
-    public function load($plugin = false)
+    public function load(bool|string $plugin = false): QUISiteInterface
     {
         return $this;
     }
@@ -105,7 +96,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return string
      */
-    public function encode()
+    public function encode(): string
     {
         return '';
     }
@@ -114,20 +105,16 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * Setzt JSON Parameter
      *
      * @param string $params - JSON encoded string
-     *
-     * @throws QUI\Exception
      */
-    public function decode($params)
+    public function decode(string $params): void
     {
-        return;
     }
 
     /**
      * Hohlt frisch die Daten aus der DB
      */
-    public function refresh()
+    public function refresh(): void
     {
-        return;
     }
 
     /**
@@ -135,7 +122,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return boolean|integer
      */
-    public function isLinked()
+    public function isLinked(): bool|int
     {
         return false;
     }
@@ -148,7 +135,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return boolean
      */
-    public function existLang($lang, $check_only_active = true)
+    public function existLang(string $lang, bool $check_only_active = true): bool
     {
         return false;
     }
@@ -158,20 +145,20 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return array
      */
-    public function getLangIds()
+    public function getLangIds(): array
     {
         return [];
     }
 
     /**
      * Return the ID of the site,
-     * or the ID of the sibling (linked) site of another languager
+     * or the ID of the sibling (linked) site of another language
      *
-     * @param string|boolean $lang - optional, if it is set, then the language of the wanted linked sibling site
+     * @param boolean|string $lang - optional, if it is set, then the language of the wanted to be linked sibling site
      *
      * @return integer
      */
-    public function getId($lang = false)
+    public function getId(bool|string $lang = false): int
     {
         return $this->id;
     }
@@ -184,9 +171,9 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *                      $params['limit']
      * @param boolean $load - Legt fest ob die Kinder die Plugins laden sollen
      *
-     * @return array;
+     * @return int|array ;
      */
-    public function getChildren($params = [], $load = false)
+    public function getChildren(array $params = [], bool $load = false): int|array
     {
         return [];
     }
@@ -197,7 +184,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * @return QUI\Projects\Site
      * @throws QUI\Exception
      */
-    public function nextSibling()
+    public function nextSibling(): QUISiteInterface
     {
         throw new QUI\Exception(
             QUI::getLocale()->get('quiqqer/quiqqer', 'exception.site.no.next.sibling')
@@ -211,7 +198,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return array
      */
-    public function nextSiblings($no)
+    public function nextSiblings(int $no): array
     {
         return [];
     }
@@ -222,7 +209,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * @return QUI\Projects\Site
      * @throws QUI\Exception
      */
-    public function previousSibling()
+    public function previousSibling(): QUISiteInterface
     {
         throw new QUI\Exception(
             QUI::getLocale()->get('quiqqer/quiqqer', 'exception.site.no.previous.sibling')
@@ -236,7 +223,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return array
      */
-    public function previousSiblings($no)
+    public function previousSiblings(int $no): array
     {
         return [];
     }
@@ -248,7 +235,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return QUI\Projects\Site | false
      */
-    public function firstChild($params = [])
+    public function firstChild(array $params = []): QUISiteInterface|bool
     {
         return false;
     }
@@ -257,10 +244,9 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * Gibt die Kinder zurück achtet aber auf "Nicht in Navigation anzeigen" und Rechte
      *
      * @param array $params
-     *
-     * @return array
+     * @return int|array
      */
-    public function getNavigation($params = [])
+    public function getNavigation(array $params = []): int|array
     {
         return [];
     }
@@ -273,7 +259,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * @return integer
      * @throws QUI\Exception
      */
-    public function getChildIdByName($name)
+    public function getChildIdByName(string $name): int
     {
         throw new QUI\Exception(
             QUI::getLocale()->get('quiqqer/quiqqer', 'exception.site.child.by.name.not.found', [
@@ -291,7 +277,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * @return QUI\Projects\Site
      * @throws QUI\Exception
      */
-    public function getChild($id)
+    public function getChild(int $id): QUISiteInterface
     {
         throw new QUI\Exception(
             QUI::getLocale()->get('quiqqer/quiqqer', 'exception.site.child.not.found'),
@@ -307,9 +293,9 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *                      $params['where']
      *                      $params['limit']
      *
-     * @return array
+     * @return int|array
      */
-    public function getChildrenIds($params = [])
+    public function getChildrenIds(array $params = []): int|array
     {
         return [];
     }
@@ -321,7 +307,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return array
      */
-    public function getChildrenIdsRecursive($params = [])
+    public function getChildrenIdsRecursive(array $params = []): array
     {
         return [];
     }
@@ -333,7 +319,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return integer - Anzahl der Kinder
      */
-    public function hasChildren($navhide = false)
+    public function hasChildren(bool $navhide = false): int
     {
         return 0;
     }
@@ -343,9 +329,8 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @todo move to Site/Edit
      */
-    public function delete()
+    public function delete(): void
     {
-        return;
     }
 
     /**
@@ -356,7 +341,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return string
      */
-    public function getUrl($params = [], $rewrited = false)
+    public function getUrl(array $params = [], array $getParams = []): string
     {
         return $this->url;
     }
@@ -365,7 +350,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * @param array $params
      * @return mixed
      */
-    public function getUrlRewritten($params = [])
+    public function getUrlRewritten(array $params = []): string
     {
         return $this->url;
     }
@@ -375,7 +360,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return integer
      */
-    public function getParentId()
+    public function getParentId(): int
     {
         return 1;
     }
@@ -390,7 +375,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return array
      */
-    public function getParentIds()
+    public function getParentIds(): array
     {
         return [1];
     }
@@ -400,7 +385,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return array
      */
-    public function getParentIdTree()
+    public function getParentIdTree(): array
     {
         return [1];
     }
@@ -410,8 +395,9 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * Wenn kein Parent Objekt existiert wird false zurückgegeben.
      *
      * @return QUISiteInterface|false
+     * @throws Exception
      */
-    public function getParent()
+    public function getParent(): QUISiteInterface|bool
     {
         return $this->getProject()->get(1);
     }
@@ -421,8 +407,9 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * Site->Parent->ParentParent->ParentParentParent
      *
      * @return array
+     * @throws Exception
      */
-    public function getParents()
+    public function getParents(): array
     {
         return [$this->getParent()];
     }
@@ -432,9 +419,8 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * ??? wieso hier? und nicht im trash? O.o
      */
-    public function restore()
+    public function restore(): void
     {
-        return;
     }
 
     /**
@@ -442,9 +428,8 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * Die Seite wird komplett aus der DB gelöscht und auch alle Beziehungen
      * Funktioniert nur wenn die Seite gelöscht ist
      */
-    public function destroy()
+    public function destroy(): void
     {
-        return;
     }
 
     /**
@@ -452,7 +437,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return string
      */
-    public function getCanonical()
+    public function getCanonical(): string
     {
         return $this->url; // @todo
     }
@@ -460,28 +445,26 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
     /**
      * Löscht den Seitencache
      */
-    public function deleteCache()
+    public function deleteCache(): void
     {
-        return;
     }
 
     /**
      * Löscht den Seitencache
      */
-    public function createCache()
+    public function createCache(): void
     {
-        return;
     }
 
     /**
      * Shortcut for QUI\Permissions\Permission::hasSitePermission
      *
      * @param string $permission - name of the permission
-     * @param QUI\Users\User|boolean $User - optional
+     * @param User|null $User - optional
      *
      * @return boolean|integer
      */
-    public function hasPermission($permission, $User = false)
+    public function hasPermission(string $permission, QUI\Interfaces\Users\User $User = null): bool|int
     {
         return true;
     }
@@ -490,13 +473,10 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * Shortcut for QUI\Permissions\Permission::checkSitePermission
      *
      * @param string $permission - name of the permission
-     * @param QUI\Users\User|boolean $User - optional
-     *
-     * @throws QUI\Exception
+     * @param User|null $User - optional
      */
-    public function checkPermission($permission, $User = false)
+    public function checkPermission(string $permission, QUI\Interfaces\Users\User $User = null): void
     {
-        return;
     }
 
     /**
@@ -504,7 +484,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'id' => $this->id,

@@ -7,12 +7,17 @@
 namespace QUI;
 
 use QUI;
+use QUI\Database\Exception;
 use QUI\Projects\Project;
 use QUI\Projects\Site;
 use QUI\Projects\Site\Edit as SiteEdit;
 use QUI\Search\Fulltext;
 use QUI\Search\Quicksearch;
 use QUI\System\Log;
+
+use function is_object;
+use function set_time_limit;
+use function strtotime;
 
 /**
  * Hauptsuche
@@ -37,11 +42,12 @@ class Search
 
     /**
      * Create the fulltext search table for the Project
-     * Excecutes events and insert the standard
+     * Executes events and insert the standard
      *
-     * @param \QUI\Projects\Project $Project
+     * @param Project $Project
+     * @throws ExceptionStack
      */
-    public function createFulltextSearch(Project $Project)
+    public function createFulltextSearch(Project $Project): void
     {
         $Fulltext = new Fulltext();
         $Fulltext->clearSearchTable($Project); // @todo muss raus
@@ -53,12 +59,14 @@ class Search
     }
 
     /**
-     * Create the quicksearch search table for the Project
-     * Excecutes events and insert the standard
+     * Create the quick search table for the Project
+     * Executes events and insert the standard
      *
-     * @param \QUI\Projects\Project $Project
+     * @param Project $Project
+     * @throws Exception
+     * @throws ExceptionStack
      */
-    public function createQuicksearch(Project $Project)
+    public function createQuicksearch(Project $Project): void
     {
         $list = $Project->getSitesIds([
             'where' => [
@@ -71,10 +79,10 @@ class Search
 
         foreach ($list as $siteParams) {
             try {
-                \set_time_limit(0);
+                set_time_limit(0);
 
                 $siteId = (int)$siteParams['id'];
-                $Site = new SiteEdit($Project, (int)$siteId);
+                $Site = new SiteEdit($Project, $siteId);
 
                 if (!$Site->getAttribute('active')) {
                     continue;
@@ -104,8 +112,9 @@ class Search
 
     /**
      * Setup, create the extra fields
+     * @throws Exception|\QUI\Exception
      */
-    public static function setup()
+    public static function setup(): void
     {
         QUI\Cache\Manager::clear('quiqqer/search');
 
@@ -176,11 +185,11 @@ class Search
     /**
      * event : on site deactivate
      *
-     * @param \QUI\Projects\Site $Site
+     * @param QUI\Interfaces\Projects\Site $Site
+     * @throws Exception
      */
-    public static function onSiteDeactivate($Site)
+    public static function onSiteDeactivate(QUI\Interfaces\Projects\Site $Site): void
     {
-        /* @param $Site \QUI\Projects\Site */
         $Project = $Site->getProject();
 
         $tableSearchFull = QUI::getDBProjectTableName(
@@ -206,9 +215,11 @@ class Search
     /**
      * event : on site activate / change
      *
-     * @param \QUI\Projects\Site $Site
+     * @param Site $Site
+     * @throws ExceptionStack
+     * @throws \Exception
      */
-    public static function onSiteChange($Site)
+    public static function onSiteChange(Site $Site): void
     {
         // check default settings
         if ($Site->getAttribute('type') === 'quiqqer/search:types/search') {
@@ -227,21 +238,21 @@ class Search
             return;
         }
 
-        /* @param $Site \QUI\Projects\Site */
+        /* @param $Site Site */
         $Project = $Site->getProject();
 
         $Quicksearch = new Quicksearch();
         $Fulltext = new Fulltext();
 
         $e_date = $Site->getAttribute('e_date');
-        $e_date = \strtotime($e_date);
+        $e_date = strtotime($e_date);
 
         if (!$e_date) {
             $e_date = 0;
         }
 
         $c_date = $Site->getAttribute('c_date');
-        $c_date = \strtotime($c_date);
+        $c_date = strtotime($c_date);
 
         if (!$c_date) {
             $c_date = 0;
@@ -260,7 +271,6 @@ class Search
 
         // Quicksearch
         $Quicksearch->setEntries($Project, $Site->getId(), [
-//            $Site->getAttribute('name'),
             $Site->getAttribute('title')
         ]);
     }
@@ -273,7 +283,7 @@ class Search
      *
      * @throws QUI\Exception
      */
-    protected static function setSiteDefaultSettings(Site $Site)
+    protected static function setSiteDefaultSettings(Site $Site): void
     {
         $fields = $Site->getAttribute('quiqqer.settings.search.list.fields');
         $selectedFields = $Site->getAttribute('quiqqer.settings.search.list.fields.selected');
@@ -295,12 +305,13 @@ class Search
      * event onTemplateGetHeader
      *
      * @param QUI\Template $Template - Template object
+     * @throws \Exception
      */
-    public static function onTemplateGetHeader(QUI\Template $Template)
+    public static function onTemplateGetHeader(QUI\Template $Template): void
     {
         $Project = $Template->getAttribute('Project');
 
-        if (!\is_object($Project)) {
+        if (!is_object($Project)) {
             $Project = QUI::getProjectManager()->get();
         }
 
@@ -317,12 +328,12 @@ class Search
 
         $host = $Project->getVHost(true, true);
 
-        /* @var $SearchSite QUI\Projects\Site */
+        /* @var $SearchSite Site */
         $SearchSite = $result[0];
         $searchUrl = $SearchSite->getUrlRewritten();
         $start = $Project->firstChild()->getUrlRewritten();
 
-        if (\strpos($searchUrl, 'http') !== 0) {
+        if (!str_starts_with($searchUrl, 'http')) {
             $searchUrl = $host . $searchUrl;
             $start = $host . $start;
         }
@@ -331,7 +342,7 @@ class Search
             '
             <script type="application/ld+json">
             {
-                "@context": "http://schema.org",
+                "@context": "https://schema.org",
                 "@type": "WebSite",
                 "url": "' . $start . '",
                 "potentialAction": {

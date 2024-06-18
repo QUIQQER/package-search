@@ -7,8 +7,16 @@
 namespace QUI\Search\Controls;
 
 use QUI;
+use QUI\Exception;
 use QUI\Search\Fulltext;
 use QUI\Utils\Security\Orthos;
+
+use function dirname;
+use function explode;
+use function in_array;
+use function is_array;
+use function is_string;
+use function urldecode;
 
 /**
  * Class SearchInput
@@ -22,16 +30,17 @@ class SearchInput extends QUI\Control
     /**
      * Site the control is on
      *
-     * @var QUI\Projects\Site
+     * @var QUI\Interfaces\Projects\Site|null
      */
-    protected $Site = null;
+    protected QUI\Interfaces\Projects\Site|null $Site = null;
 
     /**
      * constructor
      *
      * @param array $attributes
+     * @throws Exception
      */
-    public function __construct($attributes = [])
+    public function __construct(array $attributes = [])
     {
         $this->Site = QUI::getRewrite()->getSite();
 
@@ -63,7 +72,7 @@ class SearchInput extends QUI\Control
      *
      * @see \QUI\Control::create()
      */
-    public function getBody()
+    public function getBody(): string
     {
         $Engine = QUI::getTemplateManager()->getEngine();
 
@@ -86,7 +95,7 @@ class SearchInput extends QUI\Control
             'submitIcon' => $this->getAttribute('submitIcon')
         ]);
 
-        return $Engine->fetch(\dirname(__FILE__) . '/SearchInput.html');
+        return $Engine->fetch(dirname(__FILE__) . '/SearchInput.html');
     }
 
     /**
@@ -94,7 +103,7 @@ class SearchInput extends QUI\Control
      *
      * @return void
      */
-    public function setAttributesFromRequest()
+    public function setAttributesFromRequest(): void
     {
         // requests
         if (isset($_REQUEST['searchterms'])) {
@@ -112,12 +121,12 @@ class SearchInput extends QUI\Control
         if (isset($_REQUEST['searchIn'])) {
             $fields = [];
 
-            if (!\is_array($_REQUEST['searchIn'])) {
-                $_REQUEST['searchIn'] = \explode(',', \urldecode($_REQUEST['searchIn']));
+            if (!is_array($_REQUEST['searchIn'])) {
+                $_REQUEST['searchIn'] = explode(',', urldecode($_REQUEST['searchIn']));
             }
 
             foreach ($_REQUEST['searchIn'] as $field) {
-                if (!\is_string($field)) {
+                if (!is_string($field)) {
                     continue;
                 }
 
@@ -133,20 +142,20 @@ class SearchInput extends QUI\Control
     /**
      * Sanitizes fields
      */
-    protected function sanitizeFields()
+    protected function sanitizeFields(): void
     {
         // available fields
         $allFields = $this->getAllAvailableFields();
         $availableFields = $this->getAttribute('availableFields');
 
         if (
-            !\is_array($availableFields)
+            !is_array($availableFields)
             /*|| empty($availableFields)*/
         ) {
             $availableFields = $allFields;
         } else {
             foreach ($availableFields as $k => $field) {
-                if (!\in_array($field, $allFields)) {
+                if (!in_array($field, $allFields)) {
                     unset($availableFields[$k]);
                 }
             }
@@ -155,12 +164,12 @@ class SearchInput extends QUI\Control
         // selected fields
         $selectedFields = $this->getAttribute('fields');
 
-        if (!\is_array($selectedFields)) {
+        if (!is_array($selectedFields)) {
             $selectedFields = [];
         }
 
         foreach ($selectedFields as $k => $field) {
-            if (!\in_array($field, $availableFields)) {
+            if (!in_array($field, $availableFields)) {
                 unset($selectedFields[$k]);
             }
         }
@@ -174,7 +183,7 @@ class SearchInput extends QUI\Control
      *
      * @return array
      */
-    protected function getAllAvailableFields()
+    protected function getAllAvailableFields(): array
     {
         $allFields = [];
 

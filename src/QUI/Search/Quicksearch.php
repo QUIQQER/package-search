@@ -6,11 +6,17 @@
 
 namespace QUI\Search;
 
+use PDO;
 use QUI;
+use QUI\Database\Exception;
+use QUI\ExceptionStack;
 use QUI\Projects\Project;
 use QUI\Search;
 use QUI\Search\Items\CustomSearchItem;
 use QUI\Utils\Security\Orthos;
+
+use function is_array;
+use function json_encode;
 
 /**
  * Quicksearch Manager
@@ -51,7 +57,7 @@ class Quicksearch extends QUI\QDOM
      *        'count'  => count of results
      * )
      */
-    public function search($str, Project $Project, $params = [])
+    public function search(string $str, Project $Project, array $params = []): array
     {
         $PDO = QUI::getPDO();
         $table = QUI::getDBProjectTableName(
@@ -59,7 +65,7 @@ class Quicksearch extends QUI\QDOM
             $Project
         );
 
-        if (!\is_array($params)) {
+        if (!is_array($params)) {
             $params = [];
         }
 
@@ -76,7 +82,7 @@ class Quicksearch extends QUI\QDOM
         $siteTypesQuery = '';
 
         if ($siteTypes) {
-            if (!\is_array($siteTypes)) {
+            if (!is_array($siteTypes)) {
                 $siteTypes = [$siteTypes];
             }
 
@@ -91,7 +97,7 @@ class Quicksearch extends QUI\QDOM
 
                 $binds['type' . $i] = [
                     'value' => $siteTypes[$i],
-                    'type' => \PDO::PARAM_STR
+                    'type' => PDO::PARAM_STR
                 ];
             }
 
@@ -125,16 +131,16 @@ class Quicksearch extends QUI\QDOM
             GROUP BY siteId, urlParameter, id
         ";
 
-        $selectQuery = "{$query} {$limit['limit']}";
+        $selectQuery = "$query {$limit['limit']}";
 
         $countQuery = "
             SELECT COUNT(*) as count
-            FROM ({$query}) as T
+            FROM ($query) as T
         ";
 
         // search
         $Statement = $PDO->prepare($selectQuery);
-        $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
+        $Statement->bindValue(':search', $search);
 
         foreach ($binds as $placeholder => $bind) {
             $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
@@ -144,7 +150,7 @@ class Quicksearch extends QUI\QDOM
             $Statement->bindValue(
                 ':limit1',
                 $limit['prepare'][':limit1'][0],
-                \PDO::PARAM_INT
+                PDO::PARAM_INT
             );
         }
 
@@ -152,13 +158,13 @@ class Quicksearch extends QUI\QDOM
             $Statement->bindValue(
                 ':limit2',
                 $limit['prepare'][':limit2'][0],
-                \PDO::PARAM_INT
+                PDO::PARAM_INT
             );
         }
 
         $Statement->execute();
 
-        $result = $Statement->fetchAll(\PDO::FETCH_ASSOC);
+        $result = $Statement->fetchAll(PDO::FETCH_ASSOC);
 
         if (!isset($params['group']) || $params['group'] !== false) {
             $groups = [];
@@ -175,7 +181,7 @@ class Quicksearch extends QUI\QDOM
 
         // count
         $Statement = $PDO->prepare($countQuery);
-        $Statement->bindValue(':search', $search, \PDO::PARAM_STR);
+        $Statement->bindValue(':search', $search);
 
         foreach ($binds as $placeholder => $bind) {
             $Statement->bindValue(':' . $placeholder, $bind['value'], $bind['type']);
@@ -183,7 +189,7 @@ class Quicksearch extends QUI\QDOM
 
         $Statement->execute();
 
-        $count = $Statement->fetchAll(\PDO::FETCH_ASSOC);
+        $count = $Statement->fetchAll(PDO::FETCH_ASSOC);
 
         return [
             'list' => $result,
@@ -196,26 +202,26 @@ class Quicksearch extends QUI\QDOM
      */
 
     /**
-     * Add entries to the quicksearch search table
+     * Add entries to the quick search table
      * Removes similar entries, with same siteId and siteParams
      *
      * @param Project $Project
      * @param integer $siteId
      * @param array $data - data array -> every array entry is a data entry
      * @param array $siteParams - optional; Parameter for the site link
+     * @throws Exception
+     * @throws ExceptionStack
      */
     public static function setEntries(
         Project $Project,
-        $siteId,
-        $data = [],
-        $siteParams = []
-    ) {
+        int $siteId,
+        array $data = [],
+        array $siteParams = []
+    ): void {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
             $Project
         );
-
-        $siteId = (int)$siteId;
 
         if (!$siteId) {
             return;
@@ -232,7 +238,7 @@ class Quicksearch extends QUI\QDOM
             if (!$Site->getAttribute('active')) {
                 return;
             }
-        } catch (\Exception $Exception) {
+        } catch (\Exception) {
             return;
         }
 
@@ -243,7 +249,7 @@ class Quicksearch extends QUI\QDOM
         $siteUrlParams = [];
 
         // site params
-        if (\is_array($siteParams) && !empty($siteParams)) {
+        if (is_array($siteParams) && !empty($siteParams)) {
             foreach ($siteParams as $key => $value) {
                 $key = Orthos::clearMySQL($key, false);
                 $value = Orthos::clearMySQL($value, false);
@@ -271,25 +277,24 @@ class Quicksearch extends QUI\QDOM
     }
 
     /**
-     * Add an entry to the quicksearch search table
+     * Add an entry to the quick search table
      *
      * @param Project $Project
      * @param integer $siteId
      * @param string $data
      * @param array $siteParams
+     * @throws Exception
      */
     public static function addEntry(
         Project $Project,
-        $siteId,
-        $data,
-        $siteParams = []
-    ) {
+        int $siteId,
+        string $data,
+        array $siteParams = []
+    ): void {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
             $Project
         );
-
-        $siteId = (int)$siteId;
 
         if (!$siteId) {
             return;
@@ -306,11 +311,11 @@ class Quicksearch extends QUI\QDOM
             if (!$Site->getAttribute('active')) {
                 return;
             }
-        } catch (\Exception $Exception) {
+        } catch (\Exception) {
             return;
         }
 
-        $urlParameter = \json_encode($siteParams);
+        $urlParameter = json_encode($siteParams);
 //        $data         = QUI::getPDO()->quote($data);
 
         // check if entry exists
@@ -341,23 +346,22 @@ class Quicksearch extends QUI\QDOM
     }
 
     /**
-     * Remove an search entry
+     * Remove a search entry
      *
      * @param Project $Project
      * @param integer $siteId
      * @param array $siteParams
+     * @throws Exception
      */
     public static function removeEntries(
         Project $Project,
-        $siteId,
-        $siteParams = []
-    ) {
+        int $siteId,
+        array $siteParams = []
+    ): void {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
             $Project
         );
-
-        $siteId = (int)$siteId;
 
         if (!$siteId) {
             return;
@@ -365,12 +369,12 @@ class Quicksearch extends QUI\QDOM
 
         QUI::getDataBase()->delete($table, [
             'siteId' => $siteId,
-            'urlParameter' => \json_encode($siteParams)
+            'urlParameter' => json_encode($siteParams)
         ]);
     }
 
     /**
-     * Return an fulltext entry
+     * Return a fulltext entry
      *
      * @param Project $Project
      * @param integer $siteId
@@ -382,20 +386,20 @@ class Quicksearch extends QUI\QDOM
      */
     public static function getEntry(
         Project $Project,
-        $siteId,
-        $siteParams = []
-    ) {
+        int $siteId,
+        array $siteParams = []
+    ): array {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
             $Project
         );
 
-        $urlParameter = \json_encode($siteParams);
+        $urlParameter = json_encode($siteParams);
 
         $result = QUI::getDataBase()->fetch([
             'from' => $table,
             'where' => [
-                'siteId' => (int)$siteId,
+                'siteId' => $siteId,
                 'urlParameter' => $urlParameter
             ]
         ]);
@@ -410,32 +414,33 @@ class Quicksearch extends QUI\QDOM
     }
 
     /**
-     * Check if a quicksearch entry already exists
+     * Check if a quick search entry already exists
      *
      * @param Project $Project
      * @param int $siteId
      * @param string $data
      * @param array $siteParams
      * @return bool
+     * @throws Exception
      */
     public static function existsEntry(
         Project $Project,
-        $siteId,
-        $data,
-        $siteParams = []
-    ) {
+        int $siteId,
+        string $data,
+        array $siteParams = []
+    ): bool {
         $table = QUI::getDBProjectTableName(
             Search::TABLE_SEARCH_QUICK,
             $Project
         );
 
-        $urlParameter = \json_encode($siteParams);
+        $urlParameter = json_encode($siteParams);
 
         $result = QUI::getDataBase()->fetch([
             'count' => 1,
             'from' => $table,
             'where' => [
-                'siteId' => (int)$siteId,
+                'siteId' => $siteId,
                 'data' => $data,
                 'urlParameter' => $urlParameter
             ]
@@ -456,13 +461,13 @@ class Quicksearch extends QUI\QDOM
     public static function setCustomEntry(
         Project $Project,
         CustomSearchItem $CustomFulltextItem,
-        $searchStrings
-    ) {
+        array $searchStrings
+    ): void {
         $table = QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project);
 
         $baseEntryData = [
             'custom_id' => $CustomFulltextItem->getId(),
-            'custom_data' => \json_encode($CustomFulltextItem->toArray()),
+            'custom_data' => json_encode($CustomFulltextItem->toArray()),
             'origin' => $CustomFulltextItem->getOrigin(),
             'siteType' => 'custom',
             'icon' => $CustomFulltextItem->getAttribute('icon') ?: null
@@ -511,7 +516,7 @@ class Quicksearch extends QUI\QDOM
         Project $Project,
         CustomSearchItem $CustomFulltextItem,
         string $searchString
-    ) {
+    ): bool {
         $table = QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project);
 
         $result = QUI::getDataBase()->fetch([
@@ -532,8 +537,9 @@ class Quicksearch extends QUI\QDOM
      * @param Project $Project
      * @param CustomSearchItem $CustomSearchItem
      * @return void
+     * @throws Exception
      */
-    public static function removeCustomEntries(Project $Project, CustomSearchItem $CustomSearchItem)
+    public static function removeCustomEntries(Project $Project, CustomSearchItem $CustomSearchItem): void
     {
         QUI::getDataBase()->delete(
             QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project),
@@ -552,7 +558,7 @@ class Quicksearch extends QUI\QDOM
      *
      * @param Project $Project
      */
-    public static function clearSearchTable(Project $Project)
+    public static function clearSearchTable(Project $Project): void
     {
         QUI::getDataBase()->table()->truncate(
             QUI::getDBProjectTableName(Search::TABLE_SEARCH_QUICK, $Project)

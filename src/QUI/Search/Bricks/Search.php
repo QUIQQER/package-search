@@ -8,6 +8,9 @@ namespace QUI\Search\Bricks;
 
 use QUI;
 
+use function count;
+use function dirname;
+
 /**
  * Class Search
  *
@@ -20,7 +23,7 @@ class Search extends QUI\Control
      *
      * @param array $attributes
      */
-    public function __construct($attributes = [])
+    public function __construct(array $attributes = [])
     {
         // default options
         $this->setAttributes([
@@ -39,7 +42,7 @@ class Search extends QUI\Control
      *
      * @return String
      */
-    public function getBody()
+    public function getBody(): string
     {
         //QUI::getPackage('quiqqer/search');
         $Engine = QUI::getTemplateManager()->getEngine();
@@ -64,7 +67,7 @@ class Search extends QUI\Control
                 'limit' => 1
             ]);
 
-            if (\count($searchSites)) {
+            if (count($searchSites)) {
                 $resultSite = $searchSites[0]->getUrlRewritten();
             }
         }
@@ -82,8 +85,8 @@ class Search extends QUI\Control
             'suggestSearch' => $suggestSearch
         ]);
 
-        $this->addCSSFile(\dirname(__FILE__) . '/Search.css');
+        $this->addCSSFile(dirname(__FILE__) . '/Search.css');
 
-        return $Engine->fetch(\dirname(__FILE__) . '/Search.html');
+        return $Engine->fetch(dirname(__FILE__) . '/Search.html');
     }
 }
