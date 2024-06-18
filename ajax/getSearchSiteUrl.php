@@ -1,6 +1,8 @@
 <?php
 
-use QUI\Projects\Site\Utils;
+/**
+ * This file contains package_quiqqer_search_ajax_getSearchSiteUrl
+ */
 
 /**
  * Get Project main Search Site
@@ -12,19 +14,19 @@ use QUI\Projects\Site\Utils;
 QUI::$Ajax->registerFunction(
     'package_quiqqer_search_ajax_getSearchSiteUrl',
     function ($project, $getParams) {
-        $getParams            = json_decode($getParams, true);
-        $Project              = QUI::getProjectManager()->decode($project);
-        $SearchSite           = false;
+        $getParams = json_decode($getParams, true);
+        $Project = QUI::getProjectManager()->decode($project);
+        $SearchSite = false;
         $defaultSearchSiteIds = $Project->getConfig('quiqqer_search_settings.defaultSearchSite');
 
         if (!empty($defaultSearchSiteIds)) {
             $defaultSearchSiteIds = json_decode($defaultSearchSiteIds, true);
-            $lang                 = $Project->getLang();
+            $lang = $Project->getLang();
 
             if (!empty($defaultSearchSiteIds[$lang])) {
                 try {
                     $SearchSite = $Project->get($defaultSearchSiteIds[$Project->getLang()]);
-                } catch (\Exception $Exception) {
+                } catch (Exception) {
                     // nothing
                 }
             }
@@ -35,10 +37,10 @@ QUI::$Ajax->registerFunction(
         }
 
         // set default search params
-        $defaultSearchParams = array(
-            'quiqqer.settings.search.list.max'    => 'max',
+        $defaultSearchParams = [
+            'quiqqer.settings.search.list.max' => 'max',
             'quiqqer.settings.search.list.fields' => 'searchFields'
-        );
+        ];
 
         foreach ($defaultSearchParams as $siteParam => $searchParam) {
             if (isset($getParams[$searchParam])) {
@@ -56,7 +58,7 @@ QUI::$Ajax->registerFunction(
             }
         }
 
-        return $SearchSite->getUrlRewritten(array(), $getParams);
+        return $SearchSite->getUrlRewritten([], $getParams);
     },
-    array('project', 'getParams')
+    ['project', 'getParams']
 );

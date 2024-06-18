@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * This file contains package_quiqqer_search_ajax_suggest
+ */
+
+/**
  * Return the suggest html search result
  *
  * @param string $project - project data
@@ -11,8 +15,8 @@
 QUI::$Ajax->registerFunction(
     'package_quiqqer_search_ajax_suggest',
     function ($project, $siteId, $search) {
-        $Project         = QUI::getProjectManager()->decode($project);
-        $Site            = $Project->get($siteId);
+        $Project = QUI::getProjectManager()->decode($project);
+        $Site = $Project->get($siteId);
         $siteTypesFilter = $Site->getAttribute('quiqqer.settings.search.sitetypes.filter');
 
         if (!empty($siteTypesFilter)) {
@@ -38,7 +42,7 @@ QUI::$Ajax->registerFunction(
         foreach ($result['list'] as $entry) {
             try {
                 if ($entry['siteType'] === 'custom') {
-                    $customData = \json_decode($entry['custom_data'], true);
+                    $customData = json_decode($entry['custom_data'], true);
 
                     $Site = new QUI\Search\Items\CustomSearchItem(
                         $entry['custom_id'],
@@ -52,17 +56,17 @@ QUI::$Ajax->registerFunction(
                 }
 
                 $url = $Site->getUrlRewritten();
-            } catch (QUI\Exception $exception) {
+            } catch (QUI\Exception) {
                 continue;
             }
 
-            $list .= '<li data-id="'.$entry['id'].'" data-url="'.$url.'">';
+            $list .= '<li data-id="' . $entry['id'] . '" data-url="' . $url . '">';
             $list .= '<div class="quiqqer-search-suggest-icon">';
 
             if (empty($entry['icon'])) {
                 $list .= '<span class="fa fa-file-o"></span>';
             } else {
-                $list .= '<span class="fa '.$entry['icon'].'"></span>';
+                $list .= '<span class="fa ' . $entry['icon'] . '"></span>';
             }
 
             $list .= '</div>';
