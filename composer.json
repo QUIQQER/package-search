@@ -1,36 +1,36 @@
 {
-    "name": "quiqqer\/search",
-    "type": "quiqqer-module",
-    "description": "The package provides an advanced frontend search for QUIQQER. Search your projects through a relevancy search.",
-    "license": [
-        "PCSG QL-1.0",
-        "CC BY-NC-SA 4.0"
-    ],
-    "authors": [
-        {
-            "name": "Henning Leutz",
-            "email": "leutz@pcsg.de",
-            "homepage": "http:\/\/www.pcsg.de",
-            "role": "Developer"
-        },
-        {
-            "name": "Patrick M\u00fcller",
-            "email": "p.mueller@pcsg.de",
-            "homepage": "http:\/\/www.pcsg.de",
-            "role": "Developer"
-        }
-    ],
-    "support": {
-        "email": "support@pcsg.de"
+  "name": "quiqqer/search",
+  "type": "quiqqer-module",
+  "description": "The package provides an advanced frontend search for QUIQQER. Search your projects through a relevancy search.",
+  "license": [
+    "PCSG QL-1.0",
+    "CC BY-NC-SA 4.0"
+  ],
+  "authors": [
+    {
+      "name": "Henning Leutz",
+      "email": "leutz@pcsg.de",
+      "homepage": "https://www.pcsg.de",
+      "role": "Developer"
     },
-    "require": {
-        "quiqqer\/quiqqer": ">=1.1|dev-master|dev-dev",
-        "quiqqer\/utils": ">=1.4|dev-master|dev-dev"
-    },
-    "autoload": {
-        "psr-4": {
-            "QUI\\": "src\/QUI",
-            "QUI\\Search\\": "src\/QUI\/Search"
-        }
+    {
+      "name": "Patrick M\u00fcller",
+      "email": "p.mueller@pcsg.de",
+      "homepage": "https://www.pcsg.de",
+      "role": "Developer"
     }
+  ],
+  "support": {
+    "email": "support@pcsg.de"
+  },
+  "require": {
+    "quiqqer/core": "^2",
+    "quiqqer/utils": "^2"
+  },
+  "autoload": {
+    "psr-4": {
+      "QUI\\": "src/QUI",
+      "QUI\\Search\\": "src/QUI/Search"
+    }
+  }
 }
