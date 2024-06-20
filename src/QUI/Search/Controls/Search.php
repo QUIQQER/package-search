@@ -9,10 +9,29 @@ namespace QUI\Search\Controls;
 use QUI;
 use QUI\Controls\ChildrenList;
 use QUI\Controls\Navigating\Pagination;
+use QUI\Exception;
 use QUI\Projects\Site;
 use QUI\Search\Fulltext;
 use QUI\Utils\Security\Orthos;
 use QUI\Utils\StringHelper;
+
+use function array_flip;
+use function array_keys;
+use function array_merge;
+use function array_values;
+use function dirname;
+use function explode;
+use function file_exists;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_null;
+use function is_string;
+use function json_decode;
+use function json_encode;
+use function round;
+use function str_replace;
+use function urldecode;
 
 /**
  * Class Search
@@ -31,24 +50,21 @@ class Search extends QUI\Control
 
     /**
      * Site the control is on
-     *
-     * @var QUI\Projects\Site
      */
-    protected $Site = null;
+    protected ?QUI\Interfaces\Projects\Site $Site = null;
 
     /**
      * Search results runtime cache
-     *
-     * @var array
      */
-    protected $searchResults = null;
+    protected ?array $searchResults = null;
 
     /**
      * constructor
      *
      * @param array $attributes
+     * @throws Exception
      */
-    public function __construct($attributes = [])
+    public function __construct(array $attributes = [])
     {
         if (
             isset($attributes['Site'])
@@ -60,7 +76,7 @@ class Search extends QUI\Control
             $this->Site = QUI::getRewrite()->getSite();
         }
 
-        $directory = \dirname(\dirname(\dirname(\dirname(\dirname(__FILE__)))));
+        $directory = dirname(__FILE__, 5);
 
         $this->setAttributes([
             'search' => '',
@@ -91,21 +107,20 @@ class Search extends QUI\Control
 
         // set javascript control data
         $this->setJavaScriptControl('package/quiqqer/search/bin/controls/Search');
-        $this->setJavaScriptControlOption('searchparams', \json_encode($this->getJavaScriptControlAttributes()));
+        $this->setJavaScriptControlOption('searchparams', json_encode($this->getJavaScriptControlAttributes()));
 
         // set template data
         $this->addCSSClass('quiqqer-search');
-        $this->addCSSFile(\dirname(__FILE__) . '/Search.css');
+        $this->addCSSFile(dirname(__FILE__) . '/Search.css');
     }
 
     /**
      * Execute search and return search result information
-     *
-     * @return array
+     * @throws Exception
      */
-    public function search()
+    public function search(): ?array
     {
-        if (!\is_null($this->searchResults)) {
+        if (!is_null($this->searchResults)) {
             return $this->searchResults;
         }
 
@@ -131,7 +146,7 @@ class Search extends QUI\Control
             $siteTypesFilter = $this->Site->getAttribute('quiqqer.settings.search.sitetypes.filter');
 
             if (!empty($siteTypesFilter)) {
-                $siteTypesFilter = \explode(';', $siteTypesFilter);
+                $siteTypesFilter = explode(';', $siteTypesFilter);
             } else {
                 $siteTypesFilter = [];
             }
@@ -155,7 +170,7 @@ class Search extends QUI\Control
                 // immer neues site objekt
                 // falls die gleiche seite mit unterschiedlichen url params existiert
                 if ($entry['datatype'] === 'custom') {
-                    $customData = \json_decode($entry['custom_data'], true);
+                    $customData = json_decode($entry['custom_data'], true);
 
                     $ResultSite = new QUI\Search\Items\CustomSearchItem(
                         $entry['custom_id'],
@@ -168,9 +183,9 @@ class Search extends QUI\Control
                     $ResultSite = $Project->get((int)$entry['siteId']);//new Site($Project, );
                 }
 
-                $urlParams = \json_decode($entry['urlParameter'], true);
+                $urlParams = json_decode($entry['urlParameter'], true);
 
-                if (!\is_array($urlParams)) {
+                if (!is_array($urlParams)) {
                     $urlParams = [];
                 }
 
@@ -184,7 +199,7 @@ class Search extends QUI\Control
                 $ResultSite->setAttribute('search-name', $entry['name']);
                 $ResultSite->setAttribute('search-title', $entry['title']);
                 $ResultSite->setAttribute('search-short', $entry['short']);
-                $ResultSite->setAttribute('search-relevance', \round($entry['relevance'], 2));
+                $ResultSite->setAttribute('search-relevance', round($entry['relevance'], 2));
                 $ResultSite->setAttribute('search-url', $url);
                 $ResultSite->setAttribute('search-icon', $entry['icon']);
 
@@ -210,10 +225,9 @@ class Search extends QUI\Control
 
     /**
      * Get children list (search results)
-     *
-     * @return ChildrenList
+     * @throws Exception
      */
-    public function getChildrenList()
+    public function getChildrenList(): ChildrenList
     {
         $searchResult = $this->search();
 
@@ -230,8 +244,8 @@ class Search extends QUI\Control
             'showShort' => true,
             'showHeader' => true,
             'showContent' => false,
-            'itemtype' => 'http://schema.org/ItemList',
-            'child-itemtype' => 'http://schema.org/ListItem',
+            'itemtype' => 'https://schema.org/ItemList',
+            'child-itemtype' => 'https://schema.org/ListItem',
             'display' => $this->Site->getAttribute('quiqqer.settings.sitetypes.list.template'),
             'children' => $searchResult['children'],
             'loadAllChildrenOnEmptyList' => false
@@ -256,9 +270,9 @@ class Search extends QUI\Control
 
         if (
             !empty($childrenListAttributes)
-            && \is_array($childrenListAttributes)
+            && is_array($childrenListAttributes)
         ) {
-            $params = \array_merge($childrenListAttributes, $params);
+            $params = array_merge($childrenListAttributes, $params);
         }
 
         $List = new ChildrenList($params);
@@ -267,12 +281,7 @@ class Search extends QUI\Control
         return $List;
     }
 
-    /**
-     * (non-PHPdoc)
-     *
-     * @see \QUI\Control::create()
-     */
-    public function getBody()
+    public function getBody(): string
     {
         $Engine = QUI::getTemplateManager()->getEngine();
         $search = $this->getAttribute('search');
@@ -291,7 +300,7 @@ class Search extends QUI\Control
         $Pagination->loadFromRequest();
 
         $Pagination->setGetParams('search', $search);
-        $Pagination->setGetParams('searchIn', \implode(',', $fields));
+        $Pagination->setGetParams('searchIn', implode(',', $fields));
 
         $Engine->assign('Pagination', $Pagination);
 
@@ -307,7 +316,7 @@ class Search extends QUI\Control
         $PaginationAsync->loadFromRequest();
 
         $PaginationAsync->setGetParams('search', $search);
-        $PaginationAsync->setGetParams('searchIn', \implode(',', $fields));
+        $PaginationAsync->setGetParams('searchIn', implode(',', $fields));
 
         $Engine->assign('PaginationAsync', $PaginationAsync);
 
@@ -325,7 +334,7 @@ class Search extends QUI\Control
 
         $this->setJavaScriptControlOption('resultcount', $searchResult['count']);
 
-        return $Engine->fetch(\dirname(__FILE__) . '/Search.html');
+        return $Engine->fetch(dirname(__FILE__) . '/Search.html');
     }
 
     /**
@@ -333,7 +342,7 @@ class Search extends QUI\Control
      *
      * @return void
      */
-    public function setAttributesFromRequest()
+    public function setAttributesFromRequest(): void
     {
         // requests
         if (isset($_REQUEST['sheet'])) {
@@ -345,7 +354,7 @@ class Search extends QUI\Control
         }
 
         if (!empty($_REQUEST['fieldConstraints'])) {
-            $this->setAttribute('fieldConstraints', \json_decode($_REQUEST['fieldConstraints'], true));
+            $this->setAttribute('fieldConstraints', json_decode($_REQUEST['fieldConstraints'], true));
         }
 
         if (isset($_REQUEST['search'])) {
@@ -363,12 +372,12 @@ class Search extends QUI\Control
 
         // search fields
         if (isset($_REQUEST['searchIn'])) {
-            if (!\is_array($_REQUEST['searchIn'])) {
-                $_REQUEST['searchIn'] = \explode(',', \urldecode($_REQUEST['searchIn']));
+            if (!is_array($_REQUEST['searchIn'])) {
+                $_REQUEST['searchIn'] = explode(',', urldecode($_REQUEST['searchIn']));
             }
 
             foreach ($_REQUEST['searchIn'] as $field) {
-                if (!\is_string($field)) {
+                if (!is_string($field)) {
                     continue;
                 }
 
@@ -387,9 +396,9 @@ class Search extends QUI\Control
      * @param array $fields
      * @return array - cleared fields
      */
-    protected function clearSearchFields($fields)
+    protected function clearSearchFields(array $fields): array
     {
-        if (!\is_array($fields) || empty($fields)) {
+        if (empty($fields)) {
             return $this->getDefaultSearchFields();
         }
 
@@ -402,8 +411,8 @@ class Search extends QUI\Control
         $settingsFields = $this->Site->getAttribute('quiqqer.settings.search.list.fields.selected');
         $filteredFields = [];
 
-        if (!empty($settingsFields) && \is_array($settingsFields)) {
-            $settingsFields = \array_flip($settingsFields);
+        if (!empty($settingsFields) && is_array($settingsFields)) {
+            $settingsFields = array_flip($settingsFields);
 
             foreach ($fields as $field) {
                 if (isset($settingsFields[$field])) {
@@ -414,7 +423,7 @@ class Search extends QUI\Control
             return $filteredFields;
         }
 
-        $allFields = \array_flip($allFields);
+        $allFields = array_flip($allFields);
 
         foreach ($fields as $field) {
             if (isset($allFields[$field])) {
@@ -430,14 +439,14 @@ class Search extends QUI\Control
      *
      * @return void
      */
-    protected function sanitizeAttributes()
+    protected function sanitizeAttributes(): void
     {
         $attributes = $this->getAttributes();
 
         foreach ($attributes as $k => $v) {
             switch ($k) {
                 case 'search':
-                    if (!\is_string($v)) {
+                    if (!is_string($v)) {
                         $v = '';
                         break;
                     }
@@ -447,8 +456,8 @@ class Search extends QUI\Control
                     if ($v !== $this::SEARCH_TYPE_OR) {
                         $settingsFields = $this->Site->getAttribute('quiqqer.settings.search.list.fields');
 
-                        if (\is_array($settingsFields)) {
-                            if (\in_array('searchTypeAnd', $settingsFields)) {
+                        if (is_array($settingsFields)) {
+                            if (in_array('searchTypeAnd', $settingsFields)) {
                                 $v = $this::SEARCH_TYPE_AND;
                             } else {
                                 $v = $this::SEARCH_TYPE_OR;
@@ -465,7 +474,7 @@ class Search extends QUI\Control
                     break;
 
                 case 'searchFields':
-                    if (!\is_array($v)) {
+                    if (!is_array($v)) {
                         $v = $this->getDefaultSearchFields();
                         break;
                     }
@@ -483,19 +492,19 @@ class Search extends QUI\Control
 
                     if (!empty($selectedFields)) {
                         foreach ($selectedFields as $j => $field) {
-                            if (!\in_array($field, $v) && \in_array($field, $availableFields)) {
+                            if (!in_array($field, $v) && in_array($field, $availableFields)) {
                                 unset($selectedFields[$j]);
                             }
                         }
 
-                        $v = \array_values($selectedFields);
+                        $v = array_values($selectedFields);
                     }
 
                     $v = $this->clearSearchFields($v);
                     break;
 
                 case 'orderFields':
-                    if (!\is_array($v)) {
+                    if (!is_array($v)) {
                         $v = $this->getDefaultSearchFields();
                         break;
                     }
@@ -503,36 +512,36 @@ class Search extends QUI\Control
 
                 case 'suggestSearch':
                 case 'relevanceSearch':
-                    $v = $v ? true : false;
+                    $v = (bool)$v;
                     break;
 
                 case 'fieldConstraints':
-                    if (!\is_array($v)) {
+                    if (!is_array($v)) {
                         $v = [];
                         break;
                     }
 
-                    $fields = $this->clearSearchFields(\array_keys($v));
+                    $fields = $this->clearSearchFields(array_keys($v));
                     $constraints = [];
 
                     foreach ($v as $field => $constraint) {
-                        if (!\in_array($field, $fields)) {
+                        if (!in_array($field, $fields)) {
                             continue;
                         }
 
-                        if (!\is_array($constraint) && !\is_string($constraint)) {
+                        if (!is_array($constraint) && !is_string($constraint)) {
                             continue;
                         }
 
                         $constraints[$field] = [];
 
-                        if (\is_array($constraint)) {
+                        if (is_array($constraint)) {
                             foreach ($constraint as $k => $value) {
-                                if (!\is_string($value) && !\is_array($value)) {
+                                if (!is_string($value) && !is_array($value)) {
                                     continue;
                                 }
 
-                                if (\is_array($value)) {
+                                if (is_array($value)) {
                                     if (!isset($value['value']) && !isset($value['type'])) {
                                         continue;
                                     }
@@ -559,17 +568,17 @@ class Search extends QUI\Control
                     break;
 
                 case 'childrenListTemplate':
-                    $directory = \dirname(\dirname(\dirname(\dirname(\dirname(__FILE__)))));
+                    $directory = dirname(__FILE__, 5);
 
-                    if (!\file_exists($v)) {
+                    if (!file_exists($v)) {
                         $v = $directory . '/templates/SearchResultList.html';
                     }
                     break;
 
                 case 'childrenListCss':
-                    $directory = \dirname(\dirname(\dirname(\dirname(\dirname(__FILE__)))));
+                    $directory = dirname(__FILE__, 5);
 
-                    if (!\file_exists($v)) {
+                    if (!file_exists($v)) {
                         $v = $directory . '/templates/SearchResultList.css';
                     }
                     break;
@@ -586,7 +595,7 @@ class Search extends QUI\Control
      *
      * @return array
      */
-    protected function getDefaultSearchFields()
+    protected function getDefaultSearchFields(): array
     {
         $allFields = [];
 
@@ -599,11 +608,11 @@ class Search extends QUI\Control
             'quiqqer.settings.search.list.fields.selected'
         );
 
-        if (!\is_array($settingsFields)) {
+        if (!is_array($settingsFields)) {
             $settingsFields = [];
         }
 
-        if (!\is_array($settingsFieldsSelected)) {
+        if (!is_array($settingsFieldsSelected)) {
             $settingsFieldsSelected = [];
         }
 
@@ -620,13 +629,13 @@ class Search extends QUI\Control
      *
      * @return array
      */
-    protected function getJavaScriptControlAttributes()
+    protected function getJavaScriptControlAttributes(): array
     {
         $attributes = $this->getAttributes();
 
         foreach ($attributes as $k => $v) {
-            if (\is_string($v)) {
-                $attributes[$k] = \str_replace(OPT_DIR, '', $v);
+            if (is_string($v)) {
+                $attributes[$k] = str_replace(OPT_DIR, '', $v);
             }
         }
 
@@ -639,7 +648,7 @@ class Search extends QUI\Control
      * @param string $str
      * @return string - sanitized string
      */
-    protected static function sanitizeSearchString($str)
+    protected static function sanitizeSearchString(string $str): string
     {
         return QUI\Search\Utils::sanitizeSearchString($str);
     }
@@ -649,7 +658,7 @@ class Search extends QUI\Control
      *
      * @return string|false - pagination type or false if no pagination required
      */
-    protected function getPaginationType()
+    protected function getPaginationType(): bool|string
     {
         $paginationType = $this->getAttribute('paginationType');
 

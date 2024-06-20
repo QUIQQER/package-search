@@ -7,6 +7,8 @@
 namespace QUI\Search;
 
 use QUI;
+use QUI\Cron\Manager;
+use QUI\Exception;
 use QUI\Search;
 
 /**
@@ -22,9 +24,10 @@ class Cron
      * Cron : create search database
      *
      * @param array $params
-     * @param \QUI\Cron\Manager $CronManager
+     * @param Manager $CronManager
+     * @throws Exception
      */
-    public static function createSearchDatabase($params, $CronManager)
+    public static function createSearchDatabase(array $params, Manager $CronManager): void
     {
         if (!isset($params['project'])) {
             return;
@@ -45,10 +48,11 @@ class Cron
      * Create search database for all projects and all languages
      *
      * @param array $params
-     * @param \QUI\Cron\Manager $CronManager
+     * @param Manager $CronManager
      * @return void
+     * @throws Exception
      */
-    public static function createSearchDatabaseAllProjects($params, $CronManager)
+    public static function createSearchDatabaseAllProjects(array $params, Manager $CronManager): void
     {
         $projects = QUI::getProjectManager()->getProjects();
         $Search = new Search();

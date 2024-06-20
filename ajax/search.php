@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file contains package_quiqqer_search_ajax_search
+ */
+
+use QUI\Output;
 use QUI\Search\Controls\Search;
 use QUI\Utils\Security\Orthos;
 
@@ -13,10 +18,10 @@ QUI::$Ajax->registerFunction(
     'package_quiqqer_search_ajax_search',
     function ($project, $siteId, $searchParams) {
         $Project = QUI::getProjectManager()->decode($project);
-        $Site    = $Project->get($siteId);
+        $Site = $Project->get($siteId);
 
-    //        $searchParams         = Orthos::clearArray();
-        $searchParams         = json_decode($searchParams, true);
+        //        $searchParams         = Orthos::clearArray();
+        $searchParams = json_decode($searchParams, true);
         $searchParams['Site'] = $Site;
 
         // clear certain attributes
@@ -36,18 +41,18 @@ QUI::$Ajax->registerFunction(
             $searchParams[$k] = $v;
         }
 
-        $Search       = new Search($searchParams);
+        $Search = new Search($searchParams);
         $searchResult = $Search->search();
 
-        $Output           = new \QUI\Output();
+        $Output = new Output();
         $childrenListHtml = $Output->parse($Search->getChildrenList()->create());
 
-        return array(
+        return [
             'childrenListHtml' => $childrenListHtml,
-            'sheets'           => $searchResult['sheets'],
-            'count'            => $searchResult['count'],
-            'more'             => $searchResult['more']
-        );
+            'sheets' => $searchResult['sheets'],
+            'count' => $searchResult['count'],
+            'more' => $searchResult['more']
+        ];
     },
-    array('project', 'siteId', 'searchParams')
+    ['project', 'siteId', 'searchParams']
 );
