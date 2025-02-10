@@ -1,11 +1,2 @@
 parameters:
 	ignoreErrors:
-		-
-			message: "#^Call to an undefined method DOMNode\\:\\:getAttribute\\(\\)\\.$#"
-			count: 2
-			path: src/QUI/Search/Fulltext.php
-
-		-
-			message: "#^PHPDoc tag @return with type mixed is not subtype of native type string\\.$#"
-			count: 1
-			path: src/QUI/Search/Items/CustomSearchItem.php
