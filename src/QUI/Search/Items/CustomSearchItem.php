@@ -22,7 +22,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
 
     protected string $url;
 
-    protected QUI\Projects\Project|null $Project = null;
+    protected QUI\Projects\Project | null $Project = null;
 
     /**
      * CustomFulltextItem constructor.
@@ -86,7 +86,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return QUISiteInterface
      */
-    public function load(bool|string $plugin = false): QUISiteInterface
+    public function load(bool | string $plugin = false): QUISiteInterface
     {
         return $this;
     }
@@ -122,7 +122,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return boolean|integer
      */
-    public function isLinked(): bool|int
+    public function isLinked(): bool | int
     {
         return false;
     }
@@ -158,7 +158,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return integer
      */
-    public function getId(bool|string $lang = false): int
+    public function getId(bool | string $lang = false): int
     {
         return $this->id;
     }
@@ -173,7 +173,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return int|array ;
      */
-    public function getChildren(array $params = [], bool $load = false): int|array
+    public function getChildren(array $params = [], bool $load = false): int | array
     {
         return [];
     }
@@ -235,7 +235,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return QUI\Projects\Site | false
      */
-    public function firstChild(array $params = []): QUISiteInterface|bool
+    public function firstChild(array $params = []): QUISiteInterface | bool
     {
         return false;
     }
@@ -246,7 +246,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * @param array $params
      * @return int|array
      */
-    public function getNavigation(array $params = []): int|array
+    public function getNavigation(array $params = []): int | array
     {
         return [];
     }
@@ -295,7 +295,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return int|array
      */
-    public function getChildrenIds(array $params = []): int|array
+    public function getChildrenIds(array $params = []): int | array
     {
         return [];
     }
@@ -348,7 +348,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
 
     /**
      * @param array $params
-     * @return mixed
+     * @return string
      */
     public function getUrlRewritten(array $params = []): string
     {
@@ -397,7 +397,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * @return QUISiteInterface|false
      * @throws Exception
      */
-    public function getParent(): QUISiteInterface|bool
+    public function getParent(): QUISiteInterface | bool
     {
         return $this->getProject()->get(1);
     }
@@ -464,7 +464,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      *
      * @return boolean|integer
      */
-    public function hasPermission(string $permission, QUI\Interfaces\Users\User $User = null): bool|int
+    public function hasPermission(string $permission, null | QUI\Interfaces\Users\User $User = null): bool | int
     {
         return true;
     }
@@ -475,7 +475,7 @@ class CustomSearchItem extends QUI\QDOM implements QUISiteInterface
      * @param string $permission - name of the permission
      * @param User|null $User - optional
      */
-    public function checkPermission(string $permission, QUI\Interfaces\Users\User $User = null): void
+    public function checkPermission(string $permission, null | QUI\Interfaces\Users\User $User = null): void
     {
     }
 
